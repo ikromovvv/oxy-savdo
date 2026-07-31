@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html {
+  background: #0a0a0b;
+}
+
+body {
+  background: transparent;
+  color: #f3f3f5;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #c8ff2e;
+  color: #0a0a0b;
+}
+
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-site px-5 sm:px-8;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium tracking-wide transition;
+  }
+  .btn-primary {
+    @apply btn bg-white text-ink hover:bg-accent;
+  }
+  .btn-ghost {
+    @apply btn border border-line text-white/90 hover:border-white/40 hover:text-white;
+  }
+  .card {
+    @apply rounded-2xl border border-line bg-panel;
+  }
+  .h-display {
+    @apply text-4xl font-semibold tracking-tight sm:text-6xl;
+  }
+  .label {
+    @apply text-[11px] uppercase tracking-[0.2em] text-muted;
+  }
+}
+
+/* Butun ekranni qoplaydigan kvadrat to'r (fon) */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: center top;
+}
+
+/* Chetlarga qarab so'nishi uchun */
+.grid-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 60% at 50% 0%, transparent 20%, rgba(10, 10, 11, 0.75) 75%, #0a0a0b 100%);
+}
+
+.grid-fade {
+  background-image: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.07), transparent 65%);
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
