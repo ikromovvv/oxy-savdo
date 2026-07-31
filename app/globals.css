@@ -26,7 +26,7 @@ body {
     @apply mx-auto w-full max-w-site px-5 sm:px-8;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium tracking-wide transition;
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium tracking-wide transition-all duration-300 ease-out;
   }
   .btn-primary {
     @apply btn bg-white text-ink hover:bg-accent;
@@ -35,7 +35,7 @@ body {
     @apply btn border border-line text-white/90 hover:border-white/40 hover:text-white;
   }
   .card {
-    @apply rounded-2xl border border-line bg-panel;
+    @apply rounded-2xl border border-line bg-panel transition-colors duration-300 ease-out;
   }
   .h-display {
     @apply text-4xl font-semibold tracking-tight sm:text-6xl;

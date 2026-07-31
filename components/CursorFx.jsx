@@ -39,6 +39,8 @@ export default function CursorFx() {
     const onMove = (e) => {
       if (!shown) {
         shown = true;
+        // birinchi harakatda darhol shu joyga qo'yamiz (0,0 dan uchib kelmasin)
+        gsap.set(els, { x: e.clientX, y: e.clientY });
         gsap.to(els, { opacity: 1, duration: 0.3 });
       }
       move.dotX(e.clientX);

@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { useStore } from '@/components/StoreProvider';
 import ProductCard, { ProductMedia } from '@/components/ProductCard';
 import Reveal from '@/components/Reveal';
+import Magnetic from '@/components/Magnetic';
 import { products, categories, formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
 
@@ -60,8 +61,12 @@ export default function Home() {
           <h1 className="hero-title h-display mt-5 max-w-3xl">{t('hero_title')}</h1>
           <p className="hero-lead mt-5 max-w-xl text-base text-muted">{t('hero_text')}</p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
-            <Link href="/katalog/skins" className="hero-btn btn-primary">{t('hero_cta')}</Link>
-            <a href={site.telegram} className="hero-btn btn-ghost">{t('hero_cta2')}</a>
+            <Magnetic strength={0.4} scale={1.05}>
+              <Link href="/katalog/skins" className="hero-btn btn-primary">{t('hero_cta')}</Link>
+            </Magnetic>
+            <Magnetic strength={0.4} scale={1.05}>
+              <a href={site.telegram} className="hero-btn btn-ghost">{t('hero_cta2')}</a>
+            </Magnetic>
           </div>
         </div>
       </section>
@@ -70,14 +75,17 @@ export default function Home() {
       <section className="py-14">
         <Reveal stagger className="container-site grid gap-4 sm:grid-cols-3">
           {categories.map((c) => (
-            <Link
-              key={c.slug}
-              href={`/katalog/${c.slug}`}
-              className="card group flex items-center justify-between p-6 transition hover:border-white/30"
-            >
-              <span className="text-lg font-medium">{c[lang]}</span>
-              <span className="text-muted transition group-hover:translate-x-1 group-hover:text-accent">→</span>
-            </Link>
+            <Magnetic key={c.slug} strength={0.16} scale={1.02}>
+              <Link
+                href={`/katalog/${c.slug}`}
+                className="card group flex items-center justify-between p-6 transition-colors duration-300 hover:border-white/30"
+              >
+                <span className="text-lg font-medium">{c[lang]}</span>
+                <span className="text-muted transition-all duration-300 group-hover:translate-x-1.5 group-hover:text-accent">
+                  →
+                </span>
+              </Link>
+            </Magnetic>
           ))}
         </Reveal>
       </section>
