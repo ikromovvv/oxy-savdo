@@ -16,7 +16,7 @@ export default function CatalogPage({ params }) {
     <section className="container-site py-14">
       <Reveal>
         <span className="label">OXY / {cat.slug}</span>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight">{cat[lang]}</h1>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{cat[lang]}</h1>
       </Reveal>
 
       <Reveal stagger className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

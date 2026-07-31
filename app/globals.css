@@ -13,6 +13,7 @@ html {
 body {
   background: transparent;
   color: #f3f3f5;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -38,7 +39,7 @@ body {
     @apply rounded-2xl border border-line bg-panel transition-colors duration-300 ease-out;
   }
   .h-display {
-    @apply text-4xl font-semibold tracking-tight sm:text-6xl;
+    @apply text-[2rem] font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl;
   }
   .label {
     @apply text-[11px] uppercase tracking-[0.2em] text-muted;

@@ -52,7 +52,16 @@ export default function ProductPage({ params }) {
               </dl>
             </div>
 
-            <div className="text-2xl font-semibold">{formatPrice(product.price * qty)}</div>
+            <div>
+              {/* asosiy narx — bitta dona uchun, o'zgarmaydi */}
+              <div className="text-2xl font-semibold">{formatPrice(product.price)}</div>
+              {qty > 1 && (
+                <span className="mt-1 block text-sm text-muted">
+                  {qty} × {formatPrice(product.price)} ={' '}
+                  <span className="text-white/90">{formatPrice(product.price * qty)}</span>
+                </span>
+              )}
+            </div>
 
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2 rounded-full border border-line px-2 py-1.5">

@@ -11,7 +11,7 @@ export default function CarePage() {
     <section className="container-site max-w-3xl py-16">
       <Reveal>
         <span className="label">OXY / care</span>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight">{t('care_title')}</h1>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{t('care_title')}</h1>
       </Reveal>
 
       <Reveal as="ol" stagger className="mt-10 space-y-4">

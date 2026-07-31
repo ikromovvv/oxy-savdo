@@ -37,6 +37,8 @@ export default function Gallery({ product }) {
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
+    // kichik ekranlarda og'ir animatsiya kerak emas
+    if (window.innerWidth < 768) return;
 
     const rect = box.getBoundingClientRect();
     const vw = window.innerWidth;

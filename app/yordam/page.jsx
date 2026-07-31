@@ -79,7 +79,7 @@ export default function SupportPage() {
     <section className="container-site max-w-3xl py-16">
       <Reveal>
         <span className="label">OXY / support</span>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight">{t('support_title')}</h1>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{t('support_title')}</h1>
         <p className="mt-4 text-muted">{c.intro}</p>
       </Reveal>
 
