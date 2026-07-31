@@ -36,12 +36,18 @@ export default function ProductCard({ product }) {
   const mediaRef = useRef(null);
   const btnRef = useRef(null);
 
+  // touch qurilmalarda hover effekti kerak emas
+  const fine = () =>
+    typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;
+
   const onEnter = () => {
+    if (!fine()) return;
     gsap.to(mediaRef.current, { scale: 1.06, duration: 0.6, ease: 'power3.out' });
     gsap.to(cardRef.current, { y: -6, duration: 0.45, ease: 'power3.out' });
   };
 
   const onLeave = () => {
+    if (!fine()) return;
     gsap.to(mediaRef.current, { scale: 1, duration: 0.6, ease: 'power3.out' });
     gsap.to(cardRef.current, { y: 0, duration: 0.45, ease: 'power3.out' });
   };

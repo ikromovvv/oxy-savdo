@@ -8,12 +8,16 @@
 
 html {
   background: #0a0a0b;
+  /* gorizontal scroll chiqmasin (clip — sticky header'ni buzmaydi) */
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 body {
   background: transparent;
   color: #f3f3f5;
-  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
   -webkit-font-smoothing: antialiased;
 }
 
