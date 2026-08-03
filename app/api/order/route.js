@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 export async function POST(req) {
   try {
     const data = await req.json();
-    const { name, phone, tg, note, items = [], total = 0 } = data;
+    const { name, phone, tg, note, items = [], total = 0, steam } = data;
 
     if (!name || !phone || items.length === 0) {
       return NextResponse.json({ ok: false, error: 'invalid' }, { status: 400 });
@@ -19,6 +19,7 @@ export async function POST(req) {
       `🛒 Yangi buyurtma\n\n` +
       `👤 ${name}\n📞 ${phone}\n` +
       (tg ? `✈️ ${tg}\n` : '') +
+      (steam?.profileUrl ? `🎮 Steam: ${steam.name} — ${steam.profileUrl}\n` : '') +
       (note ? `📝 ${note}\n` : '') +
       `\n${lines}\n\n💰 Jami: ${total} so'm`;
 

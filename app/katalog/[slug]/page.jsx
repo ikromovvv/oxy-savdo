@@ -1,6 +1,6 @@
 'use client';
 
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
 import Reveal from '@/components/Reveal';
 import { useStore } from '@/components/StoreProvider';
@@ -8,6 +8,13 @@ import { byCategory, categories } from '@/lib/products';
 
 export default function CatalogPage({ params }) {
   const { lang } = useStore();
+
+  // Skinlar endi alohida katalog sahifasida emas — Steam orqali kirgach,
+  // bosh sahifaning o'zi skinlar katalogiga aylanadi
+  if (params.slug === 'skins') {
+    redirect('/');
+  }
+
   const cat = categories.find((c) => c.slug === params.slug);
   if (!cat) notFound();
   const items = byCategory(params.slug);

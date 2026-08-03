@@ -8,17 +8,38 @@ const StoreCtx = createContext(null);
 export function StoreProvider({ children }) {
   const [lang, setLang] = useState('uz');
   const [items, setItems] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [ready, setReady] = useState(false);
+  const [user, setUser] = useState(null);
+  const [userLoading, setUserLoading] = useState(true);
 
   useEffect(() => {
     try {
       const l = localStorage.getItem('oxy_lang');
       const c = localStorage.getItem('oxy_cart');
+      const f = localStorage.getItem('oxy_favorites');
       if (l) setLang(l);
       if (c) setItems(JSON.parse(c));
+      if (f) {
+        const parsed = JSON.parse(f);
+        // eski versiyada favorites shunchaki id string massivi edi —
+        // moslashtirib olamiz
+        setFavorites(
+          Array.isArray(parsed) ? parsed.map((x) => (typeof x === 'string' ? { id: x } : x)) : []
+        );
+      }
     } catch (e) {}
     setReady(true);
+  }, []);
+
+  // Steam orqali kirilgan bo'lsa, sessiyani serverdan olib kelamiz
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((r) => r.json())
+      .then((d) => setUser(d.loggedIn ? d : null))
+      .catch(() => setUser(null))
+      .finally(() => setUserLoading(false));
   }, []);
 
   useEffect(() => {
@@ -26,8 +47,9 @@ export function StoreProvider({ children }) {
     try {
       localStorage.setItem('oxy_lang', lang);
       localStorage.setItem('oxy_cart', JSON.stringify(items));
+      localStorage.setItem('oxy_favorites', JSON.stringify(favorites));
     } catch (e) {}
-  }, [lang, items, ready]);
+  }, [lang, items, favorites, ready]);
 
   const value = useMemo(() => {
     const add = (product, qty = 1) =>
@@ -57,8 +79,32 @@ export function StoreProvider({ children }) {
       total: items.reduce((s, x) => s + x.qty * x.price, 0),
       cartOpen,
       setCartOpen,
+      user,
+      userLoading,
+      favorites,
+      isFavorite: (id) => favorites.some((f) => f.id === id),
+      // to'liq mahsulot obyektini yuboring — shunda "saqlangan" sahifasida
+      // qayta so'rovsiz ko'rsatish mumkin (skinlar endi statik ro'yxatda emas)
+      toggleFavorite: (product) =>
+        setFavorites((prev) =>
+          prev.some((f) => f.id === product.id)
+            ? prev.filter((f) => f.id !== product.id)
+            : [
+                ...prev,
+                {
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  image: product.image || '',
+                  tone: product.tone || '',
+                  weaponType: product.weaponType || null,
+                  wear: product.wear || null,
+                },
+              ]
+        ),
+      favoritesCount: favorites.length,
     };
-  }, [lang, items, cartOpen]);
+  }, [lang, items, cartOpen, user, userLoading, favorites]);
 
   return <StoreCtx.Provider value={value}>{children}</StoreCtx.Provider>;
 }

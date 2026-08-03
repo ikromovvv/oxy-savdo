@@ -41,6 +41,27 @@ TELEGRAM_CHAT_ID=123456789
 Bot token — @BotFather dan, chat id — @userinfobot dan olinadi.
 Env to'ldirilmasa buyurtma faqat konsolga yoziladi (sayt ishlayveradi).
 
+### Steam orqali kirish
+
+Saytda "Steam orqali kirish" tugmasi bor (lis-skins kabi). Steam OAuth emas, OpenID
+ishlatadi — tashqi kutubxona shart emas. Ishlashi uchun `.env.local` ga qo'shing:
+
+```
+STEAM_API_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+SESSION_SECRET=istalgan_uzun_tasodifiy_matn
+```
+
+- `STEAM_API_KEY` — https://steamcommunity.com/dev/apikey dan bepul olinadi (domain
+  sifatida lokal test uchun `localhost` yozsa ham bo'ladi). Foydalanuvchining ismi va
+  avatarini olish uchun kerak; bo'lmasa ham login ishlaydi, faqat ism "Steam 1234"
+  ko'rinishida chiqadi.
+- `SESSION_SECRET` — sessiya cookie'sini imzolash uchun, o'zingiz istalgan uzun matn
+  yozing (masalan parol generatordan).
+
+Ishlash tartibi: foydalanuvchi tugmani bosadi → Steam sahifasiga o'tadi → tasdiqlaydi →
+saytga qaytadi va ismi/avatari header'da chiqadi. Sessiya 30 kun saqlanadi
+(`oxy_session` nomli httpOnly cookie).
+
 ## Animatsiya
 
 - **GSAP + ScrollTrigger** — hero timeline, scroll bo'yicha karta va bloklar stagger bilan chiqadi

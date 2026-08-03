@@ -6,8 +6,15 @@ import gsap from 'gsap';
 import { useStore } from './StoreProvider';
 import { formatPrice } from '@/lib/products';
 
+const STEAM_IMAGE_RE = /steamstatic\.com\/economy\/image\//;
+
 export function ProductMedia({ product, className = '', innerRef, src }) {
-  const image = src || product.image;
+  const rawImage = src || product.image || '';
+  // Steam CDN rasmlari — bular kichik/shaffof hoshiyali icon bo'lgani uchun
+  // kattaroq o'lchamda so'raymiz va kartada zoom qilib ko'rsatamiz
+  const isSteamImage = STEAM_IMAGE_RE.test(rawImage) && !/\/\d+fx\d+f$/.test(rawImage);
+  const image = isSteamImage ? `${rawImage}/512fx512f` : rawImage;
+
   return (
     <div className={`product-media relative overflow-hidden ${className}`}>
       <div
@@ -16,7 +23,16 @@ export function ProductMedia({ product, className = '', innerRef, src }) {
       >
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={image} alt={product.name} className="h-full w-full object-cover" />
+          <img
+            src={image}
+            alt={product.name}
+            draggable={false}
+            className={
+              isSteamImage
+                ? 'h-full w-full scale-[1.35] object-contain p-2'
+                : 'h-full w-full object-cover'
+            }
+          />
         ) : (
           <div className="grid h-full w-full place-items-center">
             <span className="px-6 text-center text-xl font-semibold tracking-tight text-white/85">
@@ -75,24 +91,22 @@ export default function ProductCard({ product }) {
       onMouseLeave={onLeave}
       className="card flex flex-col overflow-hidden p-3 transition-colors hover:border-white/25"
     >
-      <Link href={`/mahsulot/${product.id}`}>
+      <Link href={`/mahsulot/${product.id}`} className="relative block">
+        {product.badge && (
+          <span className="absolute left-2 top-2 z-10 rounded-full border border-line bg-ink/80 px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted backdrop-blur">
+            {product.badge[lang]}
+          </span>
+        )}
         <ProductMedia product={product} innerRef={mediaRef} className="aspect-[4/3] rounded-xl" />
       </Link>
 
       <div className="flex flex-1 flex-col p-3">
-        <div className="flex items-start justify-between gap-3">
-          <Link
-            href={`/mahsulot/${product.id}`}
-            className="text-[15px] font-medium leading-snug transition-colors hover:text-accent"
-          >
-            {product.name}
-          </Link>
-          {product.badge && (
-            <span className="shrink-0 rounded-full border border-line px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted">
-              {product.badge[lang]}
-            </span>
-          )}
-        </div>
+        <Link
+          href={`/mahsulot/${product.id}`}
+          className="text-[15px] font-medium leading-snug transition-colors hover:text-accent"
+        >
+          {product.name}
+        </Link>
 
         <p className="mt-2 line-clamp-2 text-sm text-muted">{product.short[lang]}</p>
 

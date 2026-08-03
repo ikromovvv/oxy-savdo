@@ -7,12 +7,18 @@ import { formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
 
 export default function CartDrawer() {
-  const { t, items, remove, setQty, total, cartOpen, setCartOpen, clear } = useStore();
+  const { t, items, remove, setQty, total, cartOpen, setCartOpen, clear, user } = useStore();
   const [step, setStep] = useState('cart'); // cart | form | ok | err
   const [form, setForm] = useState({ name: '', phone: '', tg: '', note: '' });
   const [sending, setSending] = useState(false);
   const panelRef = useRef(null);
   const overlayRef = useRef(null);
+
+  // Steam bilan kirilgan bo'lsa, ism maydoni avtomatik to'ldiriladi (o'zgartirsa bo'ladi)
+  useEffect(() => {
+    if (user?.name && !form.name) setForm((f) => ({ ...f, name: user.name }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // ochilganda sirg'alib chiqadi
   useLayoutEffect(() => {
@@ -46,7 +52,12 @@ export default function CartDrawer() {
       const res = await fetch('/api/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, items, total }),
+        body: JSON.stringify({
+          ...form,
+          items,
+          total,
+          steam: user ? { steamid: user.steamid, name: user.name, profileUrl: user.profileUrl } : null,
+        }),
       });
       if (!res.ok) throw new Error('failed');
       clear();
@@ -127,6 +138,22 @@ export default function CartDrawer() {
 
         {step === 'form' && (
           <form onSubmit={submit} className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-5">
+            {user && (
+              <div className="mb-1 flex items-center gap-2 rounded-xl border border-line bg-panel px-3 py-2">
+                {user.avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={user.avatar} alt={user.name} className="h-8 w-8 rounded-full" />
+                ) : (
+                  <span className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-xs font-semibold">
+                    {user.name?.[0]?.toUpperCase() || 'S'}
+                  </span>
+                )}
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium">{user.name}</div>
+                  <div className="text-[11px] text-muted">Steam</div>
+                </div>
+              </div>
+            )}
             <Field label={t('name_label')} value={form.name} required
               onChange={(v) => setForm({ ...form, name: v })} />
             <Field label={t('phone_label')} value={form.phone} required type="tel"

@@ -7,11 +7,12 @@ import { useStore } from '@/components/StoreProvider';
 import ProductCard, { ProductMedia } from '@/components/ProductCard';
 import Reveal from '@/components/Reveal';
 import Magnetic from '@/components/Magnetic';
+import BuyCatalogHome from '@/components/BuyCatalogHome';
 import { products, categories, formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
 
 export default function Home() {
-  const { t, lang, add } = useStore();
+  const { t, lang, add, user } = useStore();
   const heroRef = useRef(null);
   const featured = products.find((p) => p.featured) || products[0];
   const skins = products.filter((p) => p.category === 'skins').slice(0, 4);
@@ -52,6 +53,11 @@ export default function Home() {
     };
   }, []);
 
+  // Steam orqali kirilgan bo'lsa, bosh sahifa "skin sotib olish" katalogiga almashadi
+  if (user) {
+    return <BuyCatalogHome />;
+  }
+
   return (
     <>
       {/* HERO */}
@@ -62,7 +68,7 @@ export default function Home() {
           <p className="hero-lead mt-5 max-w-xl text-base text-muted">{t('hero_text')}</p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
             <Magnetic strength={0.4} scale={1.05}>
-              <Link href="/katalog/skins" className="hero-btn btn-primary">{t('hero_cta')}</Link>
+              <Link href="/katalog/kovriklar" className="hero-btn btn-primary">{t('hero_cta')}</Link>
             </Magnetic>
             <Magnetic strength={0.4} scale={1.05}>
               <a href={site.telegram} className="hero-btn btn-ghost">{t('hero_cta2')}</a>
