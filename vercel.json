@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/fulfill/run",
-      "schedule": "* * * * *"
+      "schedule": "0 3 * * *"
     }
   ]
 }
