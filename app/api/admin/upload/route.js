@@ -7,9 +7,10 @@ import { kvEnabled, kvSet } from '@/lib/kv';
 
 export const dynamic = 'force-dynamic';
 
-// KV rejimida (Vercel) rasm bazaga base64 sifatida yoziladi -> 1 MB REST limiti.
-// Lokalda public/products/ ga fayl sifatida yoziladi -> cheklov yumshoqroq.
-const MAX_KV = 900 * 1024; // ~900 KB xom
+// KV rejimida (Vercel) rasm bazaga base64 sifatida yoziladi. Upstash REST
+// so'rov limiti ~1 MB, base64 hajmni ~33% oshiradi -> xom fayl 680 KB dan
+// oshmasligi kerak.
+const MAX_KV = 680 * 1024;
 const MAX_LOCAL = 6 * 1024 * 1024; // 6 MB
 
 const EXT = {
@@ -47,13 +48,21 @@ export async function POST(req) {
       return NextResponse.json(
         {
           error:
-            'Rasm juda katta (max ~900 KB). Rasmni siqing yoki tashqi havola (URL) kiriting.',
+            'Rasm juda katta (max ~650 KB). Rasmni siqing yoki tashqi havola (URL) kiriting.',
         },
         { status: 413 }
       );
     }
-    const dataUri = `data:${type};base64,${buf.toString('base64')}`;
-    await kvSet(`oxy:img:${id}`, dataUri);
+    try {
+      const dataUri = `data:${type};base64,${buf.toString('base64')}`;
+      await kvSet(`oxy:img:${id}`, dataUri);
+    } catch (e) {
+      console.error('[api/admin/upload] KV xato:', e.message);
+      return NextResponse.json(
+        { error: 'Rasmni saqlab bo\'lmadi. Tashqi havola (URL) kiriting.' },
+        { status: 502 }
+      );
+    }
     return NextResponse.json({ url: `/api/img/${id}` });
   }
 
