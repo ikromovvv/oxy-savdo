@@ -60,7 +60,18 @@ export function StoreProvider({ children }) {
           next[i] = { ...next[i], qty: next[i].qty + qty };
           return next;
         }
-        return [...prev, { id: product.id, name: product.name, price: product.price, qty }];
+        const isSkin = product.category === 'skins';
+        return [
+          ...prev,
+          {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            qty,
+            kind: isSkin ? 'skin' : 'product',
+            marketHashName: isSkin ? product.fullName || product.name : undefined,
+          },
+        ];
       });
 
     return {

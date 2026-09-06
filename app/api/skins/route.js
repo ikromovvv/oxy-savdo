@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { queryCatalog } from '@/lib/lisSkinsFeed';
-import { getSkinImages } from '@/lib/skinImages';
+import { getSkinMeta } from '@/lib/skinImages';
 
 // Skinlar katalogini LIS-SKINS'ning ochiq narxlar eksportidan olib,
 // filtr/qidiruv/saralash/sahifalash bilan qaytaradi. Rasm — CSGO-API orqali
@@ -22,16 +22,26 @@ export async function GET(request) {
   try {
     const { total, items, weaponTypes } = await queryCatalog(filters);
 
-    let images = {};
+    let meta = {};
     try {
-      images = await getSkinImages(items.map((p) => p.name));
+      meta = await getSkinMeta(items.map((p) => p.name));
     } catch (e) {
-      // rasm topilmasa ham katalogni ko'rsataveramiz
+      // metama'lumot topilmasa ham katalogni ko'rsataveramiz
     }
 
-    const withImages = items.map((p) => ({ ...p, image: images[p.name] || '' }));
+    const enriched = items.map((p) => {
+      const m = meta[p.name] || {};
+      return {
+        ...p,
+        image: m.image || p.image || '',
+        rarity: m.rarity || null,
+        rarityColor: m.rarityColor || null,
+        minFloat: m.minFloat ?? null,
+        maxFloat: m.maxFloat ?? null,
+      };
+    });
 
-    return NextResponse.json({ total, items: withImages, weaponTypes });
+    return NextResponse.json({ total, items: enriched, weaponTypes });
   } catch (e) {
     console.error('[api/skins] xato:', e?.code || e?.message || e, e?.status ? `HTTP ${e.status}` : '', e?.stack || '');
     return NextResponse.json(

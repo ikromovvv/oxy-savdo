@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server';
 import { getSkinById, getRelatedSkins } from '@/lib/lisSkinsFeed';
-import { getSkinImages } from '@/lib/skinImages';
+import { getSkinMeta } from '@/lib/skinImages';
+
+function withMeta(p, meta) {
+  const m = meta[p.name] || {};
+  return {
+    ...p,
+    image: m.image || p.image || '',
+    rarity: m.rarity || null,
+    rarityColor: m.rarityColor || null,
+    minFloat: m.minFloat ?? null,
+    maxFloat: m.maxFloat ?? null,
+  };
+}
 
 // Bitta skinni id (slug) bo'yicha, o'xshash skinlar bilan birga qaytaradi.
 // Mahsulot sahifasi (/mahsulot/[id]) statik ro'yxatda topilmasa shu yerga murojaat qiladi.
@@ -14,15 +26,15 @@ export async function GET(request, { params }) {
     const related = await getRelatedSkins(item.id, item.weaponType, 4);
     const names = [item.name, ...related.map((r) => r.name)];
 
-    let images = {};
+    let meta = {};
     try {
-      images = await getSkinImages(names);
+      meta = await getSkinMeta(names);
     } catch (e) {}
 
-    const withImages = { ...item, image: images[item.name] || '' };
-    const relatedWithImages = related.map((r) => ({ ...r, image: images[r.name] || '' }));
-
-    return NextResponse.json({ item: withImages, related: relatedWithImages });
+    return NextResponse.json({
+      item: withMeta(item, meta),
+      related: related.map((r) => withMeta(r, meta)),
+    });
   } catch (e) {
     console.error('[api/skins/[id]] xato:', e?.code || e?.message || e);
     return NextResponse.json(

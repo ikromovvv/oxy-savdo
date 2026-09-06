@@ -9,31 +9,56 @@ import SkinCard from '@/components/SkinCard';
 import Gallery from '@/components/Gallery';
 import Reveal from '@/components/Reveal';
 import SteamLoginGate from '@/components/SteamLoginGate';
-import { getProduct, products, formatPrice, weaponTypes } from '@/lib/products';
+import { formatPrice, weaponTypes } from '@/lib/products';
+import { rarityInfo } from '@/lib/skinMeta';
 
-// Kovrik/aksessuar bo'lsa statik ro'yxatdan, skin bo'lsa (statik ro'yxatda
-// yo'q — LIS-SKINS'dan real vaqtda) /api/skins/[id] orqali olamiz.
+// Kovrik/aksessuar bo'lsa /api/products/[id] dan (admin panel boshqaradi),
+// skin bo'lsa /api/skins/[id] dan (LIS-SKINS'dan real vaqtda) olamiz.
 export default function ProductPage({ params }) {
   const { t, lang, add, setCartOpen, user, userLoading } = useStore();
   const [qty, setQty] = useState(1);
 
-  const staticProduct = getProduct(params.id);
-  const [product, setProduct] = useState(staticProduct || null);
-  const [related, setRelated] = useState(
-    staticProduct ? products.filter((p) => p.category === staticProduct.category && p.id !== staticProduct.id).slice(0, 3) : []
-  );
-  const [loading, setLoading] = useState(!staticProduct);
+  const [product, setProduct] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    if (staticProduct) return;
     let alive = true;
     setLoading(true);
     setFailed(false);
+    setProduct(null);
+    setRelated([]);
 
-    fetch(`/api/skins/${params.id}`)
-      .then((r) => r.json())
-      .then((d) => {
+    (async () => {
+      // 1) kovrik / aksessuar
+      try {
+        const r = await fetch(`/api/products/${params.id}`, { cache: 'no-store' });
+        if (r.ok) {
+          const d = await r.json();
+          if (d.item && alive) {
+            setProduct(d.item);
+            try {
+              const lr = await fetch(`/api/products?category=${d.item.category}`, {
+                cache: 'no-store',
+              });
+              const ld = await lr.json();
+              if (alive) {
+                setRelated(
+                  (ld.items || []).filter((p) => p.id !== d.item.id).slice(0, 3)
+                );
+              }
+            } catch {}
+            if (alive) setLoading(false);
+            return;
+          }
+        }
+      } catch {}
+
+      // 2) skin
+      try {
+        const r = await fetch(`/api/skins/${params.id}`);
+        const d = await r.json();
         if (!alive) return;
         if (d.item) {
           setProduct(d.item);
@@ -41,14 +66,16 @@ export default function ProductPage({ params }) {
         } else {
           setFailed(true);
         }
-      })
-      .catch(() => alive && setFailed(true))
-      .finally(() => alive && setLoading(false));
+      } catch {
+        if (alive) setFailed(true);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
 
     return () => {
       alive = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   if (loading) {
@@ -109,6 +136,21 @@ export default function ProductPage({ params }) {
               <dl className="mt-4 divide-y divide-line">
                 {isSkin ? (
                   <>
+                    {(() => {
+                      const r = rarityInfo(product);
+                      return (
+                        <div className="flex items-center justify-between py-2.5 text-sm">
+                          <dt className="text-muted">Rariteti</dt>
+                          <dd className="flex items-center gap-1.5">
+                            <span
+                              className="h-2 w-2 rounded-full"
+                              style={{ backgroundColor: r.color }}
+                            />
+                            {r.label}
+                          </dd>
+                        </div>
+                      );
+                    })()}
                     <div className="flex justify-between py-2.5 text-sm">
                       <dt className="text-muted">{t('catalog_wear')}</dt>
                       <dd>{product.wear || '—'}</dd>

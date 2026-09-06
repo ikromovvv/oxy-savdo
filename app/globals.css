@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'Manrope', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 html {
-  background: #0a0a0b;
+  background: #080b0d;
   /* gorizontal scroll chiqmasin (clip — sticky header'ni buzmaydi) */
   overflow-x: clip;
   max-width: 100%;
@@ -22,8 +22,8 @@ body {
 }
 
 ::selection {
-  background: #c8ff2e;
-  color: #0a0a0b;
+  background: #c6ff00;
+  color: #080b0d;
 }
 
 @layer components {
@@ -31,19 +31,23 @@ body {
     @apply mx-auto w-full max-w-site px-5 sm:px-8;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium tracking-wide transition-all duration-300 ease-out;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold tracking-wide transition-all duration-300 ease-out;
   }
   .btn-primary {
-    @apply btn bg-white text-ink hover:bg-accent;
+    @apply btn bg-white text-ink hover:bg-accent hover:shadow-[0_8px_30px_rgba(198,255,0,0.25)];
   }
   .btn-ghost {
-    @apply btn border border-line text-white/90 hover:border-white/40 hover:text-white;
+    @apply btn border border-line bg-panel/60 text-white/90 hover:border-white/40 hover:text-white;
   }
   .card {
     @apply rounded-2xl border border-line bg-panel transition-colors duration-300 ease-out;
   }
+  /* Spec: hoverda yuqoriga 4px, accent border, yumshoq shadow */
+  .card-hover {
+    @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:border-accent/35 hover:shadow-[0_12px_40px_rgba(0,0,0,0.35)];
+  }
   .h-display {
-    @apply text-[2rem] font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl;
+    @apply text-[2.5rem] font-bold leading-[1.12] tracking-tight sm:text-5xl lg:text-[4rem] lg:leading-[1.08];
   }
   .label {
     @apply text-[11px] uppercase tracking-[0.2em] text-muted;
@@ -67,11 +71,24 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 90% 60% at 50% 0%, transparent 20%, rgba(10, 10, 11, 0.75) 75%, #0a0a0b 100%);
+  background: radial-gradient(ellipse 90% 60% at 50% 0%, transparent 20%, rgba(8, 11, 13, 0.75) 75%, #080b0d 100%);
 }
 
 .grid-fade {
   background-image: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.07), transparent 65%);
+}
+
+/* Hero pastidagi yumshoq egri neon-lime porlash (spec 5-bo'lim) */
+.hero-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -60%;
+  width: 120%;
+  height: 100%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(198, 255, 0, 0.16), rgba(198, 255, 0, 0.05) 40%, transparent 70%);
+  filter: blur(20px);
 }
 
 /* Lenis smooth scroll */

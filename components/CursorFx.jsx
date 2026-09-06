@@ -55,7 +55,7 @@ export default function CursorFx() {
       const hot = t instanceof Element && t.closest('a, button, input, textarea, [role="button"]');
       gsap.to(ring.current, {
         scale: hot ? 1.9 : 1,
-        borderColor: hot ? 'rgba(200,255,46,0.9)' : 'rgba(255,255,255,0.35)',
+        borderColor: hot ? 'rgba(198,255,0,0.9)' : 'rgba(255,255,255,0.35)',
         duration: 0.3,
         ease: 'power3.out',
         overwrite: 'auto',
@@ -91,7 +91,7 @@ export default function CursorFx() {
         className="absolute left-0 top-0 h-[320px] w-[320px] rounded-full opacity-0"
         style={{
           background:
-            'radial-gradient(circle, rgba(200,255,46,0.10) 0%, rgba(200,255,46,0.04) 35%, transparent 70%)',
+            'radial-gradient(circle, rgba(198,255,0,0.10) 0%, rgba(198,255,0,0.04) 35%, transparent 70%)',
         }}
       />
       <div

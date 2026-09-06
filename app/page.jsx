@@ -1,22 +1,53 @@
 'use client';
 
 import Link from 'next/link';
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useStore } from '@/components/StoreProvider';
 import ProductCard, { ProductMedia } from '@/components/ProductCard';
 import Reveal from '@/components/Reveal';
 import Magnetic from '@/components/Magnetic';
 import BuyCatalogHome from '@/components/BuyCatalogHome';
-import { products, categories, formatPrice } from '@/lib/products';
+import FeatureCards from '@/components/FeatureCards';
+import { categories, formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
+
+// "Aniqlik. Barqarorlik. Qulaylik." — nuqtalarni neon-lime accent bilan
+function AccentDots({ text }) {
+  const str = String(text).trim();
+  const endsWithDot = str.endsWith('.');
+  const words = str.split('.').map((w) => w.trim()).filter(Boolean);
+  return words.map((w, i) => {
+    const showDot = endsWithDot || i < words.length - 1;
+    return (
+      <span key={i}>
+        {w}
+        {showDot && <span className="text-accent">.</span>}
+        {i < words.length - 1 && ' '}
+      </span>
+    );
+  });
+}
 
 export default function Home() {
   const { t, lang, add, user } = useStore();
   const heroRef = useRef(null);
-  const featured = products.find((p) => p.featured) || products[0];
-  const skins = products.filter((p) => p.category === 'skins').slice(0, 4);
-  const pads = products.filter((p) => p.category === 'kovriklar').slice(0, 3);
+
+  // Kovriklar endi admin panel orqali boshqariladi — real vaqtda olib kelamiz
+  const [pads, setPads] = useState([]);
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/products?category=kovriklar', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => alive && setPads(Array.isArray(d.items) ? d.items : []))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const featured = pads.find((p) => p.featured) || pads[0] || null;
+  const skins = [];
 
   // Hero — sahifa ochilganda
   useLayoutEffect(() => {
@@ -61,11 +92,14 @@ export default function Home() {
   return (
     <>
       {/* HERO */}
-      <section ref={heroRef} className="grid-fade border-b border-line">
-        <div className="container-site flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center py-24 text-center">
+      <section ref={heroRef} className="grid-fade relative overflow-hidden border-b border-line">
+        <div className="hero-glow" aria-hidden="true" />
+        <div className="container-site relative flex min-h-[86vh] flex-col items-center justify-center py-24 text-center">
           <span className="hero-kicker label">{t('hero_kicker')}</span>
-          <h1 className="hero-title h-display mt-5 max-w-3xl">{t('hero_title')}</h1>
-          <p className="hero-lead mt-5 max-w-xl text-base text-muted">{t('hero_text')}</p>
+          <h1 className="hero-title h-display mt-5 max-w-3xl">
+            <AccentDots text={t('hero_title')} />
+          </h1>
+          <p className="hero-lead mt-5 max-w-xl text-base leading-relaxed text-muted">{t('hero_text')}</p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
             <Magnetic strength={0.4} scale={1.05}>
               <Link href="/katalog/kovriklar" className="hero-btn btn-primary">{t('hero_cta')}</Link>
@@ -77,14 +111,17 @@ export default function Home() {
         </div>
       </section>
 
+      {/* AFZALLIKLAR */}
+      <FeatureCards />
+
       {/* KATEGORIYALAR */}
-      <section className="py-14">
+      <section className="pb-14 pt-4">
         <Reveal stagger className="container-site grid gap-4 sm:grid-cols-3">
           {categories.map((c) => (
             <Magnetic key={c.slug} strength={0.16} scale={1.02}>
               <Link
                 href={`/katalog/${c.slug}`}
-                className="card group flex items-center justify-between p-6 transition-colors duration-300 hover:border-white/30"
+                className="card card-hover group flex items-center justify-between p-6"
               >
                 <span className="text-lg font-medium">{c[lang]}</span>
                 <span className="text-muted transition-all duration-300 group-hover:translate-x-1.5 group-hover:text-accent">
@@ -97,29 +134,33 @@ export default function Home() {
       </section>
 
       {/* FEATURED */}
-      <section className="container-site py-10">
-        <Reveal className="card grid overflow-hidden lg:grid-cols-2">
-          <ProductMedia product={featured} className="min-h-[320px]" />
-          <div className="flex flex-col justify-center gap-5 p-8 sm:p-12">
-            <span className="label">{t('featured')}</span>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{featured.name}</h2>
-            <p className="text-muted">{featured.short[lang]}</p>
-            <div className="flex flex-wrap gap-x-8 gap-y-3 border-y border-line py-5">
-              {featured.specs.map((s) => (
-                <div key={s.v}>
-                  <div className="label">{s[lang]}</div>
-                  <div className="mt-1 text-sm">{s.v}</div>
+      {featured && (
+        <section className="container-site py-10">
+          <Reveal className="card grid overflow-hidden lg:grid-cols-2">
+            <ProductMedia product={featured} className="min-h-[320px]" />
+            <div className="flex flex-col justify-center gap-5 p-8 sm:p-12">
+              <span className="label">{t('featured')}</span>
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{featured.name}</h2>
+              <p className="text-muted">{featured.short?.[lang]}</p>
+              {featured.specs?.length > 0 && (
+                <div className="flex flex-wrap gap-x-8 gap-y-3 border-y border-line py-5">
+                  {featured.specs.map((s) => (
+                    <div key={s.v}>
+                      <div className="label">{s[lang]}</div>
+                      <div className="mt-1 text-sm">{s.v}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+              <div className="flex flex-wrap items-center gap-4">
+                <span className="text-xl font-semibold">{formatPrice(featured.price)}</span>
+                <button onClick={() => add(featured)} className="btn-primary">{t('add_to_cart')}</button>
+                <Link href={`/mahsulot/${featured.id}`} className="btn-ghost">{t('learn_more')}</Link>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <span className="text-xl font-semibold">{formatPrice(featured.price)}</span>
-              <button onClick={() => add(featured)} className="btn-primary">{t('add_to_cart')}</button>
-              <Link href={`/mahsulot/${featured.id}`} className="btn-ghost">{t('learn_more')}</Link>
-            </div>
-          </div>
-        </Reveal>
-      </section>
+          </Reveal>
+        </section>
+      )}
 
       {/* SKINLAR */}
       <Section title={t('nav_skins')} href="/katalog/skins" cta={t('all_products')}>
@@ -131,7 +172,7 @@ export default function Home() {
       {/* KOVRIKLAR */}
       <Section title={t('nav_pads')} href="/katalog/kovriklar" cta={t('all_products')}>
         <Reveal stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {pads.map((p) => <ProductCard key={p.id} product={p} />)}
+          {pads.slice(0, 3).map((p) => <ProductCard key={p.id} product={p} />)}
         </Reveal>
       </Section>
 
@@ -142,7 +183,7 @@ export default function Home() {
         </Reveal>
         <Reveal stagger className="mt-6 grid gap-4 sm:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="card p-7">
+            <div key={i} className="card card-hover p-7">
               <div className="text-sm font-semibold text-accent">0{i}</div>
               <div className="mt-3 text-lg font-medium">{t(`why${i}_t`)}</div>
               <p className="mt-2 text-sm text-muted">{t(`why${i}_d`)}</p>

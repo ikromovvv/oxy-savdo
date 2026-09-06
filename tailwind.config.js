@@ -8,14 +8,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ink: '#0a0a0b',
-        panel: '#111113',
-        line: '#1e1e22',
-        muted: '#8a8a93',
-        accent: '#c8ff2e',
+        ink: '#080B0D',
+        panel: '#121214',
+        line: '#1E1E21',
+        muted: '#8B8B91',
+        accent: '#C6FF00',
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'Manrope', 'system-ui', 'sans-serif'],
+      },
+      borderRadius: {
+        '2xl': '1.125rem', // 18px — spec bo'yicha card radiusi
       },
       maxWidth: {
         site: '1280px',

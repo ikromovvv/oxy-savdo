@@ -4,13 +4,18 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useStore } from './StoreProvider';
 import { formatPrice } from '@/lib/products';
+import { isValidTradeUrl } from '@/lib/steamTrade';
 import { site } from '@/lib/site';
 
 export default function CartDrawer() {
   const { t, items, remove, setQty, total, cartOpen, setCartOpen, clear, user } = useStore();
   const [step, setStep] = useState('cart'); // cart | form | ok | err
-  const [form, setForm] = useState({ name: '', phone: '', tg: '', note: '' });
+  const [form, setForm] = useState({ name: '', phone: '', tg: '', note: '', tradeUrl: '' });
   const [sending, setSending] = useState(false);
+  const [formErr, setFormErr] = useState('');
+  const [okRef, setOkRef] = useState('');
+
+  const hasSkins = items.some((it) => it.kind === 'skin');
   const panelRef = useRef(null);
   const overlayRef = useRef(null);
 
@@ -47,9 +52,16 @@ export default function CartDrawer() {
 
   const submit = async (e) => {
     e.preventDefault();
+    setFormErr('');
+
+    if (hasSkins && !isValidTradeUrl(form.tradeUrl)) {
+      setFormErr(t('trade_url_invalid'));
+      return;
+    }
+
     setSending(true);
     try {
-      const res = await fetch('/api/order', {
+      const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -59,8 +71,16 @@ export default function CartDrawer() {
           steam: user ? { steamid: user.steamid, name: user.name, profileUrl: user.profileUrl } : null,
         }),
       });
-      if (!res.ok) throw new Error('failed');
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) throw new Error(data.error || 'failed');
       clear();
+
+      // to'lov linki bo'lsa — to'lovga yo'naltiramiz
+      if (data.payUrl) {
+        window.location.href = data.payUrl;
+        return;
+      }
+      setOkRef(data.order?.ref || '');
       setStep('ok');
     } catch (err) {
       setStep('err');
@@ -83,6 +103,14 @@ export default function CartDrawer() {
           <div className="flex flex-1 flex-col items-center justify-center gap-2 px-8 text-center">
             <div className="text-2xl font-semibold">{t('ok_title')}</div>
             <p className="text-sm text-muted">{t('ok_text')}</p>
+            {okRef && (
+              <div className="mt-3 rounded-xl border border-line bg-panel px-4 py-2.5">
+                <div className="label">{t('order_ref_label')}</div>
+                <div className="mt-0.5 font-mono text-lg font-semibold tracking-wider text-accent">
+                  {okRef}
+                </div>
+              </div>
+            )}
             <button onClick={close} className="btn-primary mt-4">OK</button>
           </div>
         )}
@@ -160,8 +188,32 @@ export default function CartDrawer() {
               placeholder="+998 90 123 45 67" onChange={(v) => setForm({ ...form, phone: v })} />
             <Field label={t('tg_label')} value={form.tg} placeholder="@username"
               onChange={(v) => setForm({ ...form, tg: v })} />
+
+            {hasSkins && (
+              <label className="block">
+                <span className="label">{t('trade_url_label')} *</span>
+                <input
+                  type="url"
+                  required
+                  value={form.tradeUrl}
+                  placeholder="https://steamcommunity.com/tradeoffer/new/?partner=…&token=…"
+                  onChange={(e) => setForm({ ...form, tradeUrl: e.target.value })}
+                  className="mt-2 w-full rounded-xl border border-line bg-panel px-4 py-3 text-sm outline-none placeholder:text-muted/60 focus:border-accent/60 focus:ring-1 focus:ring-accent/25"
+                />
+                <span className="mt-1.5 block text-[11px] leading-snug text-muted">
+                  {t('trade_url_help')}
+                </span>
+              </label>
+            )}
+
             <Field label={t('note_label')} value={form.note} textarea
               onChange={(v) => setForm({ ...form, note: v })} />
+
+            {formErr && (
+              <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-400">
+                {formErr}
+              </p>
+            )}
 
             <div className="mt-auto pt-4">
               <div className="mb-3 flex items-center justify-between">

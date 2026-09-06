@@ -78,8 +78,8 @@ export default function ProductCard({ product }) {
     );
     gsap.fromTo(
       cardRef.current,
-      { boxShadow: '0 0 0 0 rgba(200,255,46,0.45)' },
-      { boxShadow: '0 0 0 6px rgba(200,255,46,0)', duration: 0.7, ease: 'power2.out' }
+      { boxShadow: '0 0 0 0 rgba(198,255,0,0.45)' },
+      { boxShadow: '0 0 0 6px rgba(198,255,0,0)', duration: 0.7, ease: 'power2.out' }
     );
     setTimeout(() => setDone(false), 1200);
   };
@@ -89,7 +89,7 @@ export default function ProductCard({ product }) {
       ref={cardRef}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
-      className="card flex flex-col overflow-hidden p-3 transition-colors hover:border-white/25"
+      className="card flex flex-col overflow-hidden p-3 transition-colors hover:border-accent/35"
     >
       <Link href={`/mahsulot/${product.id}`} className="relative block">
         {product.badge && (
