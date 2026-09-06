@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { queryCatalog } from '@/lib/lisSkinsFeed';
+import { queryCatalog } from '@/lib/skinportFeed';
 import { getSkinMeta } from '@/lib/skinImages';
 
 // Skinlar katalogini LIS-SKINS'ning ochiq narxlar eksportidan olib,

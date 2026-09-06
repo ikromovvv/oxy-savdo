@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSkinById, getRelatedSkins } from '@/lib/lisSkinsFeed';
+import { getSkinById, getRelatedSkins } from '@/lib/skinportFeed';
 import { getSkinMeta } from '@/lib/skinImages';
 
 function withMeta(p, meta) {
