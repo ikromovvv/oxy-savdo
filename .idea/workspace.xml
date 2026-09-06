@@ -5,20 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a93bf1e1-6380-47f7-b0af-acc37bd441f0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/order/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/order/route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/katalog/[slug]/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/katalog/[slug]/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/mahsulot/[id]/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/mahsulot/[id]/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/CartDrawer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/CartDrawer.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Gallery.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Gallery.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Header.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Header.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ProductCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ProductCard.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/StoreProvider.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/StoreProvider.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/i18n.js" beforeDir="false" afterPath="$PROJECT_DIR$/lib/i18n.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/products.js" beforeDir="false" afterPath="$PROJECT_DIR$/lib/products.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +14,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="57" />
+    <option name="cachedIndexableFilesCount" value="111" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -116,7 +104,12 @@
       <workItem from="1785564276048" duration="4100000" />
       <workItem from="1785606926080" duration="1388000" />
       <workItem from="1785629095338" duration="1581000" />
-      <workItem from="1785729192337" duration="5684000" />
+      <workItem from="1785729192337" duration="7764000" />
+      <workItem from="1785826285761" duration="1648000" />
+      <workItem from="1787991309015" duration="1670000" />
+      <workItem from="1787997352181" duration="2080000" />
+      <workItem from="1788280046902" duration="29000" />
+      <workItem from="1788689232380" duration="3929000" />
     </task>
     <servers />
   </component>

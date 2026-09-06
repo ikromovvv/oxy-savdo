@@ -217,7 +217,7 @@ export default function ProductPage({ params }) {
           <Reveal as="h2" className="mb-6 text-2xl font-semibold tracking-tight">
             {t('all_products')}
           </Reveal>
-          <Reveal stagger className={isSkin ? 'grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4' : 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'}>
+          <Reveal stagger className={isSkin ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3' : 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'}>
             {related.map((p) => (isSkin ? <SkinCard key={p.id} product={p} /> : <ProductCard key={p.id} product={p} />))}
           </Reveal>
         </section>

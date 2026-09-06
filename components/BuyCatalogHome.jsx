@@ -209,7 +209,7 @@ export default function BuyCatalogHome() {
         {/* O'NG: GRID */}
         <div className="min-w-0 flex-1">
           {loading ? (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="card aspect-[3/4] animate-pulse bg-white/5" />
               ))}
@@ -229,7 +229,7 @@ export default function BuyCatalogHome() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                 {items.map((p) => (
                   <SkinCard key={p.id} product={p} />
                 ))}

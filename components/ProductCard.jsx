@@ -13,7 +13,7 @@ export function ProductMedia({ product, className = '', innerRef, src }) {
   // Steam CDN rasmlari — shaffof hoshiyali "icon" bo'lgani uchun kattaroq
   // o'lchamda so'raymiz va kartada TO'LIQ ko'rsatamiz (object-contain).
   const isSteamImage = STEAM_IMAGE_RE.test(rawImage) && !/\/\d+fx\d+f$/.test(rawImage);
-  const image = isSteamImage ? `${rawImage}/360fx360f` : rawImage;
+  const image = isSteamImage ? `${rawImage}/512fx384f` : rawImage;
 
   return (
     <div className={`product-media relative overflow-hidden ${className}`}>
@@ -29,7 +29,7 @@ export function ProductMedia({ product, className = '', innerRef, src }) {
             draggable={false}
             className={
               isSteamImage
-                ? 'h-full w-full scale-105 object-contain p-3'
+                ? 'h-full w-full scale-105 object-contain p-2'
                 : 'h-full w-full object-cover'
             }
           />
