@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import gsap from 'gsap';
 
 /**
@@ -15,6 +16,7 @@ export default function CursorFx() {
   const dot = useRef(null);
   const ring = useRef(null);
   const glow = useRef(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const fine = window.matchMedia('(pointer: fine)').matches;
@@ -83,6 +85,8 @@ export default function CursorFx() {
       gsap.set(els, { clearProps: 'all' });
     };
   }, []);
+
+  if (pathname?.startsWith('/admin')) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[70] hidden md:block" aria-hidden="true">

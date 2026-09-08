@@ -1,13 +1,17 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 
 export default function SmoothScroll() {
+  const pathname = usePathname();
+
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return;
+    // admin panelda smooth-scroll kerak emas (jadval/modal bilan xalaqit beradi)
+    if (reduce || pathname?.startsWith('/admin')) return;
 
     const lenis = new Lenis({
       duration: 1.15,
@@ -28,7 +32,7 @@ export default function SmoothScroll() {
       lenis.destroy();
       delete window.__lenis;
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }

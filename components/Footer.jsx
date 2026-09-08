@@ -1,11 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useStore } from './StoreProvider';
 import { site } from '@/lib/site';
 
 export default function Footer() {
   const { t } = useStore();
+  const pathname = usePathname();
+  if (pathname?.startsWith('/admin')) return null;
 
   return (
     <footer className="mt-24 border-t border-line bg-panel/40">

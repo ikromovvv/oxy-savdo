@@ -2,12 +2,17 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useStore } from './StoreProvider';
 import { site } from '@/lib/site';
 
 export default function Header() {
   const { t, lang, setLang, count, setCartOpen, user, userLoading, favoritesCount } = useStore();
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Admin panelning o'z sharhi bor — sayt header'i ko'rsatilmaydi
+  if (pathname?.startsWith('/admin')) return null;
 
   const links = [
     { href: '/', label: t('nav_skins') },
