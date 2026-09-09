@@ -90,17 +90,20 @@ export default function AdminDashboard({ onGo }) {
               <button
                 key={o.id}
                 onClick={() => onGo?.('orders')}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-white/[0.02]"
+                className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition hover:bg-white/[0.02]"
               >
-                <span className="font-mono text-sm font-semibold tracking-wider">{o.ref}</span>
-                <span className="hidden text-xs text-muted sm:block">{fmtDate(o.createdAt)}</span>
-                <span className="min-w-0 flex-1 truncate text-sm text-muted">
-                  {o.customer?.name} · {o.items?.length} ta
-                </span>
-                <span className="text-sm font-semibold">{formatPrice(o.total || 0)}</span>
-                <span className="rounded-full border border-line px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted">
-                  {STATUS_LABEL[o.status] || o.status}
-                </span>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="whitespace-nowrap font-mono text-sm font-semibold tracking-wider">{o.ref}</span>
+                    <span className="whitespace-nowrap rounded-full border border-line px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-muted">
+                      {STATUS_LABEL[o.status] || o.status}
+                    </span>
+                  </div>
+                  <div className="mt-0.5 truncate text-xs text-muted">
+                    {o.customer?.name} · {o.items?.length} ta · {fmtDate(o.createdAt)}
+                  </div>
+                </div>
+                <span className="flex-none whitespace-nowrap text-sm font-semibold">{formatPrice(o.total || 0)}</span>
               </button>
             ))}
           </div>

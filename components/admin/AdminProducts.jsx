@@ -245,7 +245,7 @@ export default function AdminProducts({ onToast, registerNewAction }) {
                   {!p.featured && !p.badge?.uz && <span className="text-xs text-muted">—</span>}
                 </div>
 
-                <div className="col-start-2 flex items-center justify-end gap-1.5 md:col-start-auto">
+                <div className="col-start-2 mt-1.5 flex items-center gap-1.5 md:col-start-auto md:mt-0 md:justify-end">
                   {confirmId === p.id ? (
                     <>
                       <button onClick={() => doDelete(p.id)} className="rounded-full bg-rose-500/90 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-500">

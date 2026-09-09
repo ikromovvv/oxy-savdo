@@ -167,24 +167,40 @@ export default function AdminOrders() {
                 <div key={o.id}>
                   <button
                     onClick={() => setOpenId(isOpen ? null : o.id)}
-                    className="grid w-full grid-cols-[1fr_36px] items-center gap-3 px-4 py-3 text-left transition hover:bg-white/[0.02] lg:grid-cols-[110px_120px_1fr_130px_120px_36px]"
+                    className="block w-full px-4 py-3 text-left transition hover:bg-white/[0.02]"
                   >
-                    <span className="font-mono text-sm font-semibold tracking-wider">{o.ref}</span>
-                    <span className="hidden text-xs text-muted lg:block">{fmtDate(o.createdAt)}</span>
-                    <span className="hidden min-w-0 truncate text-sm lg:block">
-                      {o.customer?.name} · <span className="text-muted">{o.customer?.phone}</span>
-                    </span>
-                    <span className="hidden text-sm font-semibold lg:block">{formatPrice(o.total || 0)}</span>
-                    <span className="hidden lg:block"><Badge status={o.status} /></span>
-                    <span className={`justify-self-end text-muted transition ${isOpen ? 'rotate-180' : ''}`}>
-                      <Svg d={Icon.chevron} className="h-4 w-4" />
-                    </span>
+                    {/* desktop qator */}
+                    <div className="hidden grid-cols-[110px_120px_1fr_130px_120px_36px] items-center gap-3 lg:grid">
+                      <span className="font-mono text-sm font-semibold tracking-wider">{o.ref}</span>
+                      <span className="text-xs text-muted">{fmtDate(o.createdAt)}</span>
+                      <span className="min-w-0 truncate text-sm">
+                        {o.customer?.name} · <span className="text-muted">{o.customer?.phone}</span>
+                      </span>
+                      <span className="text-sm font-semibold">{formatPrice(o.total || 0)}</span>
+                      <span><Badge status={o.status} /></span>
+                      <span className={`justify-self-end text-muted transition ${isOpen ? 'rotate-180' : ''}`}>
+                        <Svg d={Icon.chevron} className="h-4 w-4" />
+                      </span>
+                    </div>
 
                     {/* mobil qator */}
-                    <span className="col-span-2 -mt-1 flex flex-wrap items-center gap-2 text-xs text-muted lg:hidden">
-                      <Badge status={o.status} />
-                      {fmtDate(o.createdAt)} · {o.customer?.name} · <span className="font-semibold text-white/80">{formatPrice(o.total || 0)}</span>
-                    </span>
+                    <div className="lg:hidden">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-mono text-sm font-semibold tracking-wider">{o.ref}</span>
+                        <span className={`flex-none text-muted transition ${isOpen ? 'rotate-180' : ''}`}>
+                          <Svg d={Icon.chevron} className="h-4 w-4" />
+                        </span>
+                      </div>
+                      <div className="mt-1 flex items-center justify-between gap-2">
+                        <span className="flex min-w-0 items-center gap-2">
+                          <Badge status={o.status} />
+                          <span className="truncate text-xs text-muted">
+                            {fmtDate(o.createdAt)} · {o.customer?.name}
+                          </span>
+                        </span>
+                        <span className="flex-none text-sm font-semibold">{formatPrice(o.total || 0)}</span>
+                      </div>
+                    </div>
                   </button>
 
                   {isOpen && (

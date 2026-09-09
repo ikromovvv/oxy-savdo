@@ -125,12 +125,12 @@ export default function Gallery({ product }) {
       </div>
 
       {list.length > 1 && (
-        <div ref={thumbsRef} className="no-scrollbar flex gap-3 overflow-x-auto">
+        <div ref={thumbsRef} className="grid grid-cols-4 gap-2 sm:gap-3">
           {list.map((src, idx) => (
             <button
               key={src}
               onClick={() => setI(idx)}
-              className={`relative aspect-[4/3] w-24 shrink-0 overflow-hidden rounded-xl border transition ${
+              className={`relative aspect-[4/3] overflow-hidden rounded-xl border transition ${
                 idx === i ? 'border-accent' : 'border-line hover:border-white/35'
               }`}
             >
