@@ -162,15 +162,22 @@ export default function AdminPage() {
         <Sidebar view={view} setView={setView} onLogout={doLogout} />
       </aside>
 
-      {/* mobile drawer */}
-      {drawer && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDrawer(false)} />
-          <aside className="absolute inset-y-0 left-0 w-64 border-r border-line bg-panel">
-            <Sidebar view={view} setView={setView} onLogout={doLogout} onNav={() => setDrawer(false)} />
-          </aside>
-        </div>
-      )}
+      {/* mobile drawer — chapdan sirg'alib chiqadi */}
+      <div className={`fixed inset-0 z-50 md:hidden ${drawer ? '' : 'pointer-events-none'}`} aria-hidden={!drawer}>
+        <div
+          onClick={() => setDrawer(false)}
+          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+            drawer ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+        <aside
+          className={`absolute inset-y-0 left-0 w-64 border-r border-line bg-panel transition-transform duration-300 ease-out ${
+            drawer ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <Sidebar view={view} setView={setView} onLogout={doLogout} onNav={() => setDrawer(false)} />
+        </aside>
+      </div>
 
       <div className="flex min-h-screen flex-col md:pl-60">
         <header className="sticky top-0 z-30 flex h-14 flex-none items-center gap-3 border-b border-line bg-ink/85 px-4 backdrop-blur-xl md:px-8">

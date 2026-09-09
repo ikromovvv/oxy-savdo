@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useStore } from './StoreProvider';
 import { site } from '@/lib/site';
@@ -10,6 +10,25 @@ export default function Header() {
   const { t, lang, setLang, count, setCartOpen, user, userLoading, favoritesCount } = useStore();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+
+  // sahifa almashsa menyu yopiladi
+  useEffect(() => setOpen(false), [pathname]);
+
+  // menyu ochiq bo'lsa orqa fon scroll qilmasin
+  useEffect(() => {
+    const lenis = typeof window !== 'undefined' ? window.__lenis : null;
+    if (open) {
+      document.body.style.overflow = 'hidden';
+      lenis?.stop();
+    } else {
+      document.body.style.overflow = '';
+      lenis?.start();
+    }
+    return () => {
+      document.body.style.overflow = '';
+      lenis?.start();
+    };
+  }, [open]);
 
   // Admin panelning o'z sharhi bor — sayt header'i ko'rsatilmaydi
   if (pathname?.startsWith('/admin')) return null;
@@ -24,6 +43,7 @@ export default function Header() {
   ];
 
   return (
+    <>
     <header className="sticky top-0 z-40 border-b border-line/80 bg-ink/80 backdrop-blur-xl">
       <div className="container-site flex h-16 items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2">
@@ -126,25 +146,48 @@ export default function Header() {
           </button>
 
           <button
-            onClick={() => setOpen((v) => !v)}
-            aria-label="menu"
-            className="rounded-full border border-line p-2 md:hidden"
+            onClick={() => setOpen(true)}
+            aria-label="Menyu"
+            className="grid h-9 w-9 place-items-center rounded-full border border-line md:hidden"
           >
             <span className="block h-[2px] w-4 bg-white" />
             <span className="mt-1 block h-[2px] w-4 bg-white" />
           </button>
         </div>
       </div>
+    </header>
 
-      {open && (
-        <div className="border-t border-line md:hidden">
-          <div className="container-site flex flex-col py-3">
+    {/* ——— mobil menyu: o'ngdan sirg'alib chiqadigan drawer ——— */}
+    <div className={`fixed inset-0 z-[60] md:hidden ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open}>
+        <div
+          onClick={() => setOpen(false)}
+          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+            open ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+        <aside
+          className={`absolute right-0 top-0 flex h-full w-[80%] max-w-xs flex-col border-l border-line bg-ink transition-transform duration-300 ease-out ${
+            open ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <div className="flex h-16 flex-none items-center justify-between border-b border-line px-5">
+            <span className="text-sm font-semibold tracking-[0.25em]">{site.name}</span>
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Yopish"
+              className="grid h-8 w-8 place-items-center rounded-full border border-line text-muted transition hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+
+          <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-4">
             {links.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="py-2.5 text-sm text-white/80"
+                className="rounded-xl px-3 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white"
               >
                 {l.label}
               </Link>
@@ -152,7 +195,7 @@ export default function Header() {
             <Link
               href="/saqlangan"
               onClick={() => setOpen(false)}
-              className="flex items-center justify-between py-2.5 text-sm text-white/80"
+              className="flex items-center justify-between rounded-xl px-3 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white"
             >
               {t('saved_title')}
               {favoritesCount > 0 && (
@@ -161,12 +204,13 @@ export default function Header() {
                 </span>
               )}
             </Link>
-            <div className="mt-2 flex gap-2">
+
+            <div className="mt-3 flex gap-2 px-3">
               {['uz', 'ru'].map((l) => (
                 <button
                   key={l}
                   onClick={() => setLang(l)}
-                  className={`rounded-full border border-line px-4 py-1.5 text-xs uppercase ${
+                  className={`rounded-full border border-line px-4 py-1.5 text-xs uppercase transition ${
                     lang === l ? 'bg-white text-ink' : 'text-muted'
                   }`}
                 >
@@ -174,37 +218,37 @@ export default function Header() {
                 </button>
               ))}
             </div>
+          </nav>
 
-            {!userLoading && (
-              <div className="mt-3 border-t border-line pt-3">
-                {user ? (
-                  <div className="flex items-center gap-2">
-                    {user.avatar ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={user.avatar} alt={user.name} className="h-7 w-7 rounded-full" />
-                    ) : (
-                      <span className="grid h-7 w-7 place-items-center rounded-full bg-white/10 text-xs font-semibold">
-                        {user.name?.[0]?.toUpperCase() || 'S'}
-                      </span>
-                    )}
-                    <span className="flex-1 truncate text-sm text-white/85">{user.name}</span>
-                    <a href="/api/auth/steam/logout" className="text-xs text-muted">
-                      {t('steam_logout')}
-                    </a>
-                  </div>
-                ) : (
-                  <a
-                    href="/api/auth/steam/login"
-                    className="flex items-center justify-center gap-1.5 rounded-full border border-line py-2 text-sm text-white/85"
-                  >
-                    {t('steam_login')}
+          {!userLoading && (
+            <div className="flex-none border-t border-line p-4">
+              {user ? (
+                <div className="flex items-center gap-2">
+                  {user.avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={user.avatar} alt={user.name} className="h-7 w-7 rounded-full" />
+                  ) : (
+                    <span className="grid h-7 w-7 place-items-center rounded-full bg-white/10 text-xs font-semibold">
+                      {user.name?.[0]?.toUpperCase() || 'S'}
+                    </span>
+                  )}
+                  <span className="flex-1 truncate text-sm text-white/85">{user.name}</span>
+                  <a href="/api/auth/steam/logout" className="text-xs text-muted">
+                    {t('steam_logout')}
                   </a>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </header>
+                </div>
+              ) : (
+                <a
+                  href="/api/auth/steam/login"
+                  className="flex items-center justify-center gap-1.5 rounded-full border border-line py-2.5 text-sm text-white/85"
+                >
+                  {t('steam_login')}
+                </a>
+              )}
+            </div>
+          )}
+        </aside>
+    </div>
+    </>
   );
 }
