@@ -21,12 +21,15 @@ export default function ProductPage({ params }) {
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState(false); // haqiqatan topilmadi -> 404
+  const [errored, setErrored] = useState(false); // tarmoq/server xatosi -> qayta urinish
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let alive = true;
     setLoading(true);
     setFailed(false);
+    setErrored(false);
     setProduct(null);
     setRelated([]);
 
@@ -58,16 +61,19 @@ export default function ProductPage({ params }) {
       // 2) skin
       try {
         const r = await fetch(`/api/skins/${params.id}`);
+        if (!r.ok) throw new Error('http');
         const d = await r.json();
         if (!alive) return;
         if (d.item) {
           setProduct(d.item);
           setRelated(d.related || []);
+        } else if (d.error) {
+          setErrored(true); // server xatosi — qayta urinish mumkin
         } else {
-          setFailed(true);
+          setFailed(true); // haqiqatan yo'q — 404
         }
       } catch {
-        if (alive) setFailed(true);
+        if (alive) setErrored(true);
       } finally {
         if (alive) setLoading(false);
       }
@@ -76,7 +82,7 @@ export default function ProductPage({ params }) {
     return () => {
       alive = false;
     };
-  }, [params.id]);
+  }, [params.id, reloadKey]);
 
   if (loading) {
     return (
@@ -88,6 +94,19 @@ export default function ProductPage({ params }) {
             <div className="h-4 w-full animate-pulse rounded bg-white/5" />
             <div className="h-40 animate-pulse rounded bg-white/5" />
           </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (errored && !product) {
+    return (
+      <section className="container-site py-16">
+        <div className="card mx-auto max-w-md p-10 text-center">
+          <p className="text-sm text-muted">Mahsulotni yuklab bo&apos;lmadi.</p>
+          <button onClick={() => setReloadKey((k) => k + 1)} className="btn-ghost mt-4 inline-flex">
+            Qayta urinish
+          </button>
         </div>
       </section>
     );

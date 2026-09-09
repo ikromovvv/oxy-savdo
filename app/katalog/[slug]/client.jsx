@@ -21,21 +21,29 @@ export default function CatalogPage({ params }) {
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let alive = true;
     setLoading(true);
+    setError(false);
     fetch(`/api/products?category=${params.slug}`, { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((d) => {
-        if (alive) setItems(Array.isArray(d.items) ? d.items : []);
+      .then((r) => {
+        if (!r.ok) throw new Error('http');
+        return r.json();
       })
-      .catch(() => alive && setItems([]))
+      .then((d) => {
+        if (!alive) return;
+        if (d.error) throw new Error(d.error);
+        setItems(Array.isArray(d.items) ? d.items : []);
+      })
+      .catch(() => alive && setError(true))
       .finally(() => alive && setLoading(false));
     return () => {
       alive = false;
     };
-  }, [params.slug]);
+  }, [params.slug, reloadKey]);
 
   return (
     <section className="container-site py-14">
@@ -49,6 +57,13 @@ export default function CatalogPage({ params }) {
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="card aspect-[4/3] animate-pulse bg-white/5" />
           ))}
+        </div>
+      ) : error ? (
+        <div className="card mt-10 p-10 text-center">
+          <p className="text-sm text-muted">Mahsulotlarni yuklab bo&apos;lmadi.</p>
+          <button onClick={() => setReloadKey((k) => k + 1)} className="btn-ghost mt-4 inline-flex">
+            Qayta urinish
+          </button>
         </div>
       ) : items.length === 0 ? (
         <div className="card mt-10 p-10 text-center text-sm text-muted">

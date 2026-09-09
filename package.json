@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "node db/migrate.mjs",
-    "test": "node --import ./test/_setup.mjs --test test/payments.test.mjs"
+    "test": "node --import ./test/_setup.mjs --test test/payments.test.mjs test/fulfillment.test.mjs"
   },
   "dependencies": {
     "gsap": "^3.12.5",
