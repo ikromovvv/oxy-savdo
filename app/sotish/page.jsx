@@ -18,6 +18,7 @@ export default function SotishPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [errorDetail, setErrorDetail] = useState(null);
+  const [stale, setStale] = useState(false);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('price_desc');
   const [selected, setSelected] = useState(() => new Set());
@@ -35,6 +36,7 @@ export default function SotishPage() {
     setLoading(true);
     setError(null);
     setErrorDetail(null);
+    setStale(false);
     setSelected(new Set());
     try {
       const res = await fetch('/api/inventory');
@@ -45,6 +47,7 @@ export default function SotishPage() {
         setItems([]);
       } else {
         setItems(data.items || []);
+        setStale(Boolean(data.stale));
       }
     } catch (e) {
       setError('fetch_failed');
@@ -253,6 +256,12 @@ export default function SotishPage() {
           {!loading && !error && filtered.length === 0 && (
             <div className="card p-8 text-center">
               <p className="text-sm text-muted">{t('sell_empty')}</p>
+            </div>
+          )}
+
+          {!loading && !error && stale && (
+            <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-xs text-amber-300">
+              Steam hozir javob bermadi — oxirgi saqlangan inventar ko&apos;rsatilyapti. Yangilash uchun birozdan so&apos;ng qayta urinib ko&apos;ring.
             </div>
           )}
 
