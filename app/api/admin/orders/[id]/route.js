@@ -32,7 +32,7 @@ export async function PATCH(req, { params }) {
   try {
     // maxsus amallar: avtomatik yetkazish / holatni poll qilish
     if (body.action === 'fulfill') {
-      const r = await fulfillOrder(params.id);
+      const r = await fulfillOrder(params.id, { force: Boolean(body.force) });
       const order = await getOrder(params.id);
       return NextResponse.json({ order, result: r });
     }

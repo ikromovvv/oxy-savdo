@@ -10,9 +10,13 @@ export async function GET(req) {
 
   const { searchParams } = new URL(req.url);
   const status = searchParams.get('status') || 'all';
+  const fulfillment = searchParams.get('fulfillment'); // masalan 'error'
 
   try {
-    const items = await listOrders({ status });
+    let items = await listOrders({ status });
+    if (fulfillment) {
+      items = items.filter((o) => (o.fulfillment?.status || 'none') === fulfillment);
+    }
     return NextResponse.json({ items });
   } catch (e) {
     console.error('[api/admin/orders GET]', e.message);

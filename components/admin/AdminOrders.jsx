@@ -140,6 +140,38 @@ export default function AdminOrders() {
     });
   }
 
+  function exportCsv() {
+    const cols = [
+      'Order ID', 'Sana', 'Steam ID', 'Mahsulotlar', 'Summa',
+      'To\'lov provayder', 'To\'lov holati', 'Yetkazish holati', 'Buyurtma holati',
+    ];
+    const esc = (v) => {
+      const s = String(v ?? '');
+      return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const rows = visible.map((o) => [
+      o.ref,
+      new Date(o.createdAt).toISOString(),
+      o.steam?.steamid || '',
+      (o.items || []).map((i) => `${i.name} x${i.qty}`).join(' | '),
+      o.total || 0,
+      o.payment?.provider || '',
+      o.payment?.status || 'none',
+      o.fulfillment?.status || 'none',
+      o.status,
+    ]);
+    const csv = [cols, ...rows].map((r) => r.map(esc).join(',')).join('\r\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `oxy-buyurtmalar-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -156,9 +188,18 @@ export default function AdminOrders() {
             </button>
           ))}
         </div>
-        <button onClick={load} className="btn-ghost px-3 py-1.5 text-xs">
-          <Svg d={Icon.refresh} className="h-3.5 w-3.5" /> Yangilash
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={exportCsv}
+            disabled={visible.length === 0}
+            className="btn-ghost px-3 py-1.5 text-xs disabled:opacity-40"
+          >
+            <Svg d={Icon.download} className="h-3.5 w-3.5" /> CSV
+          </button>
+          <button onClick={load} className="btn-ghost px-3 py-1.5 text-xs">
+            <Svg d={Icon.refresh} className="h-3.5 w-3.5" /> Yangilash
+          </button>
+        </div>
       </div>
 
       {/* qidiruv + filtrlar */}

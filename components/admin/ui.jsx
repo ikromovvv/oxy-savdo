@@ -27,6 +27,8 @@ export const Icon = {
   copy: <path d="M9 9h10v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1Zm-3 6H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1" strokeLinecap="round" strokeLinejoin="round" />,
   play: <path d="M7 4v16l13-8L7 4Z" strokeLinecap="round" strokeLinejoin="round" />,
   wallet: <path d="M3 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Zm14 6h.01" strokeLinecap="round" strokeLinejoin="round" />,
+  warn: <path d="M12 3 2 20h20L12 3Zm0 6v5m0 3h.01" strokeLinecap="round" strokeLinejoin="round" />,
+  download: <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" strokeLinecap="round" strokeLinejoin="round" />,
 };
 
 export function Svg({ d, className = 'h-4 w-4' }) {
