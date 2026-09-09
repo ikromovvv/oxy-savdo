@@ -7,10 +7,43 @@ import SmoothScroll from '@/components/SmoothScroll';
 import ScrollToTop from '@/components/ScrollToTop';
 import CursorFx from '@/components/CursorFx';
 
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://oxy-savdo.vercel.app'
+).replace(/\/+$/, '');
+
 export const metadata = {
-  title: 'OXY SAVDO — skinlar va gaming kovriklar',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'OXY SAVDO — CS2 skinlar va gaming kovriklar',
+    template: '%s · OXY SAVDO',
+  },
   description:
-    "O'yin skinlari va professional gaming kovriklar. Ishonchli savdo, tez yetkazib berish.",
+    "CS2 skinlarini sotib oling va soting, professional gaming kovriklar. UZS'da to'lov (Payme, Click), avtomatik yetkazish.",
+  keywords: [
+    'CS2 skin', 'CS2 skin sotib olish', 'skin savdo', 'gaming kovrik',
+    'mousepad', 'Payme', 'Click', 'OXY SAVDO', 'skin marketplace',
+  ],
+  applicationName: 'OXY SAVDO',
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    siteName: 'OXY SAVDO',
+    locale: 'uz_UZ',
+    url: SITE_URL,
+    title: 'OXY SAVDO — CS2 skinlar va gaming kovriklar',
+    description:
+      "CS2 skinlarini sotib oling va soting. UZS'da to'lov, avtomatik yetkazish.",
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'OXY SAVDO — CS2 skinlar va gaming kovriklar',
+    description: "CS2 skinlarini sotib oling va soting. UZS'da to'lov, avtomatik yetkazish.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
+  },
 };
 
 export default function RootLayout({ children }) {
