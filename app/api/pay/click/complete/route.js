@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { handleClickComplete } from '@/lib/pay/click';
+import { limitOr429 } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,8 @@ async function readParams(req) {
 // Click "Complete URL":
 //   https://<domen>/api/pay/click/complete
 export async function POST(req) {
+  const limited = await limitOr429(req, 'pay-click', { limit: 120, windowSec: 60 });
+  if (limited) return limited;
   try {
     const p = await readParams(req);
     const result = await handleClickComplete(p);

@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createOrder, setPayment } from '@/lib/orderStore';
 import { createPayment } from '@/lib/payments';
+import { limitOr429 } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 
 // POST /api/orders — savatdan yangi buyurtma yaratadi (ochiq)
 export async function POST(req) {
+  const limited = await limitOr429(req, 'orders', { limit: 12, windowSec: 300 });
+  if (limited) return limited;
+
   let body;
   try {
     body = await req.json();

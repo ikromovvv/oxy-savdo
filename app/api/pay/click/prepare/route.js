@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { handleClickPrepare } from '@/lib/pay/click';
+import { limitOr429 } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,8 @@ async function readParams(req) {
 // Click "Prepare URL" — kabinetda shu manzilni ko'rsating:
 //   https://<domen>/api/pay/click/prepare
 export async function POST(req) {
+  const limited = await limitOr429(req, 'pay-click', { limit: 120, windowSec: 60 });
+  if (limited) return limited;
   try {
     const p = await readParams(req);
     const result = await handleClickPrepare(p);
