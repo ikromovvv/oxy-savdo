@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createOrder, setPayment } from '@/lib/orderStore';
+import { createOrder, setPayment, updateOrder } from '@/lib/orderStore';
 import { createPayment } from '@/lib/payments';
 import { limitOr429 } from '@/lib/rateLimit';
 
@@ -33,6 +33,12 @@ export async function POST(req) {
       payUrl = pay.payUrl;
       if (provider !== 'manual') {
         await setPayment(result.order.id, { provider, status: 'pending' });
+        // buyurtma "to'lov kutilmoqda" holatiga o'tadi
+        await updateOrder(result.order.id, {
+          status: 'pending',
+          by: 'system',
+          note: `${provider} to'lov havolasi yaratildi`,
+        });
       }
     } catch (e) {
       console.error('[api/orders] payment init xato:', e.message);
