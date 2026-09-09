@@ -6,6 +6,7 @@ import { Icon, Svg } from './ui';
 
 const STATUS = {
   new: { label: 'Yangi', cls: 'border-line text-white/80' },
+  pending: { label: "To'lov kutilmoqda", cls: 'border-amber-500/40 text-amber-300 bg-amber-500/10' },
   paid: { label: "To'landi", cls: 'border-sky-500/40 text-sky-300 bg-sky-500/10' },
   fulfilling: { label: 'Yuborilmoqda', cls: 'border-amber-500/40 text-amber-300 bg-amber-500/10' },
   sent: { label: 'Yuborildi', cls: 'border-indigo-500/40 text-indigo-300 bg-indigo-500/10' },
@@ -29,13 +30,17 @@ const FULFILL_STATUS = {
 const FILTERS = [
   { key: 'all', label: 'Hammasi' },
   { key: 'new', label: 'Yangi' },
+  { key: 'pending', label: "To'lov kutilmoqda" },
   { key: 'paid', label: "To'langan" },
   { key: 'fulfilling', label: 'Yuborilmoqda' },
   { key: 'sent', label: 'Yuborildi' },
   { key: 'done', label: 'Yakunlangan' },
+  { key: 'cancelled', label: 'Bekor' },
 ];
+const PROVIDERS = ['all', 'payme', 'click', 'manual', 'test'];
 const NEXT = {
   new: ['paid', 'cancelled'],
+  pending: ['paid', 'cancelled'],
   paid: ['fulfilling', 'sent', 'cancelled', 'refunded'],
   fulfilling: ['sent', 'cancelled', 'refunded'],
   sent: ['done', 'refunded'],
@@ -71,6 +76,11 @@ export default function AdminOrders() {
   const [openId, setOpenId] = useState(null);
   const [busyId, setBusyId] = useState(null);
   const [copied, setCopied] = useState('');
+  // qidiruv / filtrlar (client tomonda)
+  const [q, setQ] = useState('');
+  const [prov, setProv] = useState('all');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -87,6 +97,23 @@ export default function AdminOrders() {
   }, [filter]);
 
   useEffect(() => { load(); }, [load]);
+
+  const fromMs = from ? new Date(from + 'T00:00').getTime() : null;
+  const toMs = to ? new Date(to + 'T23:59:59').getTime() : null;
+  const needle = q.trim().toLowerCase();
+  const visible = items.filter((o) => {
+    if (prov !== 'all' && (o.payment?.provider || 'manual') !== prov) return false;
+    if (fromMs && o.createdAt < fromMs) return false;
+    if (toMs && o.createdAt > toMs) return false;
+    if (needle) {
+      const hay = [
+        o.ref, o.steam?.steamid, o.customer?.name, o.customer?.phone, o.customer?.tg,
+      ].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(needle)) return false;
+    }
+    return true;
+  });
+  const filtersActive = prov !== 'all' || from || to || needle;
 
   async function patch(id, body) {
     setBusyId(id);
@@ -134,7 +161,48 @@ export default function AdminOrders() {
         </button>
       </div>
 
-      <div className="mt-5 overflow-hidden rounded-2xl border border-line">
+      {/* qidiruv + filtrlar */}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Qidirish: OXY-…, Steam ID, ism, telefon"
+          className="min-w-[200px] flex-1 rounded-xl border border-line bg-panel px-3 py-2 text-xs outline-none placeholder:text-muted/60 focus:border-white/40"
+        />
+        <select
+          value={prov}
+          onChange={(e) => setProv(e.target.value)}
+          className="rounded-xl border border-line bg-panel px-3 py-2 text-xs outline-none focus:border-white/40"
+        >
+          {PROVIDERS.map((p) => (
+            <option key={p} value={p}>{p === 'all' ? 'Barcha provayder' : p}</option>
+          ))}
+        </select>
+        <input
+          type="date"
+          value={from}
+          onChange={(e) => setFrom(e.target.value)}
+          className="rounded-xl border border-line bg-panel px-2.5 py-2 text-xs outline-none focus:border-white/40"
+        />
+        <span className="text-xs text-muted">—</span>
+        <input
+          type="date"
+          value={to}
+          onChange={(e) => setTo(e.target.value)}
+          className="rounded-xl border border-line bg-panel px-2.5 py-2 text-xs outline-none focus:border-white/40"
+        />
+        {filtersActive && (
+          <button
+            onClick={() => { setQ(''); setProv('all'); setFrom(''); setTo(''); }}
+            className="text-xs text-accent hover:underline"
+          >
+            Tozalash
+          </button>
+        )}
+        <span className="ml-auto text-xs text-muted">{visible.length} ta</span>
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-2xl border border-line">
         <div className="hidden grid-cols-[110px_120px_1fr_130px_120px_36px] gap-3 border-b border-line bg-panel/60 px-4 py-2.5 text-[11px] uppercase tracking-wider text-muted lg:grid">
           <span>Raqam</span>
           <span>Sana</span>
@@ -152,16 +220,16 @@ export default function AdminOrders() {
           </div>
         ) : err ? (
           <div className="p-8 text-center text-sm text-rose-400">{err}</div>
-        ) : items.length === 0 ? (
+        ) : visible.length === 0 ? (
           <div className="grid place-items-center gap-3 p-12 text-center">
             <span className="grid h-12 w-12 place-items-center rounded-2xl border border-line text-muted">
               <Svg d={Icon.cart} className="h-5 w-5" />
             </span>
-            <p className="text-sm text-muted">Buyurtma yo&apos;q.</p>
+            <p className="text-sm text-muted">{filtersActive ? 'Filtrga mos buyurtma yo’q.' : 'Buyurtma yo’q.'}</p>
           </div>
         ) : (
           <div className="divide-y divide-line">
-            {items.map((o) => {
+            {visible.map((o) => {
               const isOpen = openId === o.id;
               return (
                 <div key={o.id}>
