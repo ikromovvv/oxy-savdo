@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { createOrder, setPayment, updateOrder } from '@/lib/orderStore';
 import { createPayment } from '@/lib/payments';
 import { limitOr429 } from '@/lib/rateLimit';
+import { verifySessionToken, SESSION_COOKIE } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +18,12 @@ export async function POST(req) {
   } catch {
     return NextResponse.json({ ok: false, error: 'Noto\'g\'ri so\'rov' }, { status: 400 });
   }
+
+  // XAVFSIZLIK: Steam ma'lumotini client'dan OLMAYMIZ — imzolangan sessiyadan olamiz.
+  const session = verifySessionToken(cookies().get(SESSION_COOKIE)?.value);
+  body.steam = session?.steamid
+    ? { steamid: session.steamid, name: session.name || '', profileUrl: session.profileUrl || '' }
+    : null;
 
   try {
     const result = await createOrder(body);

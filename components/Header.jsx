@@ -38,6 +38,7 @@ export default function Header() {
     { href: '/sotish', label: t('nav_sell') },
     { href: '/katalog/kovriklar', label: t('nav_pads') },
     { href: '/katalog/aksessuar', label: t('nav_acc') },
+    ...(user ? [{ href: '/buyurtmalarim', label: t('nav_orders') }] : []),
     { href: '/parvarish', label: t('nav_care') },
     { href: '/yordam', label: t('nav_support') },
   ];
