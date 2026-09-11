@@ -52,6 +52,31 @@ body {
   .label {
     @apply text-[11px] uppercase tracking-[0.2em] text-muted;
   }
+
+  /* OXY xrom (chrome) wordmark — rasmedagi 3D metall shriftga moslangan */
+  .oxy-logo {
+    @apply inline-block leading-none;
+    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.12))
+      drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+  }
+  .oxy-wordmark {
+    @apply font-extrabold;
+    letter-spacing: -0.035em;
+    background: linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #eef1f3 15%,
+      #a6adb4 42%,
+      #7c848b 51%,
+      #ccd1d5 60%,
+      #f7f9fa 80%,
+      #b2b8bd 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 /* Butun ekranni qoplaydigan kvadrat to'r (fon) */

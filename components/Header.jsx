@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useStore } from './StoreProvider';
 import { site } from '@/lib/site';
+import OxyLogo from './OxyLogo';
 
 export default function Header() {
   const { t, lang, setLang, count, setCartOpen, user, userLoading, favoritesCount } = useStore();
@@ -47,11 +48,8 @@ export default function Header() {
     <>
     <header className="sticky top-0 z-40 border-b border-line/80 bg-ink/80 backdrop-blur-xl">
       <div className="container-site flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-white text-sm font-bold text-ink">
-            O
-          </span>
-          <span className="text-sm font-semibold tracking-[0.25em]">{site.name}</span>
+        <Link href="/" className="flex items-center" aria-label={site.name}>
+          <OxyLogo size={22} />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -172,7 +170,7 @@ export default function Header() {
           }`}
         >
           <div className="flex h-16 flex-none items-center justify-between border-b border-line px-5">
-            <span className="text-sm font-semibold tracking-[0.25em]">{site.name}</span>
+            <OxyLogo size={20} />
             <button
               onClick={() => setOpen(false)}
               aria-label="Yopish"

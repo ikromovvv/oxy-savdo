@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useStore } from './StoreProvider';
 import { site } from '@/lib/site';
+import OxyLogo from './OxyLogo';
 
 export default function Footer() {
   const { t } = useStore();
@@ -14,11 +15,8 @@ export default function Footer() {
     <footer className="mt-24 border-t border-line bg-panel/40">
       <div className="container-site grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-white text-sm font-bold text-ink">
-              O
-            </span>
-            <span className="text-sm font-semibold tracking-[0.25em]">{site.name}</span>
+          <div className="flex items-center">
+            <OxyLogo size={26} />
           </div>
           <p className="mt-4 max-w-xs text-sm text-muted">{t('hero_text')}</p>
         </div>
