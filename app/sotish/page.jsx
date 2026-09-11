@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import SteamLoginGate from '@/components/SteamLoginGate';
+import Select from '@/components/Select';
 
 const EXTERIOR_SHORT = {
   'Factory New': 'FN',
@@ -164,14 +165,14 @@ export default function SotishPage() {
               className="min-w-[180px] flex-1 rounded-full border border-line bg-panel px-4 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
             />
 
-            <select
+            <Select
               value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="rounded-full border border-line bg-panel px-4 py-2.5 text-sm outline-none focus:border-white/40"
-            >
-              <option value="price_desc">{t('sell_sort_price')} ↓</option>
-              <option value="price_asc">{t('sell_sort_price')} ↑</option>
-            </select>
+              onChange={setSort}
+              options={[
+                { value: 'price_desc', label: `${t('sell_sort_price')} ↓` },
+                { value: 'price_asc', label: `${t('sell_sort_price')} ↑` },
+              ]}
+            />
 
             <button
               onClick={selectAll}

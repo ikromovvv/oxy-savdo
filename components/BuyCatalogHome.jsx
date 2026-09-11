@@ -5,6 +5,7 @@ import { useStore } from './StoreProvider';
 import SkinCard from './SkinCard';
 import { weaponTypes as weaponTypeLabels } from '@/lib/products';
 import { wearInfo } from '@/lib/skinMeta';
+import Select from './Select';
 
 const TIER_COLOR = { FN: '#22c55e', MW: '#a3e635', FT: '#eab308', WW: '#f97316', BS: '#ef4444' };
 
@@ -151,14 +152,14 @@ export default function BuyCatalogHome() {
           className="min-w-[180px] flex-1 rounded-full border border-line bg-panel px-4 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
         />
 
-        <select
+        <Select
           value={sort}
-          onChange={(e) => setSort(e.target.value)}
-          className="rounded-full border border-line bg-panel px-4 py-2.5 text-sm outline-none focus:border-white/40"
-        >
-          <option value="price_desc">{t('catalog_sort_price')} ↓</option>
-          <option value="price_asc">{t('catalog_sort_price')} ↑</option>
-        </select>
+          onChange={setSort}
+          options={[
+            { value: 'price_desc', label: `${t('catalog_sort_price')} ↓` },
+            { value: 'price_asc', label: `${t('catalog_sort_price')} ↑` },
+          ]}
+        />
       </div>
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
