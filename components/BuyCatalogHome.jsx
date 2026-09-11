@@ -4,6 +4,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from './StoreProvider';
 import SkinCard from './SkinCard';
 import { weaponTypes as weaponTypeLabels } from '@/lib/products';
+import { wearInfo } from '@/lib/skinMeta';
+
+const TIER_COLOR = { FN: '#22c55e', MW: '#a3e635', FT: '#eab308', WW: '#f97316', BS: '#ef4444' };
 
 const PAGE_SIZE = 60;
 
@@ -106,8 +109,10 @@ export default function BuyCatalogHome() {
       <div className="mb-5 flex flex-wrap gap-2">
         <button
           onClick={() => setWeaponType('all')}
-          className={`rounded-full border px-4 py-2 text-sm transition ${
-            weaponType === 'all' ? 'border-white bg-white text-ink' : 'border-line text-white/80 hover:border-white/40'
+          className={`rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
+            weaponType === 'all'
+              ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(198,255,0,0.3)]'
+              : 'border-line text-white/80 hover:border-white/40'
           }`}
         >
           {t('catalog_all')}
@@ -116,9 +121,9 @@ export default function BuyCatalogHome() {
           <button
             key={w.slug}
             onClick={() => setWeaponType(w.slug)}
-            className={`rounded-full border px-4 py-2 text-sm transition ${
+            className={`rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
               weaponType === w.slug
-                ? 'border-white bg-white text-ink'
+                ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(198,255,0,0.3)]'
                 : 'border-line text-white/80 hover:border-white/40'
             }`}
           >
@@ -180,29 +185,37 @@ export default function BuyCatalogHome() {
           </div>
 
           <div className="label mb-3 mt-6">{t('catalog_wear')}</div>
-          <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2 text-sm text-white/80">
-              <input
-                type="radio"
-                name="wear"
-                checked={wear === 'all'}
-                onChange={() => setWear('all')}
-                className="accent-white"
-              />
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              onClick={() => setWear('all')}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-300 ${
+                wear === 'all'
+                  ? 'border-white/50 bg-white/10 text-white'
+                  : 'border-line text-white/70 hover:border-white/40'
+              }`}
+            >
               {t('catalog_all')}
-            </label>
-            {wearOptions.map((w) => (
-              <label key={w} className="flex items-center gap-2 text-sm text-white/80">
-                <input
-                  type="radio"
-                  name="wear"
-                  checked={wear === w}
-                  onChange={() => setWear(w)}
-                  className="accent-white"
-                />
-                {w}
-              </label>
-            ))}
+            </button>
+            {wearOptions.map((w) => {
+              const tier = wearInfo(w);
+              const active = wear === w;
+              const color = tier ? TIER_COLOR[tier.key] : '#fff';
+              return (
+                <button
+                  key={w}
+                  onClick={() => setWear(w)}
+                  title={w}
+                  className="rounded-full border px-3 py-1.5 text-xs font-semibold transition-all duration-300"
+                  style={
+                    active
+                      ? { borderColor: `${color}99`, background: `${color}22`, color, boxShadow: `0 0 12px ${color}55` }
+                      : { borderColor: '#1E1E21', color: 'rgba(255,255,255,0.7)' }
+                  }
+                >
+                  {tier?.key || w}
+                </button>
+              );
+            })}
           </div>
         </aside>
 
