@@ -20,6 +20,7 @@ export default function BuyCatalogHome() {
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
   const [sort, setSort] = useState('price_desc');
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
@@ -107,10 +108,10 @@ export default function BuyCatalogHome() {
       </div>
 
       {/* QUROL TURI TABLARI */}
-      <div className="mb-5 flex flex-wrap gap-2">
+      <div className="no-scrollbar -mx-5 mb-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
         <button
           onClick={() => setWeaponType('all')}
-          className={`rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
+          className={`flex-none whitespace-nowrap rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
             weaponType === 'all'
               ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(198,255,0,0.3)]'
               : 'border-line text-white/80 hover:border-white/40'
@@ -122,7 +123,7 @@ export default function BuyCatalogHome() {
           <button
             key={w.slug}
             onClick={() => setWeaponType(w.slug)}
-            className={`rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
+            className={`flex-none whitespace-nowrap rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
               weaponType === w.slug
                 ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(198,255,0,0.3)]'
                 : 'border-line text-white/80 hover:border-white/40'
@@ -164,7 +165,16 @@ export default function BuyCatalogHome() {
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         {/* CHAP: FILTRLAR */}
-        <aside className="card w-full flex-none p-5 lg:w-[240px]">
+        <button
+          onClick={() => setFiltersOpen((v) => !v)}
+          aria-expanded={filtersOpen}
+          className="flex items-center justify-between rounded-xl border border-line bg-panel px-4 py-3 text-sm font-medium lg:hidden"
+        >
+          {t('catalog_filters')}
+          <span className={`text-muted transition-transform ${filtersOpen ? 'rotate-180' : ''}`}>⌄</span>
+        </button>
+
+        <aside className={`card w-full flex-none p-5 lg:block lg:w-[240px] ${filtersOpen ? 'block' : 'hidden'}`}>
           <div className="label mb-3">{t('catalog_sort_price')}</div>
           <div className="flex flex-col gap-2">
             <input
@@ -189,7 +199,7 @@ export default function BuyCatalogHome() {
           <div className="flex flex-wrap gap-1.5">
             <button
               onClick={() => setWear('all')}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-300 ${
+              className={`rounded-full border px-3.5 py-2 text-xs font-medium transition-all duration-300 ${
                 wear === 'all'
                   ? 'border-white/50 bg-white/10 text-white'
                   : 'border-line text-white/70 hover:border-white/40'
@@ -206,7 +216,7 @@ export default function BuyCatalogHome() {
                   key={w}
                   onClick={() => setWear(w)}
                   title={w}
-                  className="rounded-full border px-3 py-1.5 text-xs font-semibold transition-all duration-300"
+                  className="rounded-full border px-3.5 py-2 text-xs font-semibold transition-all duration-300"
                   style={
                     active
                       ? { borderColor: `${color}99`, background: `${color}22`, color, boxShadow: `0 0 12px ${color}55` }

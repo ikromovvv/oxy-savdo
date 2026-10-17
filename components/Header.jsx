@@ -147,10 +147,10 @@ export default function Header() {
           <button
             onClick={() => setOpen(true)}
             aria-label="Menyu"
-            className="grid h-9 w-9 place-items-center rounded-full border border-line md:hidden"
+            className="flex h-10 w-10 flex-col items-center justify-center gap-1 rounded-full border border-line md:hidden"
           >
             <span className="block h-[2px] w-4 bg-white" />
-            <span className="mt-1 block h-[2px] w-4 bg-white" />
+            <span className="block h-[2px] w-4 bg-white" />
           </button>
         </div>
       </div>
@@ -209,7 +209,7 @@ export default function Header() {
                 <button
                   key={l}
                   onClick={() => setLang(l)}
-                  className={`rounded-full border border-line px-4 py-1.5 text-xs uppercase transition ${
+                  className={`rounded-full border border-line px-4 py-2 text-xs uppercase transition ${
                     lang === l ? 'bg-white text-ink' : 'text-muted'
                   }`}
                 >
