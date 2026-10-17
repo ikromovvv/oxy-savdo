@@ -224,8 +224,8 @@ function withEnv(vars, fn) {
 }
 const PAYME_ENV = { PAYME_MERCHANT_ID: 'm1', PAYME_KEY: 'k' };
 const CLICK_ENV = { CLICK_SERVICE_ID: '7', CLICK_MERCHANT_ID: '9', CLICK_SECRET_KEY: 'sec' };
-// production: demo o'chiq (DEMO_PAYMENTS belgilanmagan) — haqiqiy usullar ro'yxati toza
-const NONE_ENV = { NODE_ENV: 'production', DEMO_PAYMENTS: null, PAYME_MERCHANT_ID: null, PAYME_KEY: null, CLICK_SERVICE_ID: null, CLICK_MERCHANT_ID: null, CLICK_SECRET_KEY: null, PAYMENT_PROVIDER: null };
+// demo o'chirilgan (DEMO_PAYMENTS=0), production — haqiqiy usullar ro'yxati toza
+const NONE_ENV = { NODE_ENV: 'production', DEMO_PAYMENTS: '0', PAYME_MERCHANT_ID: null, PAYME_KEY: null, CLICK_SERVICE_ID: null, CLICK_MERCHANT_ID: null, CLICK_SECRET_KEY: null, PAYMENT_PROVIDER: null };
 
 test(`providers: kalit yo'q -> usul yo'q; Payme/Click sozlansa ikkalasi ham tanlanadi`, async () => {
   await withEnv(NONE_ENV, () => assert.deepEqual(availableProviders(), []));
@@ -250,22 +250,22 @@ test(`providers: createPayment tanlangan provayder havolasini beradi; noma'lum q
   });
 });
 
-test(`demo: production'da o'zi yoqilmaydi, DEMO_PAYMENTS=1 yoki lokal dev'da yoqiladi; hech qachon haqiqiy usulni siqib chiqarmaydi`, async () => {
-  await withEnv({ ...NONE_ENV }, () => assert.deepEqual(availableProviders(), []));
+test(`demo: haqiqiy provayder yo'q bo'lsa o'zi chiqadi (production'da ham), provayder bo'lsa chiqmaydi, DEMO_PAYMENTS bilan boshqariladi`, async () => {
+  await withEnv({ ...NONE_ENV }, () => assert.deepEqual(availableProviders(), [])); // 0 = o'chiq
+  await withEnv({ ...NONE_ENV, DEMO_PAYMENTS: null }, () => assert.deepEqual(availableProviders(), ['demo']));
   await withEnv({ ...NONE_ENV, DEMO_PAYMENTS: '1' }, () => assert.deepEqual(availableProviders(), ['demo']));
-  await withEnv({ ...NONE_ENV, NODE_ENV: 'development' }, () => assert.deepEqual(availableProviders(), ['demo']));
-  // haqiqiy provayder sozlangan lokal muhitda demo avtomatik chiqmaydi
-  await withEnv({ ...NONE_ENV, ...PAYME_ENV, NODE_ENV: 'development' }, () => assert.deepEqual(availableProviders(), ['payme']));
+  // haqiqiy provayder sozlansa demo avtomatik chiqmaydi (majburlansa — haqiqiy usuldan keyin)
+  await withEnv({ ...NONE_ENV, ...PAYME_ENV, DEMO_PAYMENTS: null }, () => assert.deepEqual(availableProviders(), ['payme']));
   await withEnv({ ...NONE_ENV, ...PAYME_ENV, DEMO_PAYMENTS: '1' }, () => assert.deepEqual(availableProviders(), ['payme', 'demo']));
 
   const s = STEAM();
   const { order } = await createDepositOrder({ steam: s, amount: 60000 });
-  await withEnv({ ...NONE_ENV, DEMO_PAYMENTS: '1' }, () => {
+  await withEnv({ ...NONE_ENV, DEMO_PAYMENTS: null }, () => {
     const d = createPayment(order, 'https://oxy.uz', 'demo');
     assert.equal(d.provider, 'demo');
     assert.equal(d.payUrl, `https://oxy.uz/demo-tolov/${order.ref}`);
   });
-  // demo yoqilmagan bo'lsa so'ralsa ham berilmaydi
+  // demo o'chirilgan bo'lsa so'ralsa ham berilmaydi
   await withEnv({ ...NONE_ENV }, () => assert.equal(createPayment(order, 'https://oxy.uz', 'demo').provider, 'manual'));
   // demo havola balansga hech narsa qo'shmaydi (to'lov faqat provayder callback'i orqali)
   assert.equal(await getBalance(s.steamid), 0);
