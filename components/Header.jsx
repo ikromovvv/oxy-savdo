@@ -88,12 +88,12 @@ export default function Header() {
               ) : (
                 <a
                   href="/api/auth/steam/login"
-                  className="hidden items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs font-medium text-white/85 transition hover:border-white/40 sm:flex"
+                  className="hidden items-center gap-1.5 rounded-full border border-accent/40 bg-accent/[0.06] px-3.5 py-2 text-xs font-semibold text-white transition hover:border-accent/70 hover:shadow-[0_0_16px_rgba(198,255,0,0.25)] sm:flex"
                 >
                   <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current">
                     <path d="M12 2C6.95 2 2.8 5.8 2.14 10.7l4.5 1.86a2.7 2.7 0 0 1 1.53-.47c.06 0 .12 0 .18.01l2-2.9v-.04a3.6 3.6 0 0 1 3.6-3.6 3.6 3.6 0 0 1 0 7.2h-.08l-2.86 2.04c0 .06.01.11.01.17a2.72 2.72 0 0 1-5.4.5L2 15.06C2.9 19.14 6.6 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2Zm-2.02 15.34-1.03-.43a2.06 2.06 0 0 0 1.9 1.27 2.07 2.07 0 0 0 2.07-2.07 2.06 2.06 0 0 0-.86-1.68l1.06.44a1.52 1.52 0 1 1-1.17 2.8l-1.97-.33Zm7.65-8.32a2.4 2.4 0 1 1-4.8 0 2.4 2.4 0 0 1 4.8 0Zm-2.4 1.6a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2Z" />
                   </svg>
-                  {t('steam_login')}
+                  <span className="whitespace-nowrap md:hidden lg:inline">{t('steam_login')}</span>
                 </a>
               )}
             </>
