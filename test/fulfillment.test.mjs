@@ -55,6 +55,27 @@ async function paidSkinOrder() {
 
 test.beforeEach(() => { process.env.FULFILL_TEST_MODE = 'ok'; process.env.FULFILL_PROVIDER = 'test'; });
 
+// -------- LIS-SKINS uslubi: Steam bilan kirgan xaridor, telefon/ism formasiz --------
+
+test('createOrder: Steam bilan skin xaridi telefonsiz ishlaydi, ism Steam profilidan', async () => {
+  const res = await createOrder({
+    name: '', phone: '', tradeUrl: TRADE_URL,
+    steam: { steamid: '76561199537376347', name: 'Steam Nick', profileUrl: '' },
+    items: [{ id: 'ak-test', name: 'x', price: 1, qty: 1, kind: 'skin' }],
+  });
+  assert.ok(res.order, res.error);
+  assert.equal(res.order.customer.name, 'Steam Nick');
+  assert.equal(res.order.customer.phone, '');
+});
+
+test('createOrder: Steam yo\'q bo\'lsa telefon hamon majburiy', async () => {
+  const res = await createOrder({
+    name: 'T', phone: '', tradeUrl: TRADE_URL,
+    items: [{ id: 'ak-test', name: 'x', price: 1, qty: 1, kind: 'skin' }],
+  });
+  assert.ok(res.error);
+});
+
 // -------- muvaffaqiyatli oqim --------
 
 test('fulfill: paid skin -> sent, keyin poll -> done', async () => {

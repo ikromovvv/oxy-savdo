@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useStore } from './StoreProvider';
 import { formatPrice } from '@/lib/products';
-import { isValidTradeUrl } from '@/lib/steamTrade';
+import { isValidTradeUrl, parseTradeUrl } from '@/lib/steamTrade';
 import { site } from '@/lib/site';
 
 export default function CartDrawer() {
@@ -14,8 +14,14 @@ export default function CartDrawer() {
   const [sending, setSending] = useState(false);
   const [formErr, setFormErr] = useState('');
   const [okRef, setOkRef] = useState('');
+  const [errMsg, setErrMsg] = useState('');
 
   const hasSkins = items.some((it) => it.kind === 'skin');
+  // LIS-SKINS uslubi: Steam bilan kirgan + savatda faqat skin -> forma yo'q,
+  // faqat (saqlangan) Trade URL va bitta "Sotib olish" tugmasi.
+  const express = Boolean(user) && items.length > 0 && items.every((it) => it.kind === 'skin');
+  const [editTrade, setEditTrade] = useState(false);
+  const tradeKey = user?.steamid ? `oxy:trade:${user.steamid}` : null;
   const panelRef = useRef(null);
   const overlayRef = useRef(null);
 
@@ -24,6 +30,15 @@ export default function CartDrawer() {
     if (user?.name && !form.name) setForm((f) => ({ ...f, name: user.name }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // saqlangan Trade URL'ni yuklaymiz (har safar qayta kiritmaslik uchun)
+  useEffect(() => {
+    if (!tradeKey) return;
+    try {
+      const v = localStorage.getItem(tradeKey);
+      if (v && isValidTradeUrl(v)) setForm((f) => (f.tradeUrl ? f : { ...f, tradeUrl: v }));
+    } catch {}
+  }, [tradeKey]);
 
   // ochilganda sirg'alib chiqadi
   useLayoutEffect(() => {
@@ -51,7 +66,7 @@ export default function CartDrawer() {
   };
 
   const submit = async (e) => {
-    e.preventDefault();
+    e?.preventDefault?.();
     setFormErr('');
 
     if (hasSkins && !isValidTradeUrl(form.tradeUrl)) {
@@ -65,7 +80,7 @@ export default function CartDrawer() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...form,
+          ...(express ? { name: user.name, phone: '', tg: '', note: '', tradeUrl: form.tradeUrl } : form),
           items,
           total,
           steam: user ? { steamid: user.steamid, name: user.name, profileUrl: user.profileUrl } : null,
@@ -73,6 +88,9 @@ export default function CartDrawer() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) throw new Error(data.error || 'failed');
+      if (tradeKey && isValidTradeUrl(form.tradeUrl)) {
+        try { localStorage.setItem(tradeKey, form.tradeUrl); } catch {}
+      }
       clear();
 
       // to'lov linki bo'lsa — to'lovga yo'naltiramiz
@@ -83,6 +101,8 @@ export default function CartDrawer() {
       setOkRef(data.order?.ref || '');
       setStep('ok');
     } catch (err) {
+      // server rad etgan aniq sabab (narx yangilandi, noto'g'ri trade URL ...) ko'rsatiladi
+      setErrMsg(err?.message && err.message !== 'failed' ? err.message : '');
       setStep('err');
     } finally {
       setSending(false);
@@ -117,6 +137,7 @@ export default function CartDrawer() {
 
         {step === 'err' && (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
+            {errMsg && <p className="text-sm text-white/85">{errMsg}</p>}
             <p className="text-sm text-muted">{t('err_text')}</p>
             <a href={site.telegram} className="btn-primary">Telegram</a>
             <button onClick={() => setStep('cart')} className="text-xs text-muted underline">←</button>
@@ -153,13 +174,52 @@ export default function CartDrawer() {
                 <span className="label">{t('total')}</span>
                 <span className="text-lg font-semibold">{formatPrice(total)}</span>
               </div>
-              <button
-                disabled={!items.length}
-                onClick={() => setStep('form')}
-                className="btn-primary w-full disabled:opacity-40"
-              >
-                {t('checkout')}
-              </button>
+              {express ? (
+                <>
+                  {isValidTradeUrl(form.tradeUrl) && !editTrade ? (
+                    <div className="mb-3 flex items-center justify-between gap-2 rounded-xl border border-line bg-panel px-3 py-2 text-xs">
+                      <span className="min-w-0 truncate text-muted">
+                        Trade URL: <span className="text-white/80">…{parseTradeUrl(form.tradeUrl)?.token}</span>
+                      </span>
+                      <button onClick={() => setEditTrade(true)} className="flex-none py-1.5 pl-3 text-accent">
+                        {t('trade_url_change')}
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="mb-3 block">
+                      <span className="label">{t('trade_url_label')} *</span>
+                      <input
+                        type="url"
+                        value={form.tradeUrl}
+                        placeholder="https://steamcommunity.com/tradeoffer/new/?partner=…&token=…"
+                        onChange={(e) => setForm({ ...form, tradeUrl: e.target.value })}
+                        className="mt-2 w-full rounded-xl border border-line bg-panel px-4 py-3 text-sm outline-none placeholder:text-muted/60 focus:border-accent/60 focus:ring-1 focus:ring-accent/25"
+                      />
+                      <span className="mt-1.5 block text-[11px] leading-snug text-muted">{t('trade_url_help')}</span>
+                    </label>
+                  )}
+                  {formErr && (
+                    <p className="mb-3 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-400">
+                      {formErr}
+                    </p>
+                  )}
+                  <button
+                    disabled={!items.length || sending}
+                    onClick={() => { setEditTrade(false); submit(); }}
+                    className="btn-primary w-full disabled:opacity-50"
+                  >
+                    {sending ? t('sending') : t('buy_now')}
+                  </button>
+                </>
+              ) : (
+                <button
+                  disabled={!items.length}
+                  onClick={() => setStep('form')}
+                  className="btn-primary w-full disabled:opacity-40"
+                >
+                  {t('checkout')}
+                </button>
+              )}
             </div>
           </>
         )}
