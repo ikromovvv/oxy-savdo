@@ -156,8 +156,8 @@ export default function DemoPaymentPage({ params }) {
                 <h2 className="mt-4 text-xl font-bold">{credited ? "To'lov o'tdi (demo)" : 'Demo yakunlandi'}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted">
                   {credited
-                    ? "Lokal demo: to'lov simulyatsiya qilindi va balans to'ldirildi."
-                    : "Haqiqiy to'lov amalga oshmadi, balans o'zgarmadi. Payme/Click ulangach shu oqim haqiqiy bo'ladi."}
+                    ? "Demo: to'lov simulyatsiya qilindi va balans to'ldirildi (admin sinovi)."
+                    : "Haqiqiy to'lov amalga oshmadi, balans o'zgarmadi. Sinash uchun avval shu brauzerda /admin ga kiring (faqat sayt egasi uchun demo balansni to'ldiradi). Payme/Click ulangach shu oqim haqiqiy bo'ladi."}
                 </p>
                 <Link href={credited ? `/tolov/${ref}` : '/'} className="btn-cta mt-5">
                   {credited ? 'Davom etish' : 'Bosh sahifa'}
