@@ -86,6 +86,8 @@ export function StoreProvider({ children }) {
             name: product.name,
             price: product.price,
             qty,
+            image: product.image || '',
+            wear: product.wear || null,
             kind: isSkin ? 'skin' : 'product',
             marketHashName: isSkin ? product.fullName || product.name : undefined,
           },
