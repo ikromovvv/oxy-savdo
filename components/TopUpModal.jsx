@@ -6,7 +6,7 @@ import { formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
 
 const PRESETS = [50000, 100000, 250000, 500000, 1000000];
-const METHOD_LABEL = { payme: 'Payme', click: 'Click', test: 'Test' };
+const METHOD_LABEL = { payme: 'Payme', click: 'Click', test: 'Test', demo: 'Demo' };
 
 // Balansni to'ldirish: summa + usul (Payme / Click) tanlanadi, foydalanuvchi
 // provayder sahifasiga o'tadi. To'lov tasdiqlangach balans AVTOMATIK tushadi
@@ -152,6 +152,12 @@ export default function TopUpModal({ open, onClose }) {
                   ))}
                 </div>
               </div>
+            )}
+
+            {method === 'demo' && (
+              <p className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-amber-300">
+                DEMO rejim: to'lov sahifasi qanday ko'rinishini ko'rsatadi, haqiqiy to'lov va balans o'zgarishi bo'lmaydi.
+              </p>
             )}
 
             {err && (
