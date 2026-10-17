@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/adminAuth';
 import { listOrders } from '@/lib/orderStore';
+import { activeProvider, fulfillmentConfigured } from '@/lib/fulfillment';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,10 @@ export async function GET(req) {
     if (fulfillment) {
       items = items.filter((o) => (o.fulfillment?.status || 'none') === fulfillment);
     }
-    return NextResponse.json({ items });
+    return NextResponse.json({
+      items,
+      meta: { fulfillProvider: activeProvider(), fulfillConfigured: fulfillmentConfigured() },
+    });
   } catch (e) {
     console.error('[api/admin/orders GET]', e.message);
     return NextResponse.json({ items: [], error: 'load_failed' }, { status: 200 });

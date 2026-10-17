@@ -76,6 +76,8 @@ export default function AdminOrders() {
   const [openId, setOpenId] = useState(null);
   const [busyId, setBusyId] = useState(null);
   const [copied, setCopied] = useState('');
+  const [meta, setMeta] = useState(null); // { fulfillProvider, fulfillConfigured }
+  const autoOff = meta ? !meta.fulfillConfigured : false;
   // qidiruv / filtrlar (client tomonda)
   const [q, setQ] = useState('');
   const [prov, setProv] = useState('all');
@@ -89,6 +91,7 @@ export default function AdminOrders() {
       const r = await fetch(`/api/admin/orders?status=${filter}`, { cache: 'no-store' });
       const d = await r.json();
       setItems(Array.isArray(d.items) ? d.items : []);
+      if (d.meta) setMeta(d.meta);
     } catch {
       setErr('Buyurtmalarni yuklab bo\'lmadi');
     } finally {
@@ -407,8 +410,15 @@ export default function AdminOrders() {
                               ))}
                             </ul>
                           )}
+                          {autoOff && ['new', 'pending', 'paid'].includes(o.status) && (
+                            <p className="mt-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-amber-300">
+                              Avtomatik yetkazish <b>o&apos;chiq</b> (skin yetkazuvchi provayder ulanmagan,{' '}
+                              <code>FULFILL_PROVIDER={meta?.fulfillProvider || 'manual'}</code>). Shu sababli to&apos;lovdan
+                              keyin trade o&apos;zi yuborilmaydi — Trade URL&apos;ga qo&apos;lda yuboring va «Yuborildi» ni bosing.
+                            </p>
+                          )}
                           <div className="mt-2.5 flex flex-wrap gap-2">
-                            {o.status === 'paid' && (
+                            {o.status === 'paid' && !autoOff && (
                               <button disabled={busyId === o.id} onClick={() => patch(o.id, { action: 'fulfill' })}
                                 className="rounded-full border border-line px-3 py-1.5 text-xs font-semibold text-white/85 hover:border-accent/50 disabled:opacity-50">
                                 <Svg d={Icon.play} className="mr-1 inline h-3 w-3" /> Avtomatik yetkazish
