@@ -223,7 +223,7 @@ export default function CartDrawer() {
               <button type="submit" disabled={sending} className="btn-primary w-full disabled:opacity-50">
                 {sending ? t('sending') : t('submit')}
               </button>
-              <button type="button" onClick={() => setStep('cart')} className="mt-3 w-full text-xs text-muted underline">
+              <button type="button" onClick={() => setStep('cart')} className="mt-1 w-full py-3 text-xs text-muted underline">
                 ← {t('cart')}
               </button>
             </div>
