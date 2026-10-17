@@ -7,7 +7,7 @@ import { formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
 
 export default function PaymentReturnPage({ params }) {
-  const { t } = useStore();
+  const { t, refreshBalance } = useStore();
   const ref = params.ref;
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -65,6 +65,12 @@ export default function PaymentReturnPage({ params }) {
   const failed = order?.payment?.status === 'failed';
   // to'lov provayderi yo'q (manual) — operator qo'lda tasdiqlaydi
   const manual = !paid && !failed && (order?.payment?.status || 'none') === 'none';
+  // balansni to'ldirish buyurtmasi: to'lov o'tgach hamyon AVTOMATIK to'ladi (callback orqali)
+  const deposit = order?.kind === 'deposit';
+
+  useEffect(() => {
+    if (paid && deposit) refreshBalance();
+  }, [paid, deposit, refreshBalance]);
 
   function recheck() {
     tries.current = 0;
@@ -101,7 +107,9 @@ export default function PaymentReturnPage({ params }) {
 
             <h1 className="mt-4 text-2xl font-bold tracking-tight">
               {paid
-                ? "To'lov qabul qilindi"
+                ? deposit
+                  ? t('deposit_done')
+                  : "To'lov qabul qilindi"
                 : failed
                   ? "To'lov amalga oshmadi"
                   : manual
@@ -110,14 +118,20 @@ export default function PaymentReturnPage({ params }) {
             </h1>
             <p className="mt-2 text-sm text-muted">
               {paid
-                ? 'Buyurtmangiz ishlovga olindi. Tez orada skin yetkaziladi.'
+                ? deposit
+                  ? t('deposit_done_text')
+                  : 'Buyurtmangiz ishlovga olindi. Tez orada skin yetkaziladi.'
                 : failed
                   ? 'Qayta urinib ko\'ring yoki biz bilan bog\'laning.'
                   : manual
                     ? 'Operator siz bilan bog\'lanib, to\'lovni tasdiqlaydi.'
                     : gaveUp
-                      ? 'To\'lov hali tasdiqlanmadi. Agar to\'lagan bo\'lsangiz, bir ozdan keyin qayta tekshiring.'
-                      : 'To\'lov tasdiqlanishini kutmoqdamiz…'}
+                      ? deposit
+                        ? t('deposit_late_text')
+                        : 'To\'lov hali tasdiqlanmadi. Agar to\'lagan bo\'lsangiz, bir ozdan keyin qayta tekshiring.'
+                      : deposit
+                        ? t('deposit_wait_text')
+                        : 'To\'lov tasdiqlanishini kutmoqdamiz…'}
             </p>
 
             <div className="mt-5 rounded-xl border border-line bg-panel px-4 py-3 text-left text-sm">

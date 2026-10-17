@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifySessionToken, SESSION_COOKIE } from '@/lib/session';
 import { createDepositOrder, setPayment, updateOrder } from '@/lib/orderStore';
-import { createPayment } from '@/lib/payments';
+import { createPayment, availableProviders } from '@/lib/payments';
 import { limitOr429 } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +26,15 @@ export async function POST(req) {
     return NextResponse.json({ ok: false, error: "Noto'g'ri so'rov" }, { status: 400 });
   }
 
+  // To'lov provayderi (Payme/Click) ulanmagan bo'lsa — osilib qoladigan qo'lda tasdiqlanadigan
+  // so'rov yaratmaymiz: balans faqat provayder tasdiqlaganda avtomatik to'ldiriladi.
+  if (availableProviders().length === 0) {
+    return NextResponse.json(
+      { ok: false, error: "Online to'lov hali ulanmagan", code: 'no_provider' },
+      { status: 503 }
+    );
+  }
+
   try {
     const result = await createDepositOrder({
       steam: { steamid: session.steamid, name: session.name, profileUrl: session.profileUrl },
@@ -37,7 +46,10 @@ export async function POST(req) {
     let payUrl = null;
     let provider = 'manual';
     try {
-      const pay = createPayment(order, new URL(req.url).origin);
+      // faqat serverda sozlangan usullardan biri; boshqa qiymat e'tiborsiz
+      const methods = availableProviders();
+      const wanted = methods.includes(body?.provider) ? body.provider : methods[0];
+      const pay = createPayment(order, new URL(req.url).origin, wanted);
       provider = pay.provider;
       payUrl = pay.payUrl;
       if (provider !== 'manual') {

@@ -11,6 +11,7 @@ export async function GET(_req, { params }) {
     return NextResponse.json({
       order: {
         ref: o.ref,
+        kind: o.items?.some((i) => i.kind === 'deposit') ? 'deposit' : 'order',
         status: o.status,
         statusLabel: STATUS_LABEL[o.status] || o.status,
         total: o.total,

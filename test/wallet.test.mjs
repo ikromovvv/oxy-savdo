@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'oxy-wallet-'));
@@ -28,6 +29,8 @@ const { createOrder, createDepositOrder, getOrder, markOrderPaid, updateOrder } 
 const { getBalance, getWallet, creditWallet, debitWallet } = await imp('lib/walletStore.js');
 const { settlePaidOrder, payOrderWithWallet, refundWalletOrder, recoverDeposits } = await imp('lib/settle.js');
 const { handlePayme } = await imp('lib/pay/payme.js');
+const { handleClickPrepare, handleClickComplete } = await imp('lib/pay/click.js');
+const { availableProviders, createPayment } = await imp('lib/payments.js');
 process.env.PAYME_KEY = 'k';
 
 let n = 0;
@@ -209,6 +212,82 @@ test('har foydalanuvchi o\'z hamyoni: boshqasining balansiga tegmaydi', async ()
   await debitWallet({ steamid: a.steamid, amount: 20000, key: 'iso-a' });
   assert.equal(await getBalance(a.steamid), 30000);
   assert.equal(await getBalance(b.steamid), 70000);
+});
+
+// -------- Payme / Click orqali avtomatik to'ldirish --------
+
+function withEnv(vars, fn) {
+  const old = {};
+  for (const k of Object.keys(vars)) { old[k] = process.env[k]; if (vars[k] == null) delete process.env[k]; else process.env[k] = vars[k]; }
+  const restore = () => { for (const k of Object.keys(old)) { if (old[k] == null) delete process.env[k]; else process.env[k] = old[k]; } };
+  return Promise.resolve(fn()).finally(restore);
+}
+const PAYME_ENV = { PAYME_MERCHANT_ID: 'm1', PAYME_KEY: 'k' };
+const CLICK_ENV = { CLICK_SERVICE_ID: '7', CLICK_MERCHANT_ID: '9', CLICK_SECRET_KEY: 'sec' };
+const NONE_ENV = { PAYME_MERCHANT_ID: null, PAYME_KEY: null, CLICK_SERVICE_ID: null, CLICK_MERCHANT_ID: null, CLICK_SECRET_KEY: null, PAYMENT_PROVIDER: null };
+
+test(`providers: kalit yo'q -> usul yo'q; Payme/Click sozlansa ikkalasi ham tanlanadi`, async () => {
+  await withEnv(NONE_ENV, () => assert.deepEqual(availableProviders(), []));
+  await withEnv({ ...NONE_ENV, ...PAYME_ENV }, () => assert.deepEqual(availableProviders(), ['payme']));
+  await withEnv({ ...NONE_ENV, ...PAYME_ENV, ...CLICK_ENV }, () => assert.deepEqual(availableProviders(), ['payme', 'click']));
+});
+
+test(`providers: createPayment tanlangan provayder havolasini beradi; noma'lum qiymat e'tiborsiz`, async () => {
+  const s = STEAM();
+  const { order } = await createDepositOrder({ steam: s, amount: 60000 });
+  await withEnv({ ...NONE_ENV, ...PAYME_ENV, ...CLICK_ENV }, () => {
+    const pm = createPayment(order, 'https://oxy.uz', 'payme');
+    assert.equal(pm.provider, 'payme');
+    assert.ok(pm.payUrl.startsWith('https://checkout.paycom.uz/'));
+    const ck = createPayment(order, 'https://oxy.uz', 'click');
+    assert.equal(ck.provider, 'click');
+    assert.ok(ck.payUrl.includes('my.click.uz') && ck.payUrl.includes(`transaction_param=${order.ref}`));
+    assert.ok(ck.payUrl.includes('amount=60000'));
+    const bad = createPayment(order, 'https://oxy.uz', 'evil');
+    assert.equal(bad.provider, 'manual');
+    assert.equal(bad.payUrl, null);
+  });
+});
+
+function clickSign(p, withPrepare) {
+  const base = String(p.click_trans_id) + String(p.service_id) + 'sec' + String(p.merchant_trans_id) +
+    (withPrepare ? String(p.merchant_prepare_id) : '') + String(p.amount) + String(p.action) + String(p.sign_time);
+  return crypto.createHash('md5').update(base, 'utf8').digest('hex');
+}
+
+test(`click: to'ldirish prepare -> complete balansni AVTOMATIK to'ldiradi, takroriy complete qo'shmaydi`, async () => {
+  await withEnv({ ...NONE_ENV, ...CLICK_ENV }, async () => {
+    const s = STEAM();
+    const { order } = await createDepositOrder({ steam: s, amount: 60000 });
+    const prep = { click_trans_id: 'cd-' + Math.random(), service_id: '7', merchant_trans_id: order.ref, amount: '60000', action: '0', sign_time: '2026-01-01 00:00:00' };
+    prep.sign_string = clickSign(prep, false);
+    const pr = await handleClickPrepare(prep);
+    assert.equal(pr.error, 0);
+    const comp = { ...prep, action: '1', merchant_prepare_id: pr.merchant_prepare_id };
+    comp.sign_string = clickSign(comp, true);
+    assert.equal((await handleClickComplete(comp)).error, 0);
+    assert.equal(await getBalance(s.steamid), 60000);
+    await handleClickComplete(comp);
+    await handleClickComplete(comp);
+    assert.equal(await getBalance(s.steamid), 60000);
+    assert.equal((await getOrder(order.id)).status, 'done');
+  });
+});
+
+test(`click: noto'g'ri summa yoki yomon imzo balansni o'zgartirmaydi`, async () => {
+  await withEnv({ ...NONE_ENV, ...CLICK_ENV }, async () => {
+    const s = STEAM();
+    const { order } = await createDepositOrder({ steam: s, amount: 60000 });
+    const prep = { click_trans_id: 'cw-' + Math.random(), service_id: '7', merchant_trans_id: order.ref, amount: '60000', action: '0', sign_time: 't' };
+    prep.sign_string = clickSign(prep, false);
+    const pr = await handleClickPrepare(prep);
+    const wrongAmt = { ...prep, action: '1', amount: '1000', merchant_prepare_id: pr.merchant_prepare_id };
+    wrongAmt.sign_string = clickSign(wrongAmt, true);
+    assert.equal((await handleClickComplete(wrongAmt)).error, -2);
+    const badSign = { ...prep, action: '1', merchant_prepare_id: pr.merchant_prepare_id, sign_string: 'deadbeef' };
+    assert.equal((await handleClickComplete(badSign)).error, -1);
+    assert.equal(await getBalance(s.steamid), 0);
+  });
 });
 
 test.after(() => {

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifySessionToken, SESSION_COOKIE } from '@/lib/session';
 import { getWallet } from '@/lib/walletStore';
+import { availableProviders } from '@/lib/payments';
+import { DEPOSIT_MIN_UZS } from '@/lib/orderStore';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +14,8 @@ export async function GET() {
   if (!session?.steamid) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   try {
     const w = await getWallet(session.steamid, { limit: 20 });
-    return NextResponse.json(w);
+    // methods: onlayn to'ldirish usullari (bo'sh bo'lsa — Payme/Click hali ulanmagan)
+    return NextResponse.json({ ...w, methods: availableProviders(), minDeposit: DEPOSIT_MIN_UZS });
   } catch (e) {
     console.error('[api/wallet]', e?.message || e);
     return NextResponse.json({ error: 'load_failed' }, { status: 500 });
