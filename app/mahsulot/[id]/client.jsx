@@ -127,7 +127,7 @@ export default function ProductPage({ params }) {
       <section className="container-site py-10">
         <Link
           href={isSkin ? '/' : `/katalog/${product.category}`}
-          className="text-sm text-muted hover:text-white"
+          className="inline-block py-2 text-sm text-muted hover:text-white"
         >
           ← {t('all_products')}
         </Link>
@@ -215,9 +215,9 @@ export default function ProductPage({ params }) {
 
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2 rounded-full border border-line px-2 py-1.5">
-                <button onClick={() => setQty(Math.max(1, qty - 1))} className="h-7 w-7 rounded-full hover:bg-white/10">−</button>
+                <button onClick={() => setQty(Math.max(1, qty - 1))} className="h-9 w-9 rounded-full hover:bg-white/10">−</button>
                 <span className="w-6 text-center text-sm">{qty}</span>
-                <button onClick={() => setQty(qty + 1)} className="h-7 w-7 rounded-full hover:bg-white/10">+</button>
+                <button onClick={() => setQty(qty + 1)} className="h-9 w-9 rounded-full hover:bg-white/10">+</button>
               </div>
               <button onClick={() => add(product, qty)} className="btn-ghost">{t('add_to_cart')}</button>
               <button

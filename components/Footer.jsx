@@ -24,29 +24,29 @@ export default function Footer() {
         <div>
           <div className="label">{t('footer_shop')}</div>
           <ul className="mt-4 space-y-2.5 text-sm text-white/70">
-            <li><Link href="/katalog/skins" className="hover:text-white">{t('nav_skins')}</Link></li>
-            <li><Link href="/katalog/kovriklar" className="hover:text-white">{t('nav_pads')}</Link></li>
-            <li><Link href="/katalog/aksessuar" className="hover:text-white">{t('nav_acc')}</Link></li>
+            <li><Link href="/katalog/skins" className="inline-block py-1 hover:text-white">{t('nav_skins')}</Link></li>
+            <li><Link href="/katalog/kovriklar" className="inline-block py-1 hover:text-white">{t('nav_pads')}</Link></li>
+            <li><Link href="/katalog/aksessuar" className="inline-block py-1 hover:text-white">{t('nav_acc')}</Link></li>
           </ul>
         </div>
 
         <div>
           <div className="label">{t('footer_info')}</div>
           <ul className="mt-4 space-y-2.5 text-sm text-white/70">
-            <li><Link href="/parvarish" className="hover:text-white">{t('nav_care')}</Link></li>
-            <li><Link href="/yordam" className="hover:text-white">{t('nav_support')}</Link></li>
-            <li><Link href="/yordam#qaytarish" className="hover:text-white">{t('returns')}</Link></li>
-            <li><Link href="/yordam#oferta" className="hover:text-white">{t('offer')}</Link></li>
+            <li><Link href="/parvarish" className="inline-block py-1 hover:text-white">{t('nav_care')}</Link></li>
+            <li><Link href="/yordam" className="inline-block py-1 hover:text-white">{t('nav_support')}</Link></li>
+            <li><Link href="/yordam#qaytarish" className="inline-block py-1 hover:text-white">{t('returns')}</Link></li>
+            <li><Link href="/yordam#oferta" className="inline-block py-1 hover:text-white">{t('offer')}</Link></li>
           </ul>
         </div>
 
         <div>
           <div className="label">{t('footer_contact')}</div>
           <ul className="mt-4 space-y-2.5 text-sm text-white/70">
-            <li><a href={site.telegram} className="hover:text-white">Telegram {site.telegramName}</a></li>
-            <li><a href={site.instagram} className="hover:text-white">Instagram</a></li>
-            <li><a href={`tel:${site.phone.replace(/\s/g, '')}`} className="hover:text-white">{site.phone}</a></li>
-            <li><a href={`mailto:${site.email}`} className="hover:text-white">{site.email}</a></li>
+            <li><a href={site.telegram} className="inline-block py-1 hover:text-white">Telegram {site.telegramName}</a></li>
+            <li><a href={site.instagram} className="inline-block py-1 hover:text-white">Instagram</a></li>
+            <li><a href={`tel:${site.phone.replace(/\s/g, '')}`} className="inline-block py-1 hover:text-white">{site.phone}</a></li>
+            <li><a href={`mailto:${site.email}`} className="inline-block py-1 hover:text-white">{site.email}</a></li>
           </ul>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function Footer() {
         <div className="container-site flex flex-col justify-between gap-2 py-6 text-xs text-muted sm:flex-row">
           <span>© {new Date().getFullYear()} {site.full}. {t('rights')}</span>
           <span className="flex items-center gap-3">
-            <Link href="/admin" className="hover:text-white">Admin</Link>
+            <Link href="/admin" className="inline-block py-1 hover:text-white">Admin</Link>
             <span>Toshkent, O&apos;zbekiston</span>
           </span>
         </div>

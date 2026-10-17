@@ -48,7 +48,7 @@ export default function Header() {
     <>
     <header className="sticky top-0 z-40 border-b border-line/80 bg-ink/80 backdrop-blur-xl">
       <div className="container-site flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="flex items-center" aria-label={site.name}>
+        <Link href="/" className="flex items-center py-2" aria-label={site.name}>
           <OxyLogo size={22} />
         </Link>
 

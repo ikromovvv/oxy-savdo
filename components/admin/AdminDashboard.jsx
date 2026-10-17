@@ -15,9 +15,9 @@ function fmtDate(ts) {
   } catch { return ''; }
 }
 
-function Stat({ label, value, sub, accent, danger }) {
+function Stat({ label, value, sub, accent, danger, wide }) {
   return (
-    <div className="card p-4">
+    <div className={`card p-4 ${wide ? 'col-span-2 lg:col-span-1' : ''}`}>
       <div className="label">{label}</div>
       <div
         className={`mt-1.5 text-2xl font-bold tracking-tight ${
@@ -83,7 +83,7 @@ function Chart({ series }) {
             <button
               key={k}
               onClick={() => setMode(k)}
-              className={`rounded-full border px-2.5 py-1 text-[11px] transition ${
+              className={`rounded-full border px-3 py-1.5 text-[11px] transition ${
                 mode === k ? 'border-white bg-white text-ink' : 'border-line text-muted hover:border-white/40'
               }`}
             >
@@ -147,14 +147,14 @@ export default function AdminDashboard({ onGo }) {
         <div className="card mb-4 p-4 text-sm text-rose-400">Ko&apos;rsatkichlarni yuklab bo&apos;lmadi.</div>
       )}
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {loading ? (
           Array.from({ length: 8 }).map((_, i) => <div key={i} className="card h-24 animate-pulse bg-white/[0.03]" />)
         ) : (
           <>
-            <Stat label="Bugungi tushum" value={formatPrice(rev.today || 0)} sub={`Buyurtma: ${c.today || 0}`} accent />
-            <Stat label="Oylik tushum" value={formatPrice(rev.month || 0)} sub="Joriy oy" accent />
-            <Stat label="Umumiy tushum" value={formatPrice(rev.total || 0)} sub="Barcha to'langan" />
+            <Stat label="Bugungi tushum" value={formatPrice(rev.today || 0)} sub={`Buyurtma: ${c.today || 0}`} accent wide />
+            <Stat label="Oylik tushum" value={formatPrice(rev.month || 0)} sub="Joriy oy" accent wide />
+            <Stat label="Umumiy tushum" value={formatPrice(rev.total || 0)} sub="Barcha to'langan" wide />
             <Stat label="Mahsulotlar" value={prodCount ?? '…'} sub="Kovrik + aksessuar" />
             <Stat label="Jami buyurtma" value={c.total || 0} />
             <Stat label="Yakunlangan" value={c.completed || 0} sub="done" />
@@ -164,6 +164,7 @@ export default function AdminDashboard({ onGo }) {
               value={c.failed || 0}
               sub={c.fulfilling ? `Jarayonda: ${c.fulfilling}` : undefined}
               danger={(c.failed || 0) > 0}
+              wide
             />
           </>
         )}
@@ -177,7 +178,7 @@ export default function AdminDashboard({ onGo }) {
 
       <div className="mt-6 flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">So&apos;nggi buyurtmalar</h2>
-        <button onClick={() => onGo?.('orders')} className="text-xs text-accent hover:underline">
+        <button onClick={() => onGo?.('orders')} className="py-2 text-xs text-accent hover:underline">
           Hammasi →
         </button>
       </div>
