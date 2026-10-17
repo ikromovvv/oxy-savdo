@@ -14,6 +14,7 @@ export function StoreProvider({ children }) {
   const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
   const [balance, setBalance] = useState(null); // null = noma'lum / kirmagan
+  const [wallet, setWallet] = useState({ real: 0, demo: 0, payable: 0 });
 
   useEffect(() => {
     try {
@@ -50,6 +51,7 @@ export function StoreProvider({ children }) {
       if (!r.ok) return setBalance(null);
       const d = await r.json();
       setBalance(Number.isFinite(d.balance) ? d.balance : null);
+      setWallet({ real: d.realBalance || 0, demo: d.demoBalance || 0, payable: d.payable || 0 });
     } catch {
       /* eski qiymat qoladi */
     }
@@ -113,6 +115,7 @@ export function StoreProvider({ children }) {
       user,
       userLoading,
       balance,
+      wallet,
       refreshBalance,
       favorites,
       isFavorite: (id) => favorites.some((f) => f.id === id),
@@ -137,7 +140,7 @@ export function StoreProvider({ children }) {
         ),
       favoritesCount: favorites.length,
     };
-  }, [lang, items, cartOpen, user, userLoading, favorites, balance, refreshBalance]);
+  }, [lang, items, cartOpen, user, userLoading, favorites, balance, wallet, refreshBalance]);
 
   return <StoreCtx.Provider value={value}>{children}</StoreCtx.Provider>;
 }

@@ -33,7 +33,7 @@ function Thumb({ it }) {
 }
 
 export default function CartDrawer() {
-  const { t, items, remove, setQty, total, count, cartOpen, setCartOpen, clear, user, balance, refreshBalance } = useStore();
+  const { t, items, remove, setQty, total, count, cartOpen, setCartOpen, clear, user, balance, wallet, refreshBalance } = useStore();
   const [step, setStep] = useState('cart'); // cart | form | ok | err
   const [form, setForm] = useState({ name: '', phone: '', tg: '', note: '', tradeUrl: '' });
   const [sending, setSending] = useState(false);
@@ -271,8 +271,13 @@ export default function CartDrawer() {
                       {formErr}
                     </p>
                   )}
-                  {balance != null && balance >= total ? (
+                  {balance != null && wallet.payable >= total ? (
                     <>
+                      {wallet.real < total && (
+                        <p className="mb-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-amber-300">
+                          DEMO balansdan to'lanadi: haqiqiy pul emas, skin yuborilmaydi.
+                        </p>
+                      )}
                       <button
                         disabled={!items.length || sending}
                         onClick={() => { setEditTrade(false); submit(null, 'balance'); }}

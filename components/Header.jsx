@@ -108,7 +108,7 @@ function ProfileMenu({ onTopUp }) {
 }
 
 export default function Header() {
-  const { t, lang, setLang, count, setCartOpen, user, userLoading, favoritesCount, balance } = useStore();
+  const { t, lang, setLang, count, setCartOpen, user, userLoading, favoritesCount, balance, wallet } = useStore();
   const [open, setOpen] = useState(false);
   const [topUp, setTopUp] = useState(false);
   const pathname = usePathname();
@@ -223,6 +223,11 @@ export default function Header() {
                   <Ico d={WALLET} className="h-4 w-4 flex-none text-accent" />
                   <span className="mx-2 hidden whitespace-nowrap text-sm font-semibold min-[420px]:inline">
                     {balance == null ? '…' : formatPrice(balance)}
+                    {wallet?.demo > 0 && (
+                      <span className="ml-1.5 rounded bg-amber-500/20 px-1 py-0.5 align-middle text-[9px] font-bold uppercase text-amber-300" title="Demo pul: haqiqiy emas">
+                        demo
+                      </span>
+                    )}
                   </span>
                   <button
                     onClick={() => setTopUp(true)}

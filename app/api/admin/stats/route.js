@@ -10,6 +10,7 @@ function isPaid(o) {
   if (o.status === 'refunded' || o.status === 'cancelled') return false;
   // balansni to'ldirish — savdo tushumi emas (pul keyin balansdan sarflanganda hisoblanadi)
   if (o.items?.some((i) => i.kind === 'deposit')) return false;
+  if (o.payment?.provider === 'wallet-demo') return false; // demo pul
   return o.payment?.status === 'paid' || PAID_STATUSES.includes(o.status);
 }
 

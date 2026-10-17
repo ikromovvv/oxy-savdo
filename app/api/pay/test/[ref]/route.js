@@ -3,16 +3,16 @@ import { getOrder, markOrderPaid } from '@/lib/orderStore';
 import { activeProvider } from '@/lib/payments';
 import { settlePaidOrder } from '@/lib/settle';
 import { limitOr429 } from '@/lib/rateLimit';
-import { isAdmin } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
 
 // Sinov to'lovi: buyurtmani real to'lovsiz "to'landi" qiladi.
 //  - Lokal ishlab chiqishda (NODE_ENV != production): test provayderi yoki demo
 //    sahifasi orqali yaratilgan buyurtma uchun.
-//  - PRODUCTION'da: faqat ADMIN sifatida kirgan (oxy_admin cookie) egasi, va faqat
-//    demo to'lov sahifasi orqali yaratilgan buyurtma uchun. Oddiy foydalanuvchi
-//    uchun 403 — aks holda hamma bepul balans olib haqiqiy skin sotib olardi.
+//  - Demo to'lov sahifasi orqali yaratilgan buyurtma (provider 'demo') har joyda,
+//    PRODUCTION'da ham: pul HAQIQIY hamyonga emas, alohida demo hamyonga tushadi
+//    (lib/settle.js), undan to'langan buyurtma yetkazilmaydi va tushumga kirmaydi.
+//  - Boshqa buyurtmalar uchun production'da 403 (bepul to'lov teshigi yo'q).
 export async function POST(req, { params }) {
   const limited = await limitOr429(req, 'pay-test', { limit: 20, windowSec: 60 });
   if (limited) return limited;
@@ -22,16 +22,14 @@ export async function POST(req, { params }) {
 
   const isDemoOrder = o.payment?.provider === 'demo';
   const prod = process.env.NODE_ENV === 'production';
-  const allowed = prod
-    ? isDemoOrder && isAdmin()
-    : isDemoOrder || activeProvider() === 'test';
+  const allowed = isDemoOrder || (!prod && activeProvider() === 'test');
   if (!allowed) return NextResponse.json({ ok: false, error: 'disabled' }, { status: 403 });
 
   if (o.payment?.status !== 'paid') {
     await markOrderPaid(
       o.id,
       isDemoOrder
-        ? { provider: 'demo', providerTxnId: `demo-${o.id}`, by: 'demo', note: "DEMO to'lov (admin sinovi)" }
+        ? { provider: 'demo', providerTxnId: `demo-${o.id}`, by: 'demo', note: "DEMO to'lov (haqiqiy pul emas)" }
         : { provider: 'test', by: 'test' }
     );
   }

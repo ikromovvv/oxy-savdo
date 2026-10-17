@@ -312,6 +312,88 @@ test(`click: noto'g'ri summa yoki yomon imzo balansni o'zgartirmaydi`, async () 
   });
 });
 
+// -------- DEMO pul: alohida hamyon, haqiqiy skin / tushum bermaydi --------
+
+const { getWalletSummary, DEMO_PROVIDER, demoKey } = await imp('lib/settle.js');
+const { fulfillOrder } = await imp('lib/fulfillment.js');
+
+async function demoDeposit(s, amount) {
+  const { order } = await createDepositOrder({ steam: s, amount });
+  await markOrderPaid(order.id, { provider: 'demo', providerTxnId: `demo-${order.id}` });
+  await settlePaidOrder(order.id);
+  return order;
+}
+
+test(`demo: demo to'ldirish HAQIQIY hamyonga emas, demo hamyonga tushadi`, async () => {
+  const s = STEAM();
+  await demoDeposit(s, 100000);
+  const sum = await getWalletSummary(s.steamid);
+  assert.equal(sum.real, 0);
+  assert.equal(sum.demo, 100000);
+  assert.equal(sum.balance, 100000);
+  assert.equal(await getBalance(s.steamid), 0);
+});
+
+test(`demo: demo pul bilan to'langan buyurtma "wallet-demo" bo'ladi va YETKAZILMAYDI`, async () => {
+  const s = STEAM();
+  await demoDeposit(s, 500000);
+  const o = await padOrder(s); // 340 000
+  const r = await payOrderWithWallet(o);
+  assert.equal(r.ok, true);
+  assert.equal(r.demo, true);
+  const fresh = await getOrder(o.id);
+  assert.equal(fresh.payment.provider, DEMO_PROVIDER);
+  assert.equal(fresh.status, 'paid');
+  const sum = await getWalletSummary(s.steamid);
+  assert.equal(sum.demo, 160000);
+  assert.equal(sum.real, 0);
+
+  const prev = process.env.FULFILL_PROVIDER;
+  process.env.FULFILL_PROVIDER = 'test'; // yetkazish yoqilgan bo'lsa ham
+  try {
+    assert.equal((await fulfillOrder(o.id)).skip, 'demo');
+    assert.equal((await fulfillOrder(o.id, { force: true })).skip, 'demo');
+  } finally {
+    if (prev == null) delete process.env.FULFILL_PROVIDER; else process.env.FULFILL_PROVIDER = prev;
+  }
+});
+
+test(`demo: haqiqiy balans yetsa u ishlatiladi (demo tegilmaydi); ikkalasi aralashtirilmaydi`, async () => {
+  const a = await depositedUser(500000); // haqiqiy 500k
+  await creditWallet({ steamid: demoKey(a.steamid), amount: 500000, key: 'dseed:' + a.steamid });
+  const oa = await padOrder(a);
+  const ra = await payOrderWithWallet(oa);
+  assert.equal(ra.demo, false);
+  assert.equal((await getOrder(oa.id)).payment.provider, 'wallet');
+  const suma = await getWalletSummary(a.steamid);
+  assert.equal(suma.real, 160000);
+  assert.equal(suma.demo, 500000);
+
+  // 200k haqiqiy + 200k demo = 400k, lekin buyurtma 340k: aralashtirib to'lanmaydi
+  const b = await depositedUser(200000);
+  await creditWallet({ steamid: demoKey(b.steamid), amount: 200000, key: 'dseedb:' + b.steamid });
+  const ob = await padOrder(b);
+  const rb = await payOrderWithWallet(ob);
+  assert.equal(rb.ok, false);
+  const sumb = await getWalletSummary(b.steamid);
+  assert.equal(sumb.payable, 200000);
+  assert.equal(sumb.balance, 400000);
+});
+
+test(`demo: demo buyurtma bekor qilinsa pul demo hamyonga qaytadi (haqiqiyga emas)`, async () => {
+  const s = STEAM();
+  await demoDeposit(s, 400000);
+  const o = await padOrder(s);
+  await payOrderWithWallet(o);
+  const before = await getOrder(o.id);
+  await updateOrder(o.id, { status: 'refunded', by: 'admin' });
+  await refundWalletOrder(before);
+  await refundWalletOrder(before);
+  const sum = await getWalletSummary(s.steamid);
+  assert.equal(sum.demo, 400000);
+  assert.equal(sum.real, 0);
+});
+
 test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch {}
 });

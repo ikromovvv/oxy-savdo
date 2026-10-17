@@ -347,6 +347,11 @@ export default function AdminOrders() {
                               <span className="rounded-full border border-line px-1.5 py-0.5 text-[10px] uppercase text-muted">{o.payment.provider}</span>
                             )}
                           </div>
+                          {(o.payment?.provider === 'wallet-demo' || o.payment?.provider === 'demo') && (
+                            <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-[11px] leading-relaxed text-amber-300">
+                              DEMO to&apos;lov — haqiqiy pul emas. Skin yubormang; tushumga qo&apos;shilmaydi.
+                            </p>
+                          )}
                           {o.payment?.providerTxnId && (
                             <div className="break-all text-[11px] text-muted">txn: {o.payment.providerTxnId}</div>
                           )}

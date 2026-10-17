@@ -156,7 +156,7 @@ export default function TopUpModal({ open, onClose }) {
 
             {method === 'demo' && (
               <p className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-amber-300">
-                DEMO rejim: to'lov sahifasi qanday ko'rinishini ko'rsatadi, haqiqiy to'lov va balans o'zgarishi bo'lmaydi.
+                DEMO rejim: balansga DEMO pul tushadi (haqiqiy emas). Undan to'langan buyurtmada skin yuborilmaydi.
               </p>
             )}
 
