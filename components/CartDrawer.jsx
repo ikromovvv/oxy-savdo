@@ -96,7 +96,7 @@ export default function CartDrawer() {
       <aside ref={panelRef} className="relative flex h-full w-full max-w-md flex-col border-l border-line bg-ink">
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <span className="text-sm font-semibold tracking-widest uppercase">{t('cart')}</span>
-          <button onClick={close} className="text-muted hover:text-white">✕</button>
+          <button aria-label="close" onClick={close} className="grid h-9 w-9 place-items-center text-muted hover:text-white">✕</button>
         </div>
 
         {step === 'ok' && (
@@ -133,15 +133,15 @@ export default function CartDrawer() {
                   {items.map((it) => (
                     <li key={it.id} className="card flex items-center gap-3 p-3">
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium">{it.name}</div>
-                        <div className="text-xs text-muted">{formatPrice(it.price)}</div>
+                        <div className="line-clamp-2 text-sm font-medium leading-snug">{it.name}</div>
+                        <div className="mt-0.5 text-xs text-muted">{formatPrice(it.price)}</div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <button onClick={() => setQty(it.id, it.qty - 1)} className="h-7 w-7 rounded-full border border-line">−</button>
+                      <div className="flex items-center gap-0.5">
+                        <button aria-label="−" onClick={() => setQty(it.id, it.qty - 1)} className="h-9 w-9 rounded-full border border-line">−</button>
                         <span className="w-6 text-center text-sm">{it.qty}</span>
-                        <button onClick={() => setQty(it.id, it.qty + 1)} className="h-7 w-7 rounded-full border border-line">+</button>
+                        <button aria-label="+" onClick={() => setQty(it.id, it.qty + 1)} className="h-9 w-9 rounded-full border border-line">+</button>
                       </div>
-                      <button onClick={() => remove(it.id)} className="text-muted hover:text-white">✕</button>
+                      <button aria-label="remove" onClick={() => remove(it.id)} className="grid h-9 w-9 flex-none place-items-center text-muted hover:text-white">✕</button>
                     </li>
                   ))}
                 </ul>
@@ -215,7 +215,7 @@ export default function CartDrawer() {
               </p>
             )}
 
-            <div className="mt-auto pt-4">
+            <div className="sticky bottom-0 z-10 -mx-5 -mb-5 mt-auto border-t border-line bg-ink px-5 pb-5 pt-4">
               <div className="mb-3 flex items-center justify-between">
                 <span className="label">{t('total')}</span>
                 <span className="text-lg font-semibold">{formatPrice(total)}</span>
