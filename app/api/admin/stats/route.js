@@ -8,6 +8,8 @@ const PAID_STATUSES = ['paid', 'fulfilling', 'sent', 'done'];
 
 function isPaid(o) {
   if (o.status === 'refunded' || o.status === 'cancelled') return false;
+  // balansni to'ldirish — savdo tushumi emas (pul keyin balansdan sarflanganda hisoblanadi)
+  if (o.items?.some((i) => i.kind === 'deposit')) return false;
   return o.payment?.status === 'paid' || PAID_STATUSES.includes(o.status);
 }
 

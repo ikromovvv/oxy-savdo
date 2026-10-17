@@ -12,6 +12,7 @@ export default function Select({
   className = '',
   menuClassName = '',
   align = 'right', // 'right' | 'left' — menyu qaysi tomonga ochilsin
+  compact = false, // header uchun kichik variant
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -41,7 +42,9 @@ export default function Select({
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm outline-none transition-all duration-200 ${
+        className={`flex items-center gap-2 rounded-full border outline-none transition-all duration-200 ${
+          compact ? 'px-3 py-2 text-xs font-semibold' : 'px-4 py-2.5 text-sm'
+        } ${
           open
             ? 'border-accent/60 bg-panel text-white shadow-[0_0_16px_rgba(198,255,0,0.25)]'
             : 'border-line bg-panel text-white/90 hover:border-white/40'

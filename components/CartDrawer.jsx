@@ -8,7 +8,7 @@ import { isValidTradeUrl, parseTradeUrl } from '@/lib/steamTrade';
 import { site } from '@/lib/site';
 
 export default function CartDrawer() {
-  const { t, items, remove, setQty, total, cartOpen, setCartOpen, clear, user } = useStore();
+  const { t, items, remove, setQty, total, cartOpen, setCartOpen, clear, user, balance, refreshBalance } = useStore();
   const [step, setStep] = useState('cart'); // cart | form | ok | err
   const [form, setForm] = useState({ name: '', phone: '', tg: '', note: '', tradeUrl: '' });
   const [sending, setSending] = useState(false);
@@ -65,7 +65,8 @@ export default function CartDrawer() {
     setTimeout(() => setStep(items.length ? 'cart' : 'cart'), 200);
   };
 
-  const submit = async (e) => {
+  // payWith === 'balance' -> hamyondan (narx va balans serverda tekshiriladi)
+  const submit = async (e, payWith) => {
     e?.preventDefault?.();
     setFormErr('');
 
@@ -83,6 +84,7 @@ export default function CartDrawer() {
           ...(express ? { name: user.name, phone: '', tg: '', note: '', tradeUrl: form.tradeUrl } : form),
           items,
           total,
+          ...(payWith === 'balance' ? { payWith: 'balance' } : {}),
           steam: user ? { steamid: user.steamid, name: user.name, profileUrl: user.profileUrl } : null,
         }),
       });
@@ -98,6 +100,7 @@ export default function CartDrawer() {
         window.location.href = data.payUrl;
         return;
       }
+      if (data.paid) refreshBalance();
       setOkRef(data.order?.ref || '');
       setStep('ok');
     } catch (err) {
@@ -203,13 +206,42 @@ export default function CartDrawer() {
                       {formErr}
                     </p>
                   )}
-                  <button
-                    disabled={!items.length || sending}
-                    onClick={() => { setEditTrade(false); submit(); }}
-                    className="btn-primary w-full disabled:opacity-50"
-                  >
-                    {sending ? t('sending') : t('buy_now')}
-                  </button>
+                  {balance != null && balance >= total ? (
+                    <>
+                      <button
+                        disabled={!items.length || sending}
+                        onClick={() => { setEditTrade(false); submit(null, 'balance'); }}
+                        className="btn-primary w-full gap-2 disabled:opacity-50"
+                      >
+                        {sending ? t('sending') : `${t('pay_balance')} · ${formatPrice(total)}`}
+                      </button>
+                      <button
+                        disabled={!items.length || sending}
+                        onClick={() => { setEditTrade(false); submit(); }}
+                        className="btn-ghost mt-2 w-full disabled:opacity-50"
+                      >
+                        {t('pay_card')}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        disabled={!items.length || sending}
+                        onClick={() => { setEditTrade(false); submit(); }}
+                        className="btn-primary w-full disabled:opacity-50"
+                      >
+                        {sending ? t('sending') : t('buy_now')}
+                      </button>
+                      {balance != null && (
+                        <button
+                          onClick={() => window.dispatchEvent(new CustomEvent('oxy:topup'))}
+                          className="mt-2 w-full py-2 text-center text-xs text-accent hover:underline"
+                        >
+                          {t('balance_low')} ({formatPrice(balance)}) · {t('balance_topup')}
+                        </button>
+                      )}
+                    </>
+                  )}
                 </>
               ) : (
                 <button

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { t as translate } from '@/lib/i18n';
 
 const StoreCtx = createContext(null);
@@ -13,6 +13,7 @@ export function StoreProvider({ children }) {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
+  const [balance, setBalance] = useState(null); // null = noma'lum / kirmagan
 
   useEffect(() => {
     try {
@@ -41,6 +42,23 @@ export function StoreProvider({ children }) {
       .catch(() => setUser(null))
       .finally(() => setUserLoading(false));
   }, []);
+
+  // Balans faqat serverdan o'qiladi (frontend uni hech qachon o'zi belgilamaydi)
+  const refreshBalance = useCallback(async () => {
+    try {
+      const r = await fetch('/api/wallet', { cache: 'no-store' });
+      if (!r.ok) return setBalance(null);
+      const d = await r.json();
+      setBalance(Number.isFinite(d.balance) ? d.balance : null);
+    } catch {
+      /* eski qiymat qoladi */
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user?.steamid) refreshBalance();
+    else setBalance(null);
+  }, [user, refreshBalance]);
 
   useEffect(() => {
     if (!ready) return;
@@ -92,6 +110,8 @@ export function StoreProvider({ children }) {
       setCartOpen,
       user,
       userLoading,
+      balance,
+      refreshBalance,
       favorites,
       isFavorite: (id) => favorites.some((f) => f.id === id),
       // to'liq mahsulot obyektini yuboring — shunda "saqlangan" sahifasida
@@ -115,7 +135,7 @@ export function StoreProvider({ children }) {
         ),
       favoritesCount: favorites.length,
     };
-  }, [lang, items, cartOpen, user, userLoading, favorites]);
+  }, [lang, items, cartOpen, user, userLoading, favorites, balance, refreshBalance]);
 
   return <StoreCtx.Provider value={value}>{children}</StoreCtx.Provider>;
 }

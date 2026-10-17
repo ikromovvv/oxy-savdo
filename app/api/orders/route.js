@@ -4,6 +4,7 @@ import { createOrder, setPayment, updateOrder } from '@/lib/orderStore';
 import { createPayment } from '@/lib/payments';
 import { limitOr429 } from '@/lib/rateLimit';
 import { verifySessionToken, SESSION_COOKIE } from '@/lib/session';
+import { payOrderWithWallet } from '@/lib/settle';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +30,35 @@ export async function POST(req) {
     const result = await createOrder(body);
     if (result.error) {
       return NextResponse.json({ ok: false, error: result.error }, { status: 400 });
+    }
+
+    // Balansdan to'lash: narx serverda hisoblangan (result.order.total), balans
+    // atomik yechiladi. Balans yetmasa buyurtma bekor qilinadi (osilib qolmaydi).
+    if (body.payWith === 'balance') {
+      const paid = await payOrderWithWallet(result.order);
+      if (!paid.ok) {
+        await updateOrder(result.order.id, {
+          status: 'cancelled',
+          by: 'system',
+          note: `Balansdan to'lanmadi: ${paid.error}`,
+        }).catch(() => {});
+        return NextResponse.json(
+          { ok: false, error: paid.error, balance: paid.balance ?? null },
+          { status: 402 }
+        );
+      }
+      const o = result.order;
+      return NextResponse.json(
+        {
+          ok: true,
+          order: { id: o.id, ref: o.ref, status: 'paid', total: o.total, createdAt: o.createdAt },
+          payUrl: null,
+          provider: 'wallet',
+          paid: true,
+          balance: paid.balance,
+        },
+        { status: 201 }
+      );
     }
 
     // to'lov provayderi faol bo'lsa — to'lov linkini yaratamiz

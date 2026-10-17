@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/adminAuth';
 import { runFulfillmentTick, activeProvider } from '@/lib/fulfillment';
+import { recoverDeposits } from '@/lib/settle';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,8 +9,9 @@ export const dynamic = 'force-dynamic';
 // Vercel Cron shu manzilga har daqiqa murojaat qiladi (vercel.json).
 // Himoya: Authorization: Bearer <FULFILL_CRON_SECRET>  yoki admin sessiyasi.
 async function run() {
+  const deposits = await recoverDeposits().catch(() => ({ fixed: 0 }));
   const summary = await runFulfillmentTick();
-  return NextResponse.json({ ok: true, provider: activeProvider(), summary });
+  return NextResponse.json({ ok: true, provider: activeProvider(), summary, deposits });
 }
 
 function authorized(req) {

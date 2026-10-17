@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/adminAuth';
-import { getOrder, updateOrder } from '@/lib/orderStore';
-import { fulfillOrder, pollFulfillment, maybeAutoFulfill } from '@/lib/fulfillment';
+import { getOrder, updateOrder, markOrderPaid } from '@/lib/orderStore';
+import { fulfillOrder, pollFulfillment } from '@/lib/fulfillment';
+import { settlePaidOrder, refundWalletOrder } from '@/lib/settle';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,6 +43,22 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ order, result: r });
     }
 
+    // Admin "To'landi" bossa — to'lov ham "paid" deb qayd etiladi (balans to'ldirish
+    // buyurtmasi bo'lsa hamyonga yoziladi, skin bo'lsa yetkazish boshlanadi).
+    if (body.status === 'paid') {
+      const r = await markOrderPaid(params.id, {
+        provider: 'manual',
+        providerTxnId: `manual-${params.id}`,
+        performTime: Date.now(),
+        by: 'admin',
+        note: body.note || "Admin to'langan deb belgiladi",
+      });
+      if (r.error) return NextResponse.json({ error: r.error }, { status: 404 });
+      await settlePaidOrder(params.id).catch((e) => console.error('[admin] settle:', e?.message));
+      return NextResponse.json({ order: await getOrder(params.id) });
+    }
+
+    const before = ['cancelled', 'refunded'].includes(body.status) ? await getOrder(params.id) : null;
     const result = await updateOrder(params.id, {
       status: body.status,
       note: body.note,
@@ -52,8 +69,8 @@ export async function PATCH(req, { params }) {
     if (result.error) {
       return NextResponse.json({ error: result.error }, { status: 404 });
     }
-    // operator qo'lda "To'landi" qilsa — avtomatik yetkazishni ham urinib ko'ramiz
-    if (body.status === 'paid') maybeAutoFulfill(params.id).catch(() => {});
+    // balansdan to'langan buyurtma bekor / qaytarilsa — pul hamyonga qaytadi
+    if (before) await refundWalletOrder(before).catch((e) => console.error('[admin] refund:', e?.message));
     return NextResponse.json({ order: result.order });
   } catch (e) {
     console.error('[api/admin/orders/[id] PATCH]', e.message);

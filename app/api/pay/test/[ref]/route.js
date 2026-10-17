@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getOrder, markOrderPaid } from '@/lib/orderStore';
 import { activeProvider } from '@/lib/payments';
-import { maybeAutoFulfill } from '@/lib/fulfillment';
+import { settlePaidOrder } from '@/lib/settle';
 import { limitOr429 } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -19,6 +19,6 @@ export async function POST(req, { params }) {
   if (o.payment?.status !== 'paid') {
     await markOrderPaid(o.id, { provider: 'test', by: 'test' });
   }
-  await maybeAutoFulfill(o.id);
+  await settlePaidOrder(o.id);
   return NextResponse.json({ ok: true });
 }
