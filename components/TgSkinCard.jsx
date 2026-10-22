@@ -1,12 +1,10 @@
 'use client';
 
+import { ShoppingCart, Check, Send, ArrowUpRight } from 'lucide-react';
 import { useStore } from './StoreProvider';
 import { WearBar } from './SkinCard';
 import { rarityRgb } from '@/lib/skinMeta';
 import { formatPrice } from '@/lib/products';
-
-const TG_ICON =
-  'M9.78 15.34 9.6 19.1c.38 0 .54-.16.74-.36l1.77-1.7 3.67 2.69c.67.37 1.15.18 1.33-.62l2.4-11.3c.22-1-.36-1.4-1.02-1.16L3.4 12.1c-.97.38-.96.92-.18 1.16l3.6 1.12 8.36-5.27c.4-.25.75-.11.46.14';
 
 // Telegram kanaldagi bitta skin e'loni (rarity rangida neon, aniq float belgisi).
 export default function TgSkinCard({ item: p, onOpen }) {
@@ -127,17 +125,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
                     : 'border-accent bg-accent text-ink shadow-[0_0_18px_rgba(198,255,0,0.4)] hover:shadow-[0_0_26px_rgba(198,255,0,0.65)]'
                 }`}
               >
-                {inCart ? (
-                  <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-[2.5]" aria-hidden="true">
-                    <path d="m5 12.5 4.5 4.5L19 7.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-2" aria-hidden="true">
-                    <circle cx="9" cy="21" r="1" />
-                    <circle cx="19" cy="21" r="1" />
-                    <path d="M1 1h3l2.4 12.4a2 2 0 0 0 2 1.6h9.2a2 2 0 0 0 2-1.6L21 6H6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
+                {inCart ? <Check className="h-5 w-5" strokeWidth={2.75} /> : <ShoppingCart className="h-5 w-5" strokeWidth={2.25} />}
               </button>
             )}
           </div>
@@ -154,9 +142,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
                 rel="noreferrer"
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:border-accent/50 hover:bg-white/10 hover:text-accent"
               >
-                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-2" aria-hidden="true">
-                  <path d={TG_ICON} strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <Send className="h-4 w-4" strokeWidth={2.25} />
                 {t('tg_buy')}
               </a>
               <a
@@ -167,7 +153,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
                 aria-label={t('tg_view_post')}
                 className="grid w-11 flex-none place-items-center rounded-xl border border-white/10 text-muted transition hover:border-white/40 hover:text-white"
               >
-                ↗
+                <ArrowUpRight className="h-4 w-4" strokeWidth={2.25} />
               </a>
             </div>
           )}
