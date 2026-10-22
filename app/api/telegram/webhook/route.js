@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { ingestUpdate } from '@/lib/tgIngest';
+import { handleBotMessage } from '@/lib/tgBot';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +31,7 @@ export async function POST(req) {
   }
 
   try {
-    const r = await ingestUpdate(update);
+    const r = update?.message ? await handleBotMessage(update) : await ingestUpdate(update);
     return NextResponse.json({ ok: true, ...r });
   } catch (e) {
     // 200 emas, xato bersak Telegram qayta yuboradi (yo'qolmasin)

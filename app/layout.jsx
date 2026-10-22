@@ -6,6 +6,7 @@ import CartDrawer from '@/components/CartDrawer';
 import SmoothScroll from '@/components/SmoothScroll';
 import ScrollToTop from '@/components/ScrollToTop';
 import CursorFx from '@/components/CursorFx';
+import TgWebApp from '@/components/TgWebApp';
 
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || 'https://oxy-savdo.vercel.app'
@@ -63,6 +64,7 @@ export default function RootLayout({ children }) {
           <SmoothScroll />
           <ScrollToTop />
           <CursorFx />
+          <TgWebApp />
           <div className="relative z-10">
             <Header />
             <main>{children}</main>
