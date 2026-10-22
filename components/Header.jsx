@@ -149,12 +149,14 @@ export default function Header() {
   const mainLinks = [
     { href: '/', label: t('nav_skins') },
     { href: '/sotish', label: t('nav_sell') },
+    { href: '/telegram-skinlar', label: t('nav_tg') },
     { href: '/katalog/kovriklar', label: t('nav_pads') },
     { href: '/yordam', label: t('nav_support') },
   ];
   const drawerLinks = [
     { href: '/', label: t('nav_skins') },
     { href: '/sotish', label: t('nav_sell') },
+    { href: '/telegram-skinlar', label: t('nav_tg') },
     { href: '/katalog/kovriklar', label: t('nav_pads') },
     { href: '/katalog/aksessuar', label: t('nav_acc') },
     ...(user ? [{ href: '/buyurtmalarim', label: t('nav_orders') }] : []),

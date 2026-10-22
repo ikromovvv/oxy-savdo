@@ -3,6 +3,10 @@
     {
       "path": "/api/fulfill/run",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/tg-skins/sync",
+      "schedule": "30 3 * * *"
     }
   ]
 }

@@ -10,7 +10,7 @@ export const revalidate = 3600; // 1 soat
 export default async function sitemap() {
   const now = new Date();
 
-  const staticRoutes = ['', '/sotish', '/katalog/kovriklar', '/katalog/aksessuar', '/parvarish', '/yordam'].map(
+  const staticRoutes = ['', '/sotish', '/telegram-skinlar', '/katalog/kovriklar', '/katalog/aksessuar', '/parvarish', '/yordam'].map(
     (p) => ({
       url: `${SITE_URL}${p || '/'}`,
       lastModified: now,

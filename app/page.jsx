@@ -10,6 +10,7 @@ import Magnetic from '@/components/Magnetic';
 import BuyCatalogHome from '@/components/BuyCatalogHome';
 import FeatureCards from '@/components/FeatureCards';
 import HeroSkins from '@/components/HeroSkins';
+import TgStrip from '@/components/TgStrip';
 import { categories, formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
 
@@ -134,6 +135,11 @@ export default function Home() {
           <HeroSkins />
         </div>
       </section>
+
+      {/* TELEGRAM KANALDAGI YANGI SKINLAR */}
+      <div className="container-site pt-10">
+        <TgStrip />
+      </div>
 
       {/* AFZALLIKLAR */}
       <FeatureCards />

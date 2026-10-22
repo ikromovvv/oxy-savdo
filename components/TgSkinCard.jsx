@@ -1,0 +1,137 @@
+'use client';
+
+import { useStore } from './StoreProvider';
+import { WearBar } from './SkinCard';
+import { rarityRgb } from '@/lib/skinMeta';
+import { formatPrice } from '@/lib/products';
+
+const TG_ICON =
+  'M9.78 15.34 9.6 19.1c.38 0 .54-.16.74-.36l1.77-1.7 3.67 2.69c.67.37 1.15.18 1.33-.62l2.4-11.3c.22-1-.36-1.4-1.02-1.16L3.4 12.1c-.97.38-.96.92-.18 1.16l3.6 1.12 8.36-5.27c.4-.25.75-.11.46.14';
+
+// Telegram kanaldagi bitta skin e'loni (rarity rangida neon, aniq float belgisi).
+export default function TgSkinCard({ item: p, onOpen }) {
+  const { t } = useStore();
+  const sold = p.status === 'sold';
+  const rgb = rarityRgb(p.rarityColor || '#c6ff00');
+  const color = p.rarityColor || '#c6ff00';
+
+  return (
+    <div
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_0_26px_var(--rglow)] ${sold ? 'opacity-70' : ''}`}
+      style={{
+        borderColor: `rgba(${rgb}, 0.32)`,
+        background: 'linear-gradient(180deg, rgba(22,28,38,0.65) 0%, rgba(18,18,20,0.55) 100%)',
+        boxShadow: `0 0 16px rgba(${rgb}, 0.16), inset 0 0 0 1px rgba(255,255,255,0.03)`,
+        '--rglow': `rgba(${rgb}, 0.38)`,
+      }}
+    >
+      <span
+        className="absolute inset-x-0 top-0 z-10 h-[2px]"
+        style={{ background: color, boxShadow: `0 0 12px ${color}` }}
+        aria-hidden="true"
+      />
+
+      {/* rasm */}
+      <button
+        type="button"
+        onClick={() => p.image && onOpen?.(p)}
+        className="relative block w-full px-3 pb-1 pt-5 text-left"
+        aria-label={p.name}
+      >
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-[45%] h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25 blur-3xl"
+          style={{ background: color }}
+        />
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-white/5 bg-black/40">
+          {p.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={p.image}
+              alt={p.name}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              draggable={false}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            />
+          ) : (
+            <div className="grid h-full w-full place-items-center px-4 text-center text-sm font-semibold text-white/60">{p.name}</div>
+          )}
+          {sold && (
+            <span className="absolute inset-0 grid place-items-center bg-black/55">
+              <span className="-rotate-12 rounded-md border-2 border-rose-400/80 px-3 py-1 text-lg font-extrabold tracking-widest text-rose-300">
+                {t('tg_sold')}
+              </span>
+            </span>
+          )}
+        </div>
+      </button>
+
+      {p.stattrak && (
+        <span className="absolute left-4 top-6 z-20 rounded-md border border-line bg-black/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent backdrop-blur">
+          StatTrak™
+        </span>
+      )}
+
+      {/* tana */}
+      <div className="flex flex-1 flex-col px-4 pb-4 pt-2">
+        <div className="line-clamp-2 min-h-[2.5em] text-[15px] font-semibold leading-tight">{p.name}</div>
+
+        {p.quality && <WearBar wear={p.quality} minFloat={p.minFloat} maxFloat={p.maxFloat} value={p.float} />}
+
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[11px]">
+          {p.float != null && (
+            <span className="rounded-md bg-white/[0.06] px-2 py-0.5 font-mono text-white/80">Float {p.float}</span>
+          )}
+          {p.noBan && (
+            <span className="rounded-md bg-emerald-500/15 px-2 py-0.5 font-semibold text-emerald-300">{t('tg_noban')}</span>
+          )}
+          {p.unban && (
+            <span className="rounded-md bg-amber-500/15 px-2 py-0.5 font-semibold text-amber-300">
+              {t('tg_unban')}: {p.unban}
+            </span>
+          )}
+        </div>
+
+        <div className="mt-auto pt-3">
+          <div className="flex items-end justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-lg font-bold leading-tight">
+                {p.priceUzs != null ? formatPrice(p.priceUzs) : sold ? '—' : t('tg_price_ask')}
+              </div>
+              {p.priceUsd != null && !sold && (
+                <div className="text-[11px] text-muted">${p.priceUsd}</div>
+              )}
+            </div>
+            <a
+              href={p.link}
+              target="_blank"
+              rel="noreferrer"
+              className="flex-none py-1 text-[11px] text-muted transition hover:text-white"
+            >
+              {t('tg_view_post')} ↗
+            </a>
+          </div>
+
+          {sold ? (
+            <div className="mt-3 w-full rounded-xl border border-line py-2.5 text-center text-sm font-semibold text-muted">
+              {t('tg_sold')}
+            </div>
+          ) : (
+            <a
+              href={p.buyUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-accent/50 hover:bg-white/10 hover:text-accent hover:shadow-[0_0_18px_rgba(198,255,0,0.3)]"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-2" aria-hidden="true">
+                <path d={TG_ICON} strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              {t('tg_buy')}
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

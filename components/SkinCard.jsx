@@ -9,7 +9,7 @@ import { wearInfo, rarityInfo, rarityRgb, WEAR_TIERS } from '@/lib/skinMeta';
 
 // Skin holati (exterior) — segmentlangan neon progress bar + taxminiy pointer.
 // minFloat/maxFloat (CSGO-API'dan) berilsa, erishib bo'lmaydigan oraliq xiralashadi.
-function WearBar({ wear, minFloat, maxFloat }) {
+export function WearBar({ wear, minFloat, maxFloat, value }) {
   const w = wearInfo(wear);
   if (!w) return null;
   const lo = typeof minFloat === 'number' ? Math.max(0, Math.min(100, minFloat * 100)) : 0;
@@ -20,7 +20,7 @@ function WearBar({ wear, minFloat, maxFloat }) {
       <div className="relative pt-2">
         <span
           className="absolute top-0 h-0 w-0 -translate-x-1/2 border-x-[3px] border-t-[5px] border-x-transparent border-t-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]"
-          style={{ left: `${w.midPct}%` }}
+          style={{ left: `${Number.isFinite(value) ? Math.max(0, Math.min(100, value * 100)) : w.midPct}%` }}
         />
         <div className="relative flex h-1.5 w-full gap-[2px]">
           {WEAR_TIERS.map((tier) => {

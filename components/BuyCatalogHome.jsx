@@ -6,6 +6,7 @@ import SkinCard from './SkinCard';
 import { weaponTypes as weaponTypeLabels } from '@/lib/products';
 import { wearInfo } from '@/lib/skinMeta';
 import Select from './Select';
+import TgStrip from './TgStrip';
 
 const TIER_COLOR = { FN: '#22c55e', MW: '#a3e635', FT: '#eab308', WW: '#f97316', BS: '#ef4444' };
 
@@ -106,6 +107,8 @@ export default function BuyCatalogHome() {
         <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{t('catalog_title')}</h1>
         <p className="mt-2 max-w-lg text-sm text-muted">{t('catalog_subtitle')}</p>
       </div>
+
+      <TgStrip />
 
       {/* QUROL TURI TABLARI */}
       <div className="no-scrollbar -mx-5 mb-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
