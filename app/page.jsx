@@ -88,10 +88,11 @@ export default function Home() {
   }, []);
 
   // Steam orqali kirilgan bo'lsa, bosh sahifa "skin sotib olish" katalogiga almashadi
-  if (user) {
-    return <TelegramSkinsClient />;
-  }
+  // Hozircha skinlarni ko'rish uchun Steam orqali kirish shart emas — hamma Telegram skinlarni ko'radi.
+  // Kirish sahifasini (hero) qaytarish uchun: `if (user) return ...` ga almashtiring.
+  return <TelegramSkinsClient />;
 
+  // eslint-disable-next-line no-unreachable
   return (
     <>
       {/* HERO */}
