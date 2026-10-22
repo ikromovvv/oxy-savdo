@@ -75,6 +75,7 @@ export function StoreProvider({ children }) {
     const add = (product, qty = 1) =>
       setItems((prev) => {
         const i = prev.findIndex((x) => x.id === product.id);
+        if (i > -1 && product.kind === 'tgskin') return prev; // yagona nusxa
         if (i > -1) {
           const next = [...prev];
           next[i] = { ...next[i], qty: next[i].qty + qty };
@@ -90,7 +91,7 @@ export function StoreProvider({ children }) {
             qty,
             image: product.image || '',
             wear: product.wear || null,
-            kind: isSkin ? 'skin' : 'product',
+            kind: product.kind === 'tgskin' ? 'tgskin' : isSkin ? 'skin' : 'product',
             marketHashName: isSkin ? product.fullName || product.name : undefined,
           },
         ];

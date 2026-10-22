@@ -41,10 +41,11 @@ export default function CartDrawer() {
   const [okRef, setOkRef] = useState('');
   const [errMsg, setErrMsg] = useState('');
 
-  const hasSkins = items.some((it) => it.kind === 'skin');
+  const isSkinKind = (it) => it.kind === 'skin' || it.kind === 'tgskin';
+  const hasSkins = items.some(isSkinKind);
   // LIS-SKINS uslubi: Steam bilan kirgan + savatda faqat skin -> forma yo'q,
   // faqat (saqlangan) Trade URL va bitta "Sotib olish" tugmasi.
-  const express = Boolean(user) && items.length > 0 && items.every((it) => it.kind === 'skin');
+  const express = Boolean(user) && items.length > 0 && items.every(isSkinKind);
   const [editTrade, setEditTrade] = useState(false);
   const tradeKey = user?.steamid ? `oxy:trade:${user.steamid}` : null;
   const panelRef = useRef(null);
@@ -209,11 +210,11 @@ export default function CartDrawer() {
                             {it.wear && (
                               <span className="rounded-lg bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">{it.wear}</span>
                             )}
-                            <div className="flex items-center gap-0.5">
+                            {it.kind !== 'tgskin' && <div className="flex items-center gap-0.5">
                               <button aria-label="−" onClick={() => setQty(it.id, it.qty - 1)} className="h-8 w-8 rounded-full border border-line text-sm">−</button>
                               <span className="w-6 text-center text-sm">{it.qty}</span>
                               <button aria-label="+" onClick={() => setQty(it.id, it.qty + 1)} className="h-8 w-8 rounded-full border border-line text-sm">+</button>
-                            </div>
+                            </div>}
                           </div>
                         </div>
                         <div className="col-start-2 row-start-2 whitespace-nowrap text-left text-sm font-bold sm:col-start-3 sm:row-start-1 sm:text-right sm:text-base">{formatPrice(it.price * it.qty)}</div>

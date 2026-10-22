@@ -10,7 +10,8 @@ const TG_ICON =
 
 // Telegram kanaldagi bitta skin e'loni (rarity rangida neon, aniq float belgisi).
 export default function TgSkinCard({ item: p, onOpen }) {
-  const { t } = useStore();
+  const { t, add, items, setCartOpen } = useStore();
+  const inCart = items.some((x) => x.id === p.id);
   const sold = p.status === 'sold';
   const rgb = rarityRgb(p.rarityColor || '#c6ff00');
   const color = p.rarityColor || '#c6ff00';
@@ -118,17 +119,39 @@ export default function TgSkinCard({ item: p, onOpen }) {
               {t('tg_sold')}
             </div>
           ) : (
+            <div className="mt-3 flex flex-col gap-2">
+              {p.priceUzs != null && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    inCart
+                      ? setCartOpen(true)
+                      : add({
+                          id: p.id,
+                          kind: 'tgskin',
+                          name: `${p.stattrak ? 'StatTrak™ ' : ''}${p.name}`,
+                          price: p.priceUzs,
+                          image: p.image,
+                          wear: p.qualityName || p.quality,
+                        })
+                  }
+                  className="btn-cta flex w-full items-center justify-center gap-2 py-2.5 text-sm"
+                >
+                  {inCart ? t('tg_in_cart') : t('tg_add')}
+                </button>
+              )}
             <a
               href={p.buyUrl}
               target="_blank"
               rel="noreferrer"
-              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-accent/50 hover:bg-white/10 hover:text-accent hover:shadow-[0_0_18px_rgba(198,255,0,0.3)]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-accent/50 hover:bg-white/10 hover:text-accent hover:shadow-[0_0_18px_rgba(198,255,0,0.3)]"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-2" aria-hidden="true">
                 <path d={TG_ICON} strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               {t('tg_buy')}
             </a>
+            </div>
           )}
         </div>
       </div>
