@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { playSfx } from '@/lib/sfx';
+import { playIntro, playSfx } from '@/lib/sfx';
 
 // Brendlangan kirish animatsiyasi (faqat bir sessiyada bir marta, route almashganda qaytmaydi).
 // Foiz: haqiqiy yuklanish bosqichlariga (shrift + sahifa `load`) bog'langan, vaqt bilan
@@ -36,6 +36,21 @@ export default function IntroLoader() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const minMs = reduce ? MIN_MS_REDUCED : MIN_MS;
     const start = performance.now();
+
+    // Ovoz animatsiya bilan birga: avtoplay ruxsat bo'lsa darrov, bo'lmasa birinchi bosishda
+    // (qolgan qismi o'tib ketgan bo'lsa, tugash "whoosh"i baribir chiqadi).
+    let soundStarted = false;
+    const startSound = async () => {
+      if (soundStarted) return;
+      soundStarted = await playIntro();
+      if (soundStarted) {
+        window.removeEventListener('pointerdown', startSound);
+        window.removeEventListener('keydown', startSound);
+      }
+    };
+    startSound();
+    window.addEventListener('pointerdown', startSound);
+    window.addEventListener('keydown', startSound);
 
     let loaded = document.readyState === 'complete';
     let fonts = !document.fonts;
@@ -91,6 +106,8 @@ export default function IntroLoader() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('load', onLoad);
+      window.removeEventListener('pointerdown', startSound);
+      window.removeEventListener('keydown', startSound);
       timers.current.forEach(clearTimeout);
       root.classList.remove('intro-lock');
     };
