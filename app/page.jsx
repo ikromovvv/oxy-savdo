@@ -7,9 +7,10 @@ import { useStore } from '@/components/StoreProvider';
 import ProductCard, { ProductMedia } from '@/components/ProductCard';
 import Reveal from '@/components/Reveal';
 import Magnetic from '@/components/Magnetic';
-import BuyCatalogHome from '@/components/BuyCatalogHome';
+// import BuyCatalogHome from '@/components/BuyCatalogHome'; // Skinport katalogi vaqtincha o'chirilgan
+import TelegramSkinsClient from '@/app/telegram-skinlar/client';
 import FeatureCards from '@/components/FeatureCards';
-import HeroSkins from '@/components/HeroSkins';
+// import HeroSkins from '@/components/HeroSkins';
 import TgStrip from '@/components/TgStrip';
 import { categories, formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
@@ -88,7 +89,7 @@ export default function Home() {
 
   // Steam orqali kirilgan bo'lsa, bosh sahifa "skin sotib olish" katalogiga almashadi
   if (user) {
-    return <BuyCatalogHome />;
+    return <TelegramSkinsClient />;
   }
 
   return (
@@ -132,7 +133,7 @@ export default function Home() {
             ))}
           </ul>
 
-          <HeroSkins />
+          {/* <HeroSkins /> */}
         </div>
       </section>
 
