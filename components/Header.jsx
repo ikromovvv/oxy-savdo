@@ -147,13 +147,13 @@ export default function Header() {
 
   // ixcham asosiy navigatsiya; qolganlari mobil menyu va footer'da
   const mainLinks = [
-    { href: '/', label: t('nav_skins') },
+    { href: '/telegram-skinlar', label: t('nav_skins') },
     { href: '/sotish', label: t('nav_sell') },
     { href: '/katalog/kovriklar', label: t('nav_pads') },
     { href: '/yordam', label: t('nav_support') },
   ];
   const drawerLinks = [
-    { href: '/', label: t('nav_skins') },
+    { href: '/telegram-skinlar', label: t('nav_skins') },
     { href: '/sotish', label: t('nav_sell') },
     { href: '/katalog/kovriklar', label: t('nav_pads') },
     { href: '/katalog/aksessuar', label: t('nav_acc') },

@@ -7,8 +7,6 @@ import { useStore } from '@/components/StoreProvider';
 import ProductCard, { ProductMedia } from '@/components/ProductCard';
 import Reveal from '@/components/Reveal';
 import Magnetic from '@/components/Magnetic';
-// import BuyCatalogHome from '@/components/BuyCatalogHome'; // Skinport katalogi vaqtincha o'chirilgan
-import TelegramSkinsClient from '@/app/telegram-skinlar/client';
 import FeatureCards from '@/components/FeatureCards';
 // import HeroSkins from '@/components/HeroSkins';
 import TgStrip from '@/components/TgStrip';
@@ -33,7 +31,7 @@ function AccentDots({ text }) {
 }
 
 export default function Home() {
-  const { t, lang, add, user } = useStore();
+  const { t, lang, add } = useStore();
   const heroRef = useRef(null);
 
   // Kovriklar endi admin panel orqali boshqariladi — real vaqtda olib kelamiz
@@ -88,11 +86,6 @@ export default function Home() {
   }, []);
 
   // Steam orqali kirilgan bo'lsa, bosh sahifa "skin sotib olish" katalogiga almashadi
-  // Hozircha skinlarni ko'rish uchun Steam orqali kirish shart emas — hamma Telegram skinlarni ko'radi.
-  // Kirish sahifasini (hero) qaytarish uchun: `if (user) return ...` ga almashtiring.
-  return <TelegramSkinsClient />;
-
-  // eslint-disable-next-line no-unreachable
   return (
     <>
       {/* HERO */}
