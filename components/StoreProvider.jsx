@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { t as translate } from '@/lib/i18n';
+import { playSfx } from '@/lib/sfx';
 
 const StoreCtx = createContext(null);
 
@@ -72,8 +73,9 @@ export function StoreProvider({ children }) {
   }, [lang, items, favorites, ready]);
 
   const value = useMemo(() => {
-    const add = (product, qty = 1) =>
-      setItems((prev) => {
+    const add = (product, qty = 1) => {
+      playSfx('add');
+      return setItems((prev) => {
         const i = prev.findIndex((x) => x.id === product.id);
         if (i > -1 && product.kind === 'tgskin') return prev; // yagona nusxa
         if (i > -1) {
@@ -96,6 +98,7 @@ export function StoreProvider({ children }) {
           },
         ];
       });
+    };
 
     return {
       lang,
@@ -103,7 +106,10 @@ export function StoreProvider({ children }) {
       t: (k) => translate(lang, k),
       items,
       add,
-      remove: (id) => setItems((p) => p.filter((x) => x.id !== id)),
+      remove: (id) => {
+        playSfx('remove');
+        setItems((p) => p.filter((x) => x.id !== id));
+      },
       setQty: (id, qty) =>
         setItems((p) =>
           qty <= 0 ? p.filter((x) => x.id !== id) : p.map((x) => (x.id === id ? { ...x, qty } : x))
@@ -112,7 +118,10 @@ export function StoreProvider({ children }) {
       count: items.reduce((s, x) => s + x.qty, 0),
       total: items.reduce((s, x) => s + x.qty * x.price, 0),
       cartOpen,
-      setCartOpen,
+      setCartOpen: (v) => {
+        if (v) playSfx('open');
+        setCartOpen(v);
+      },
       user,
       userLoading,
       balance,

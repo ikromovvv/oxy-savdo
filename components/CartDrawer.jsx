@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useStore } from './StoreProvider';
+import { playSfx } from '@/lib/sfx';
 import { ProductMedia } from './ProductCard';
 import { formatPrice } from '@/lib/products';
 import { isValidTradeUrl, parseTradeUrl } from '@/lib/steamTrade';
@@ -129,6 +130,7 @@ export default function CartDrawer() {
       if (data.paid) refreshBalance();
       setOkRef(data.order?.ref || '');
       setStep('ok');
+      playSfx('success');
     } catch (err) {
       // server rad etgan aniq sabab (narx yangilandi, noto'g'ri trade URL ...) ko'rsatiladi
       setErrMsg(err?.message && err.message !== 'failed' ? err.message : '');

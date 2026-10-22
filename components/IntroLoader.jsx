@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { playSfx } from '@/lib/sfx';
 
 // Brendlangan kirish animatsiyasi (faqat bir sessiyada bir marta, route almashganda qaytmaydi).
 // Foiz: haqiqiy yuklanish bosqichlariga (shrift + sahifa `load`) bog'langan, vaqt bilan
@@ -61,6 +62,7 @@ export default function IntroLoader() {
       }
       setPct(100);
       setPhase('out');
+      playSfx('whoosh'); // brauzer ovozni bloklagan bo'lsa jim o'tadi
       timers.current.push(
         setTimeout(() => {
           setPhase('gone');
