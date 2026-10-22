@@ -7,6 +7,7 @@ import SmoothScroll from '@/components/SmoothScroll';
 import ScrollToTop from '@/components/ScrollToTop';
 import CursorFx from '@/components/CursorFx';
 import TgWebApp from '@/components/TgWebApp';
+import IntroLoader from '@/components/IntroLoader';
 
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || 'https://oxy-savdo.vercel.app'
@@ -59,6 +60,13 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="min-h-screen font-sans antialiased">
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(sessionStorage.getItem('oxy:intro')==='1')document.documentElement.classList.add('no-intro')}catch(e){}",
+          }}
+        />
+        <IntroLoader />
         <div className="grid-bg" aria-hidden="true" />
         <StoreProvider>
           <SmoothScroll />
