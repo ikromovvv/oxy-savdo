@@ -12,15 +12,28 @@ import { wearInfo, rarityInfo, rarityRgb, WEAR_TIERS } from '@/lib/skinMeta';
 export function WearBar({ wear, minFloat, maxFloat, value }) {
   const w = wearInfo(wear);
   if (!w) return null;
-  const lo = typeof minFloat === 'number' ? Math.max(0, Math.min(100, minFloat * 100)) : 0;
-  const hi = typeof maxFloat === 'number' ? Math.max(0, Math.min(100, maxFloat * 100)) : 100;
+  // Segmentlar teng kenglikda, shuning uchun float'ni segment ichidagi o'rniga qarab joylaymiz
+  const n = WEAR_TIERS.length;
+  const toPos = (f) => {
+    const x = Math.max(0, Math.min(1, f));
+    const i = WEAR_TIERS.findIndex((t, k) => x <= t.max || k === n - 1);
+    const t = WEAR_TIERS[i];
+    return ((i + Math.max(0, Math.min(1, (x - t.min) / (t.max - t.min)))) / n) * 100;
+  };
+  const idx = WEAR_TIERS.findIndex((t) => t.key === w.key);
+  const lo = typeof minFloat === 'number' ? toPos(minFloat) : 0;
+  const hi = typeof maxFloat === 'number' ? toPos(maxFloat) : 100;
+  // pointer doim o'z (yoritilgan) segmenti ustida turadi
+  const pointer = Number.isFinite(value)
+    ? Math.max((idx / n) * 100, Math.min(((idx + 1) / n) * 100, toPos(value)))
+    : ((idx + 0.5) / n) * 100;
 
   return (
     <div className="mt-2.5">
       <div className="relative pt-2">
         <span
           className="absolute top-0 h-0 w-0 -translate-x-1/2 border-x-[3px] border-t-[5px] border-x-transparent border-t-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]"
-          style={{ left: `${Number.isFinite(value) ? Math.max(0, Math.min(100, value * 100)) : w.midPct}%` }}
+          style={{ left: `${pointer}%` }}
         />
         <div className="relative flex h-1.5 w-full gap-[2px]">
           {WEAR_TIERS.map((tier) => {
