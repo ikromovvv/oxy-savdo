@@ -95,7 +95,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
         </div>
 
         <div className="mt-auto pt-3">
-          <div className="flex items-end justify-between gap-2">
+          <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="text-lg font-bold leading-tight">
                 {p.priceUzs != null ? formatPrice(p.priceUzs) : sold ? '—' : t('tg_price_ask')}
@@ -104,14 +104,42 @@ export default function TgSkinCard({ item: p, onOpen }) {
                 <div className="text-[11px] text-muted">${p.priceUsd}</div>
               )}
             </div>
-            <a
-              href={p.link}
-              target="_blank"
-              rel="noreferrer"
-              className="flex-none py-1 text-[11px] text-muted transition hover:text-white"
-            >
-              {t('tg_view_post')} ↗
-            </a>
+            {!sold && p.priceUzs != null && (
+              <button
+                type="button"
+                onClick={() =>
+                  inCart
+                    ? setCartOpen(true)
+                    : add({
+                        id: p.id,
+                        kind: 'tgskin',
+                        name: `${p.stattrak ? 'StatTrak™ ' : ''}${p.name}`,
+                        price: p.priceUzs,
+                        image: p.image,
+                        wear: p.qualityName || p.quality,
+                      })
+                }
+                aria-label={inCart ? t('tg_in_cart') : t('tg_add')}
+                title={inCart ? t('tg_in_cart') : t('tg_add')}
+                className={`grid h-11 w-11 flex-none place-items-center rounded-full border transition-all duration-300 hover:scale-110 ${
+                  inCart
+                    ? 'border-accent/60 bg-accent/15 text-accent shadow-[0_0_16px_rgba(198,255,0,0.35)]'
+                    : 'border-accent bg-accent text-ink shadow-[0_0_18px_rgba(198,255,0,0.4)] hover:shadow-[0_0_26px_rgba(198,255,0,0.65)]'
+                }`}
+              >
+                {inCart ? (
+                  <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-[2.5]" aria-hidden="true">
+                    <path d="m5 12.5 4.5 4.5L19 7.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-2" aria-hidden="true">
+                    <circle cx="9" cy="21" r="1" />
+                    <circle cx="19" cy="21" r="1" />
+                    <path d="M1 1h3l2.4 12.4a2 2 0 0 0 2 1.6h9.2a2 2 0 0 0 2-1.6L21 6H6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </button>
+            )}
           </div>
 
           {sold ? (
@@ -119,38 +147,28 @@ export default function TgSkinCard({ item: p, onOpen }) {
               {t('tg_sold')}
             </div>
           ) : (
-            <div className="mt-3 flex flex-col gap-2">
-              {p.priceUzs != null && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    inCart
-                      ? setCartOpen(true)
-                      : add({
-                          id: p.id,
-                          kind: 'tgskin',
-                          name: `${p.stattrak ? 'StatTrak™ ' : ''}${p.name}`,
-                          price: p.priceUzs,
-                          image: p.image,
-                          wear: p.qualityName || p.quality,
-                        })
-                  }
-                  className="btn-cta flex w-full items-center justify-center gap-2 py-2.5 text-sm"
-                >
-                  {inCart ? t('tg_in_cart') : t('tg_add')}
-                </button>
-              )}
-            <a
-              href={p.buyUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-accent/50 hover:bg-white/10 hover:text-accent hover:shadow-[0_0_18px_rgba(198,255,0,0.3)]"
-            >
-              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-2" aria-hidden="true">
-                <path d={TG_ICON} strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              {t('tg_buy')}
-            </a>
+            <div className="mt-3 flex items-stretch gap-2">
+              <a
+                href={p.buyUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:border-accent/50 hover:bg-white/10 hover:text-accent"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-2" aria-hidden="true">
+                  <path d={TG_ICON} strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                {t('tg_buy')}
+              </a>
+              <a
+                href={p.link}
+                target="_blank"
+                rel="noreferrer"
+                title={t('tg_view_post')}
+                aria-label={t('tg_view_post')}
+                className="grid w-11 flex-none place-items-center rounded-xl border border-white/10 text-muted transition hover:border-white/40 hover:text-white"
+              >
+                ↗
+              </a>
             </div>
           )}
         </div>
