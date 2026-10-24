@@ -20,6 +20,7 @@ export default function SotishPage() {
   const [error, setError] = useState(null);
   const [errorDetail, setErrorDetail] = useState(null);
   const [stale, setStale] = useState(false);
+  const [rate, setRate] = useState(12700); // 1 USD = ? so'm
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('price_desc');
   const [selected, setSelected] = useState(() => new Set());
@@ -49,6 +50,7 @@ export default function SotishPage() {
       } else {
         setItems(data.items || []);
         setStale(Boolean(data.stale));
+        if (data.rate > 0) setRate(data.rate);
       }
     } catch (e) {
       setError('fetch_failed');
@@ -73,6 +75,7 @@ export default function SotishPage() {
 
   const selectedItems = useMemo(() => items.filter((i) => selected.has(i.assetid)), [items, selected]);
   const total = selectedItems.reduce((s, i) => s + (i.price || 0), 0);
+  const uzs = (usd) => Math.round(usd * rate).toLocaleString('ru-RU');
 
   function toggle(it) {
     if (it.price == null) return;
@@ -302,8 +305,15 @@ export default function SotishPage() {
                       )}
                     </div>
                     <div className="mt-2 truncate text-xs text-white/80">{it.name}</div>
-                    <div className="mt-1 text-sm font-semibold">
-                      {sellable ? `$${it.price.toFixed(2)}` : t('sell_price_unknown')}
+                    <div className="mt-1">
+                      {sellable ? (
+                        <>
+                          <div className="text-sm font-semibold">{uzs(it.price)} so&apos;m</div>
+                          <div className="text-[11px] text-muted">${it.price.toFixed(2)}</div>
+                        </>
+                      ) : (
+                        <div className="text-sm font-semibold">{t('sell_price_unknown')}</div>
+                      )}
                     </div>
                   </button>
                 );
@@ -321,7 +331,10 @@ export default function SotishPage() {
 
           <div className="flex items-center justify-between border-y border-line py-3">
             <span className="label">{t('sell_total')}</span>
-            <span className="text-xl font-semibold">${total.toFixed(2)}</span>
+            <span className="text-right">
+              <span className="block text-xl font-semibold">{uzs(total)} so&apos;m</span>
+              <span className="block text-xs text-muted">${total.toFixed(2)}</span>
+            </span>
           </div>
 
           <div>

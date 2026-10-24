@@ -15,7 +15,7 @@ export async function GET() {
 
   try {
     const { items, stale } = await getInventoryWithPrices(session.steamid);
-    return NextResponse.json({ items, stale: Boolean(stale) });
+    return NextResponse.json({ items, stale: Boolean(stale), rate: Number(process.env.USD_UZS) || 12700 });
   } catch (e) {
     console.error('[api/inventory] xato:', e?.code || e?.message || e, e?.detail || '');
     return NextResponse.json({
