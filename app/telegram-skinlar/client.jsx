@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import Select from '@/components/Select';
 import TgSkinCard from '@/components/TgSkinCard';
+import { SortLabel } from '@/components/icons';
 
 const TIER_COLOR = { FN: '#22c55e', MW: '#a3e635', FT: '#eab308', WW: '#f97316', BS: '#ef4444' };
 
@@ -77,8 +78,8 @@ export default function TelegramSkinsClient() {
           onChange={setSort}
           options={[
             { value: 'new', label: t('tg_sort_new') },
-            { value: 'asc', label: t('tg_sort_asc') },
-            { value: 'desc', label: t('tg_sort_desc') },
+            { value: 'asc', label: <SortLabel text={t('tg_sort_asc').replace(/\s*[↑↓]/, '')} dir="asc" /> },
+            { value: 'desc', label: <SortLabel text={t('tg_sort_desc').replace(/\s*[↑↓]/, '')} dir="desc" /> },
           ]}
         />
       </div>

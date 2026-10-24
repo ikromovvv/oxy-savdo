@@ -1,6 +1,6 @@
 'use client';
 
-import { RotateCw } from '@/components/icons';
+import { RotateCw, SortLabel } from '@/components/icons';
 import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import SteamLoginGate from '@/components/SteamLoginGate';
@@ -171,8 +171,8 @@ export default function SotishPage() {
               value={sort}
               onChange={setSort}
               options={[
-                { value: 'price_desc', label: `${t('sell_sort_price')} ↓` },
-                { value: 'price_asc', label: `${t('sell_sort_price')} ↑` },
+                { value: 'price_desc', label: <SortLabel text={t('sell_sort_price')} dir="desc" /> },
+                { value: 'price_asc', label: <SortLabel text={t('sell_sort_price')} dir="asc" /> },
               ]}
             />
 

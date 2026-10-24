@@ -3,7 +3,7 @@
 // Saytning umumiy (dark + neon) uslubiga mos maxsus dropdown — brauzerning
 // standart <select> oynasi o'rniga (u OS uslubida oq/ko'k chiqadi va
 // dizaynga mos kelmaydi).
-import { ChevronDown } from './icons';
+import { Check, ChevronDown } from './icons';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Select({
@@ -82,7 +82,7 @@ export default function Select({
                 }`}
               >
                 {o.label}
-                {active && <span className="text-accent">✓</span>}
+                {active && <Check className="h-4 w-4 text-accent" strokeWidth={2.5} />}
               </button>
             );
           })}

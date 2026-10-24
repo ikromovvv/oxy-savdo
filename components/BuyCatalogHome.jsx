@@ -1,6 +1,6 @@
 'use client';
 
-import { RotateCw } from './icons';
+import { RotateCw, SortLabel } from './icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from './StoreProvider';
 import SkinCard from './SkinCard';
@@ -159,8 +159,8 @@ export default function BuyCatalogHome() {
           value={sort}
           onChange={setSort}
           options={[
-            { value: 'price_desc', label: `${t('catalog_sort_price')} ↓` },
-            { value: 'price_asc', label: `${t('catalog_sort_price')} ↑` },
+            { value: 'price_desc', label: <SortLabel text={t('catalog_sort_price')} dir="desc" /> },
+            { value: 'price_asc', label: <SortLabel text={t('catalog_sort_price')} dir="asc" /> },
           ]}
         />
       </div>

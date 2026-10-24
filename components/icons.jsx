@@ -15,6 +15,20 @@ export {
   Headset,
   Tag,
 } from 'lucide-react';
+import { ArrowDown, ArrowUp } from 'lucide-react';
+
+export { ArrowDown, ArrowUp };
+
+// Saralash yorlig'i: matn + yo'nalish strelkasi (dropdown va tanlangan qiymatda)
+export function SortLabel({ text, dir }) {
+  const Arrow = dir === 'asc' ? ArrowUp : ArrowDown;
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {text}
+      <Arrow className="h-3.5 w-3.5" strokeWidth={2.25} />
+    </span>
+  );
+}
 
 // Steam — brend belgisi, lucide'da yo'q
 export function SteamIcon({ className = 'h-4 w-4' }) {
