@@ -267,6 +267,14 @@ export default function CartDrawer() {
                         className="mt-2 w-full rounded-xl border border-line bg-panel px-4 py-3 text-sm outline-none placeholder:text-muted/60 focus:border-accent/60 focus:ring-1 focus:ring-accent/25"
                       />
                       <span className="mt-1.5 block text-[11px] leading-snug text-muted">{t('trade_url_help')}</span>
+                      <a
+                        href="https://steamcommunity.com/my/tradeoffers/privacy#trade_offer_access_url"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent transition hover:bg-accent/20"
+                      >
+                        {t('trade_url_get')} ↗
+                      </a>
                     </label>
                   )}
                   {formErr && (
@@ -368,6 +376,14 @@ export default function CartDrawer() {
                 <span className="mt-1.5 block text-[11px] leading-snug text-muted">
                   {t('trade_url_help')}
                 </span>
+                <a
+                  href="https://steamcommunity.com/my/tradeoffers/privacy#trade_offer_access_url"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent transition hover:bg-accent/20"
+                >
+                  {t('trade_url_get')} ↗
+                </a>
               </label>
             )}
 
