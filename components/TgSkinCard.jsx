@@ -1,6 +1,6 @@
 'use client';
 
-import { ShoppingCart, Check, Send, ArrowUpRight } from 'lucide-react';
+import { ShoppingCart, Check, Send, ArrowUpRight } from './icons';
 import { useStore } from './StoreProvider';
 import { WearBar } from './SkinCard';
 import { rarityRgb } from '@/lib/skinMeta';
@@ -98,8 +98,8 @@ export default function TgSkinCard({ item: p, onOpen }) {
               <div className="text-lg font-bold leading-tight">
                 {p.priceUzs != null ? formatPrice(p.priceUzs) : sold ? '—' : t('tg_price_ask')}
               </div>
-              {p.priceUsd != null && !sold && (
-                <div className="text-[11px] text-muted">${p.priceUsd}</div>
+              {p.priceUsdShown != null && !sold && (
+                <div className="text-[11px] text-muted">{p.usdApprox ? '≈ ' : ''}${p.priceUsdShown}</div>
               )}
             </div>
             {!sold && p.priceUzs != null && (

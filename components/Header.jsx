@@ -9,20 +9,8 @@ import { site } from '@/lib/site';
 import OxyLogo from './OxyLogo';
 import Select from './Select';
 import TopUpModal from './TopUpModal';
+import { ShoppingCart, Wallet, Plus, ChevronDown, SteamIcon } from './icons';
 
-const STEAM_ICON =
-  'M12 2C6.95 2 2.8 5.8 2.14 10.7l4.5 1.86a2.7 2.7 0 0 1 1.53-.47c.06 0 .12 0 .18.01l2-2.9v-.04a3.6 3.6 0 0 1 3.6-3.6 3.6 3.6 0 0 1 0 7.2h-.08l-2.86 2.04c0 .06.01.11.01.17a2.72 2.72 0 0 1-5.4.5L2 15.06C2.9 19.14 6.6 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2Zm-2.02 15.34-1.03-.43a2.06 2.06 0 0 0 1.9 1.27 2.07 2.07 0 0 0 2.07-2.07 2.06 2.06 0 0 0-.86-1.68l1.06.44a1.52 1.52 0 1 1-1.17 2.8l-1.97-.33Zm7.65-8.32a2.4 2.4 0 1 1-4.8 0 2.4 2.4 0 0 1 4.8 0Zm-2.4 1.6a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2Z';
-
-function Ico({ d, className = 'h-4 w-4', fill = false }) {
-  return (
-    <svg viewBox="0 0 24 24" className={`${className} ${fill ? 'fill-current' : 'fill-none stroke-current stroke-2'}`} aria-hidden="true">
-      <path d={d} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-const WALLET = 'M3 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Zm14 6h.01';
-const CART = 'M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h9.2a2 2 0 0 0 2-1.6L23 6H6M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm10 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z';
-const PLUS = 'M12 5v14M5 12h14';
 
 // Foydalanuvchi menyusi (avatar + dropdown): buyurtmalar, saqlangan, balans, chiqish
 function ProfileMenu({ onTopUp }) {
@@ -63,9 +51,7 @@ function ProfileMenu({ onTopUp }) {
             {user.name?.[0]?.toUpperCase() || 'S'}
           </span>
         )}
-        <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 fill-none stroke-current stroke-2 text-muted transition-transform ${open ? 'rotate-180 text-accent' : ''}`}>
-          <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <ChevronDown className={`h-3.5 w-3.5 text-muted transition-transform ${open ? 'rotate-180 text-accent' : ''}`} strokeWidth={2} />
       </button>
 
       {open && (
@@ -96,7 +82,7 @@ function ProfileMenu({ onTopUp }) {
             className={item}
           >
             {t('balance_topup')}
-            <Ico d={PLUS} className="h-3.5 w-3.5 text-accent" />
+            <Plus className="h-3.5 w-3.5 text-accent" strokeWidth={2.25} />
           </button>
           <a href="/api/auth/steam/logout" className={`${item} border-t border-line text-muted`}>
             {t('steam_logout')}
@@ -208,7 +194,7 @@ export default function Header() {
               aria-label={t('cart')}
               className="relative grid h-10 w-10 place-items-center rounded-xl bg-accent text-ink transition hover:brightness-95 hover:shadow-[0_0_18px_rgba(255,255,255,0.35)]"
             >
-              <Ico d={CART} className="h-[18px] w-[18px]" />
+              <ShoppingCart className="h-[18px] w-[18px]" strokeWidth={2} />
               {count > 0 && (
                 <span className="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[11px] font-bold text-ink">
                   {count}
@@ -220,7 +206,7 @@ export default function Header() {
               <>
                 {/* balans + to'ldirish */}
                 <div className="flex h-10 items-center rounded-xl border border-line bg-panel pl-2.5 pr-1">
-                  <Ico d={WALLET} className="h-4 w-4 flex-none text-accent" />
+                  <Wallet className="h-4 w-4 flex-none text-accent" strokeWidth={2} />
                   <span className="mx-2 hidden whitespace-nowrap text-sm font-semibold min-[420px]:inline">
                     {balance == null ? '…' : formatPrice(balance)}
                     {wallet?.demo > 0 && (
@@ -234,7 +220,7 @@ export default function Header() {
                     aria-label={t('balance_topup')}
                     className="ml-1.5 grid h-8 w-8 place-items-center rounded-lg bg-accent text-ink transition hover:brightness-95 hover:shadow-[0_0_14px_rgba(255,255,255,0.4)] min-[420px]:ml-0"
                   >
-                    <Ico d={PLUS} className="h-4 w-4" />
+                    <Plus className="h-4 w-4" strokeWidth={2.25} />
                   </button>
                 </div>
                 <ProfileMenu onTopUp={() => setTopUp(true)} />
@@ -245,7 +231,7 @@ export default function Header() {
                   href="/api/auth/steam/login"
                   className="hidden h-10 items-center gap-1.5 rounded-xl border border-accent/40 bg-accent/[0.06] px-3.5 text-xs font-semibold text-white transition hover:border-accent/70 hover:shadow-[0_0_16px_rgba(255,255,255,0.25)] sm:flex"
                 >
-                  <Ico d={STEAM_ICON} className="h-3.5 w-3.5" fill />
+                  <SteamIcon className="h-3.5 w-3.5" />
                   <span className="whitespace-nowrap md:hidden lg:inline">{t('steam_login')}</span>
                 </a>
               )
@@ -291,7 +277,7 @@ export default function Header() {
             {loggedIn && (
               <div className="mb-3 flex items-center justify-between rounded-xl border border-line bg-panel px-3 py-2.5">
                 <div className="flex items-center gap-2">
-                  <Ico d={WALLET} className="h-4 w-4 text-accent" />
+                  <Wallet className="h-4 w-4 text-accent" strokeWidth={2} />
                   <span className="text-sm font-semibold">{balance == null ? '…' : formatPrice(balance)}</span>
                 </div>
                 <button
@@ -366,7 +352,7 @@ export default function Header() {
                   href="/api/auth/steam/login"
                   className="flex items-center justify-center gap-1.5 rounded-full border border-accent/40 bg-accent/[0.06] py-3 text-sm font-semibold text-white"
                 >
-                  <Ico d={STEAM_ICON} className="h-4 w-4" fill />
+                  <SteamIcon className="h-4 w-4" />
                   {t('steam_login')}
                 </a>
               )}

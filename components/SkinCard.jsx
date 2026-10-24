@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useStore } from './StoreProvider';
 import { ProductMedia } from './ProductCard';
+import { ShoppingCart } from './icons';
 import { weaponTypes, formatPrice } from '@/lib/products';
 import { wearInfo, rarityInfo, rarityRgb, WEAR_TIERS } from '@/lib/skinMeta';
 
@@ -70,20 +71,6 @@ export function WearBar({ wear, minFloat, maxFloat, value }) {
 }
 
 const TIER_COLOR = { FN: '#22c55e', MW: '#a3e635', FT: '#eab308', WW: '#f97316', BS: '#ef4444' };
-
-function CartIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-2">
-      <circle cx="9" cy="21" r="1" />
-      <circle cx="19" cy="21" r="1" />
-      <path
-        d="M1 1h3l2.4 12.4a2 2 0 0 0 2 1.6h9.2a2 2 0 0 0 2-1.6L21 6H6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 // Katalog / saqlangan sahifalaridagi bitta skin kartasi — neon/glassmorphism.
 export default function SkinCard({ product: p }) {
@@ -190,7 +177,7 @@ export default function SkinCard({ product: p }) {
                 : 'border-white/15 bg-white/[0.06] text-white hover:border-accent/50 hover:bg-white/10 hover:shadow-[0_0_18px_rgba(255,255,255,0.3)] hover:text-accent'
             }`}
           >
-            <CartIcon />
+            <ShoppingCart className="h-4 w-4" strokeWidth={2} />
             {added ? t('added') : t('add_to_cart')}
           </button>
         </div>

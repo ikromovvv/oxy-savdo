@@ -8,16 +8,7 @@ import { ProductMedia } from './ProductCard';
 import { formatPrice } from '@/lib/products';
 import { isValidTradeUrl, parseTradeUrl } from '@/lib/steamTrade';
 import { site } from '@/lib/site';
-
-const TRASH = 'M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v13a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V7';
-
-function TrashIcon({ className = 'h-4 w-4' }) {
-  return (
-    <svg viewBox="0 0 24 24" className={`${className} fill-none stroke-current stroke-2`} aria-hidden="true">
-      <path d={TRASH} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
+import { ShoppingCart, Trash2 } from './icons';
 
 // Savat qatoridagi kichik rasm (rasm bo'lmasa — bosh harfli gradient)
 function Thumb({ it }) {
@@ -181,9 +172,7 @@ export default function CartDrawer() {
               {items.length === 0 ? (
                 <div className="grid place-items-center gap-3 py-14 text-center">
                   <span className="grid h-14 w-14 place-items-center rounded-2xl bg-white/[0.05] text-muted">
-                    <svg viewBox="0 0 24 24" className="h-6 w-6 fill-none stroke-current stroke-2" aria-hidden="true">
-                      <path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h9.2a2 2 0 0 0 2-1.6L23 6H6M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm10 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                    <ShoppingCart className="h-6 w-6" strokeWidth={2} />
                   </span>
                   <p className="text-sm text-muted">{t('cart_empty')}</p>
                 </div>
@@ -197,7 +186,7 @@ export default function CartDrawer() {
                       onClick={clear}
                       className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-line px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-white/80 transition hover:border-white/40 hover:text-white"
                     >
-                      <TrashIcon className="h-3.5 w-3.5" />
+                      <Trash2 className="h-3.5 w-3.5" />
                       {t('cart_clear')}
                     </button>
                   </div>
@@ -225,7 +214,7 @@ export default function CartDrawer() {
                           onClick={() => remove(it.id)}
                           className="col-start-3 row-span-2 row-start-1 grid h-11 w-11 place-items-center rounded-xl bg-white/[0.07] text-white/80 transition hover:bg-rose-500/20 hover:text-rose-300 sm:col-start-4 sm:row-span-1"
                         >
-                          <TrashIcon className="h-[18px] w-[18px]" />
+                          <Trash2 className="h-[18px] w-[18px]" />
                         </button>
                       </li>
                     ))}

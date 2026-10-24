@@ -1,5 +1,6 @@
 'use client';
 
+import { RotateCw } from './icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from './StoreProvider';
 import SkinCard from './SkinCard';
@@ -144,9 +145,7 @@ export default function BuyCatalogHome() {
           title={t('catalog_reset')}
           className="grid h-10 w-10 flex-none place-items-center rounded-full border border-line transition hover:border-white/40"
         >
-          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-2">
-            <path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v6h-6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <RotateCw className="h-4 w-4" strokeWidth={2} />
         </button>
 
         <input

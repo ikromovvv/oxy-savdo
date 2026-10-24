@@ -3,6 +3,7 @@
 // Saytning umumiy (dark + neon) uslubiga mos maxsus dropdown — brauzerning
 // standart <select> oynasi o'rniga (u OS uslubida oq/ko'k chiqadi va
 // dizaynga mos kelmaydi).
+import { ChevronDown } from './icons';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Select({
@@ -51,14 +52,10 @@ export default function Select({
         } ${className}`}
       >
         <span className="truncate">{current?.label ?? ''}</span>
-        <svg
-          viewBox="0 0 24 24"
-          className={`h-3.5 w-3.5 flex-none fill-none stroke-current stroke-2 transition-transform duration-200 ${
-            open ? 'rotate-180 text-accent' : 'text-muted'
-          }`}
-        >
-          <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <ChevronDown
+          className={`h-3.5 w-3.5 flex-none transition-transform duration-200 ${open ? 'rotate-180 text-accent' : 'text-muted'}`}
+          strokeWidth={2}
+        />
       </button>
 
       {open && (
