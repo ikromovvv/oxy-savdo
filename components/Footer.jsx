@@ -35,8 +35,9 @@ export default function Footer() {
           <ul className="mt-4 space-y-2.5 text-sm text-white/70">
             <li><Link href="/parvarish" className="inline-block py-1 hover:text-white">{t('nav_care')}</Link></li>
             <li><Link href="/yordam" className="inline-block py-1 hover:text-white">{t('nav_support')}</Link></li>
-            <li><Link href="/yordam#qaytarish" className="inline-block py-1 hover:text-white">{t('returns')}</Link></li>
-            <li><Link href="/yordam#oferta" className="inline-block py-1 hover:text-white">{t('offer')}</Link></li>
+            <li><Link href="/qaytarish" className="inline-block py-1 hover:text-white">{t('returns')}</Link></li>
+            <li><Link href="/oferta" className="inline-block py-1 hover:text-white">{t('offer')}</Link></li>
+            <li><Link href="/maxfiylik" className="inline-block py-1 hover:text-white">{t('privacy')}</Link></li>
           </ul>
         </div>
 
