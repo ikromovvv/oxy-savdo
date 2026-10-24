@@ -11,8 +11,8 @@ export default function TgSkinCard({ item: p, onOpen }) {
   const { t, add, items, setCartOpen } = useStore();
   const inCart = items.some((x) => x.id === p.id);
   const sold = p.status === 'sold';
-  const rgb = rarityRgb(p.rarityColor || '#c6ff00');
-  const color = p.rarityColor || '#c6ff00';
+  const rgb = rarityRgb(p.rarityColor || '#ffffff');
+  const color = p.rarityColor || '#ffffff';
 
   return (
     <div
@@ -121,8 +121,8 @@ export default function TgSkinCard({ item: p, onOpen }) {
                 title={inCart ? t('tg_in_cart') : t('tg_add')}
                 className={`grid h-11 w-11 flex-none place-items-center rounded-full border transition-all duration-300 hover:scale-110 ${
                   inCart
-                    ? 'border-accent/60 bg-accent/15 text-accent shadow-[0_0_16px_rgba(198,255,0,0.35)]'
-                    : 'border-accent bg-accent text-ink shadow-[0_0_18px_rgba(198,255,0,0.4)] hover:shadow-[0_0_26px_rgba(198,255,0,0.65)]'
+                    ? 'border-accent/60 bg-accent/15 text-accent shadow-[0_0_16px_rgba(255,255,255,0.35)]'
+                    : 'border-accent bg-accent text-ink shadow-[0_0_18px_rgba(255,255,255,0.4)] hover:shadow-[0_0_26px_rgba(255,255,255,0.65)]'
                 }`}
               >
                 {inCart ? <Check className="h-5 w-5" strokeWidth={2.75} /> : <ShoppingCart className="h-5 w-5" strokeWidth={2.25} />}

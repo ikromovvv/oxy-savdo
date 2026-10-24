@@ -187,7 +187,7 @@ export default function SkinCard({ product: p }) {
             className={`mt-3 flex w-full items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold backdrop-blur-md transition-all duration-300 hover:scale-[1.02] ${
               added
                 ? 'border-accent/60 bg-accent text-ink'
-                : 'border-white/15 bg-white/[0.06] text-white hover:border-accent/50 hover:bg-white/10 hover:shadow-[0_0_18px_rgba(198,255,0,0.3)] hover:text-accent'
+                : 'border-white/15 bg-white/[0.06] text-white hover:border-accent/50 hover:bg-white/10 hover:shadow-[0_0_18px_rgba(255,255,255,0.3)] hover:text-accent'
             }`}
           >
             <CartIcon />

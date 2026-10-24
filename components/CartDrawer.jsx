@@ -144,7 +144,7 @@ export default function CartDrawer() {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6">
       <div ref={overlayRef} className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={close} />
 
-      <aside ref={panelRef} className="relative flex max-h-[92vh] min-h-[320px] w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-line bg-ink shadow-[0_24px_80px_rgba(0,0,0,0.65),0_0_40px_rgba(198,255,0,0.06)]">
+      <aside ref={panelRef} className="relative flex max-h-[92vh] min-h-[320px] w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-line bg-ink shadow-[0_24px_80px_rgba(0,0,0,0.65),0_0_40px_rgba(255,255,255,0.06)]">
         <div className="flex flex-none items-center justify-between px-6 pb-3 pt-5">
           <span className="text-2xl font-bold tracking-tight">{t('cart')}</span>
           <button aria-label="close" onClick={close} className="grid h-10 w-10 place-items-center rounded-full text-2xl text-muted transition hover:bg-white/5 hover:text-white">✕</button>

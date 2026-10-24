@@ -78,8 +78,8 @@ export default function ProductCard({ product }) {
     );
     gsap.fromTo(
       cardRef.current,
-      { boxShadow: '0 0 0 0 rgba(198,255,0,0.45)' },
-      { boxShadow: '0 0 0 6px rgba(198,255,0,0)', duration: 0.7, ease: 'power2.out' }
+      { boxShadow: '0 0 0 0 rgba(255,255,255,0.45)' },
+      { boxShadow: '0 0 0 6px rgba(255,255,255,0)', duration: 0.7, ease: 'power2.out' }
     );
     setTimeout(() => setDone(false), 1200);
   };

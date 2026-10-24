@@ -12,7 +12,7 @@ module.exports = {
         panel: '#121214',
         line: '#1E1E21',
         muted: '#8B8B91',
-        accent: '#C6FF00',
+        accent: '#FFFFFF',
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'Manrope', 'system-ui', 'sans-serif'],

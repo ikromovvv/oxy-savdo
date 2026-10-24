@@ -200,7 +200,7 @@ export default function AdminPage() {
       </div>
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 z-[60] flex -translate-x-1/2 items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-ink shadow-[0_8px_30px_rgba(198,255,0,0.3)]">
+        <div className="fixed bottom-6 left-1/2 z-[60] flex -translate-x-1/2 items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-ink shadow-[0_8px_30px_rgba(255,255,255,0.3)]">
           <Svg d={Icon.check} className="h-4 w-4" />
           {toast}
         </div>

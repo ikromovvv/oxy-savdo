@@ -52,7 +52,7 @@ function ProfileMenu({ onTopUp }) {
         aria-haspopup="menu"
         aria-expanded={open}
         className={`flex h-10 items-center gap-1.5 rounded-xl border bg-panel pl-1.5 pr-2.5 transition-all ${
-          open ? 'border-accent/60 shadow-[0_0_16px_rgba(198,255,0,0.25)]' : 'border-line hover:border-white/40'
+          open ? 'border-accent/60 shadow-[0_0_16px_rgba(255,255,255,0.25)]' : 'border-line hover:border-white/40'
         }`}
       >
         {user.avatar ? (
@@ -71,7 +71,7 @@ function ProfileMenu({ onTopUp }) {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-xl border border-line bg-ink/95 py-1 shadow-[0_16px_44px_rgba(0,0,0,0.6),0_0_22px_rgba(198,255,0,0.1)] backdrop-blur-xl"
+          className="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-xl border border-line bg-ink/95 py-1 shadow-[0_16px_44px_rgba(0,0,0,0.6),0_0_22px_rgba(255,255,255,0.1)] backdrop-blur-xl"
         >
           <div className="border-b border-line px-4 py-3">
             <div className="truncate text-sm font-semibold">{user.name}</div>
@@ -206,7 +206,7 @@ export default function Header() {
             <button
               onClick={() => setCartOpen(true)}
               aria-label={t('cart')}
-              className="relative grid h-10 w-10 place-items-center rounded-xl bg-accent text-ink transition hover:brightness-95 hover:shadow-[0_0_18px_rgba(198,255,0,0.35)]"
+              className="relative grid h-10 w-10 place-items-center rounded-xl bg-accent text-ink transition hover:brightness-95 hover:shadow-[0_0_18px_rgba(255,255,255,0.35)]"
             >
               <Ico d={CART} className="h-[18px] w-[18px]" />
               {count > 0 && (
@@ -232,7 +232,7 @@ export default function Header() {
                   <button
                     onClick={() => setTopUp(true)}
                     aria-label={t('balance_topup')}
-                    className="ml-1.5 grid h-8 w-8 place-items-center rounded-lg bg-accent text-ink transition hover:brightness-95 hover:shadow-[0_0_14px_rgba(198,255,0,0.4)] min-[420px]:ml-0"
+                    className="ml-1.5 grid h-8 w-8 place-items-center rounded-lg bg-accent text-ink transition hover:brightness-95 hover:shadow-[0_0_14px_rgba(255,255,255,0.4)] min-[420px]:ml-0"
                   >
                     <Ico d={PLUS} className="h-4 w-4" />
                   </button>
@@ -243,7 +243,7 @@ export default function Header() {
               !userLoading && (
                 <a
                   href="/api/auth/steam/login"
-                  className="hidden h-10 items-center gap-1.5 rounded-xl border border-accent/40 bg-accent/[0.06] px-3.5 text-xs font-semibold text-white transition hover:border-accent/70 hover:shadow-[0_0_16px_rgba(198,255,0,0.25)] sm:flex"
+                  className="hidden h-10 items-center gap-1.5 rounded-xl border border-accent/40 bg-accent/[0.06] px-3.5 text-xs font-semibold text-white transition hover:border-accent/70 hover:shadow-[0_0_16px_rgba(255,255,255,0.25)] sm:flex"
                 >
                   <Ico d={STEAM_ICON} className="h-3.5 w-3.5" fill />
                   <span className="whitespace-nowrap md:hidden lg:inline">{t('steam_login')}</span>

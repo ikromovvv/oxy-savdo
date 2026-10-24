@@ -46,7 +46,7 @@ export default function Select({
           compact ? 'px-3 py-2 text-xs font-semibold' : 'px-4 py-2.5 text-sm'
         } ${
           open
-            ? 'border-accent/60 bg-panel text-white shadow-[0_0_16px_rgba(198,255,0,0.25)]'
+            ? 'border-accent/60 bg-panel text-white shadow-[0_0_16px_rgba(255,255,255,0.25)]'
             : 'border-line bg-panel text-white/90 hover:border-white/40'
         } ${className}`}
       >
@@ -64,7 +64,7 @@ export default function Select({
       {open && (
         <div
           role="listbox"
-          className={`absolute z-30 mt-2 min-w-full overflow-hidden rounded-xl border border-line bg-ink/95 py-1 shadow-[0_16px_44px_rgba(0,0,0,0.6),0_0_22px_rgba(198,255,0,0.1)] backdrop-blur-xl ${
+          className={`absolute z-30 mt-2 min-w-full overflow-hidden rounded-xl border border-line bg-ink/95 py-1 shadow-[0_16px_44px_rgba(0,0,0,0.6),0_0_22px_rgba(255,255,255,0.1)] backdrop-blur-xl ${
             align === 'left' ? 'left-0' : 'right-0'
           } ${menuClassName}`}
         >

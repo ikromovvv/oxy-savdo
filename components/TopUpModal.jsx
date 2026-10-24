@@ -80,7 +80,7 @@ export default function TopUpModal({ open, onClose }) {
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-accent/25 bg-panel/90 p-6 shadow-[0_0_50px_rgba(198,255,0,0.1),0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+      <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-accent/25 bg-panel/90 p-6 shadow-[0_0_50px_rgba(255,255,255,0.1),0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl">
         <span aria-hidden="true" className="pointer-events-none absolute -top-16 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-accent/15 blur-3xl" />
         <button aria-label="close" onClick={onClose} className="absolute right-3 top-3 grid h-9 w-9 place-items-center text-muted hover:text-white">✕</button>
 
@@ -109,7 +109,7 @@ export default function TopUpModal({ open, onClose }) {
                   onClick={() => setAmount(p)}
                   className={`rounded-full border px-3.5 py-2 text-xs font-semibold transition-all ${
                     Number(amount) === p
-                      ? 'border-accent/60 bg-accent/15 text-accent shadow-[0_0_14px_rgba(198,255,0,0.25)]'
+                      ? 'border-accent/60 bg-accent/15 text-accent shadow-[0_0_14px_rgba(255,255,255,0.25)]'
                       : 'border-line text-white/75 hover:border-white/40'
                   }`}
                 >
@@ -143,7 +143,7 @@ export default function TopUpModal({ open, onClose }) {
                       onClick={() => setMethod(m)}
                       className={`rounded-xl border py-3 text-sm font-bold transition-all ${
                         method === m
-                          ? 'border-accent/60 bg-accent/15 text-accent shadow-[0_0_14px_rgba(198,255,0,0.25)]'
+                          ? 'border-accent/60 bg-accent/15 text-accent shadow-[0_0_14px_rgba(255,255,255,0.25)]'
                           : 'border-line text-white/80 hover:border-white/40'
                       }`}
                     >

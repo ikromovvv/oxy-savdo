@@ -116,7 +116,7 @@ export default function BuyCatalogHome() {
           onClick={() => setWeaponType('all')}
           className={`flex-none whitespace-nowrap rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
             weaponType === 'all'
-              ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(198,255,0,0.3)]'
+              ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(255,255,255,0.3)]'
               : 'border-line text-white/80 hover:border-white/40'
           }`}
         >
@@ -128,7 +128,7 @@ export default function BuyCatalogHome() {
             onClick={() => setWeaponType(w.slug)}
             className={`flex-none whitespace-nowrap rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
               weaponType === w.slug
-                ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(198,255,0,0.3)]'
+                ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(255,255,255,0.3)]'
                 : 'border-line text-white/80 hover:border-white/40'
             }`}
           >

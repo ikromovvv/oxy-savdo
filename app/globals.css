@@ -22,7 +22,7 @@ body {
 }
 
 ::selection {
-  background: #c6ff00;
+  background: #ffffff;
   color: #080b0d;
 }
 
@@ -34,7 +34,7 @@ body {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold tracking-wide transition-all duration-300 ease-out;
   }
   .btn-primary {
-    @apply btn bg-white text-ink hover:bg-accent hover:shadow-[0_8px_30px_rgba(198,255,0,0.25)];
+    @apply btn bg-white text-ink hover:bg-accent hover:shadow-[0_8px_30px_rgba(255,255,255,0.25)];
   }
   .btn-ghost {
     @apply btn border border-line bg-panel/60 text-white/90 hover:border-white/40 hover:text-white;
@@ -48,7 +48,7 @@ body {
   }
   /* Savat / to'lov — katta neon CTA */
   .btn-cta {
-    @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-accent px-6 py-4 text-sm font-bold uppercase tracking-wide text-ink transition-all duration-300 hover:brightness-95 hover:shadow-[0_0_28px_rgba(198,255,0,0.3)];
+    @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-accent px-6 py-4 text-sm font-bold uppercase tracking-wide text-ink transition-all duration-300 hover:brightness-95 hover:shadow-[0_0_28px_rgba(255,255,255,0.3)];
   }
   .h-display {
     @apply text-[2.5rem] font-bold leading-[1.12] tracking-tight sm:text-5xl lg:text-[4rem] lg:leading-[1.08];
@@ -113,10 +113,10 @@ body {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 38% 46% at 14% 24%, rgba(136, 71, 255, 0.2), transparent 70%),
-    radial-gradient(ellipse 34% 42% at 88% 20%, rgba(75, 105, 255, 0.18), transparent 70%),
-    radial-gradient(ellipse 46% 40% at 50% 112%, rgba(198, 255, 0, 0.16), transparent 70%),
-    radial-gradient(ellipse 26% 30% at 70% 80%, rgba(235, 75, 75, 0.1), transparent 70%);
+    radial-gradient(ellipse 38% 46% at 14% 24%, rgba(255, 255, 255, 0.07), transparent 70%),
+    radial-gradient(ellipse 34% 42% at 88% 20%, rgba(255, 255, 255, 0.06), transparent 70%),
+    radial-gradient(ellipse 46% 40% at 50% 112%, rgba(255, 255, 255, 0.09), transparent 70%),
+    radial-gradient(ellipse 26% 30% at 70% 80%, rgba(255, 255, 255, 0.04), transparent 70%);
   filter: blur(14px);
 }
 
@@ -127,7 +127,7 @@ body {
   overflow: hidden;
   border-radius: 1rem;
   border: 1px solid rgba(var(--rc), 0.32);
-  background: linear-gradient(180deg, rgba(22, 28, 38, 0.7), rgba(18, 18, 20, 0.55));
+  background: linear-gradient(180deg, rgba(24, 24, 26, 0.7), rgba(18, 18, 20, 0.55));
   backdrop-filter: blur(10px);
   box-shadow: 0 0 18px rgba(var(--rc), 0.16);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -179,7 +179,7 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 .intro-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 55% 40% at 50% 50%, rgba(40, 110, 255, 0.22), rgba(40, 110, 255, 0) 70%);
+  background: radial-gradient(ellipse 55% 40% at 50% 50%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 70%);
   animation: introPulse 3.2s ease-in-out 0.4s infinite;
 }
 
@@ -211,12 +211,12 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 
 .intro-letter {
   display: inline-block;
-  background: linear-gradient(180deg, #ffffff 0%, #dbe8ff 45%, #7fb0ff 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #eef0f3 45%, #aeb4bd 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 14px rgba(60, 130, 255, 0.55));
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.55));
   animation: introLetter 0.95s cubic-bezier(0.2, 0.75, 0.2, 1) var(--d) both;
 }
 
@@ -228,8 +228,8 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   width: 120%;
   height: 2px;
   margin-top: -1px;
-  background: linear-gradient(90deg, transparent, rgba(60, 130, 255, 0.9) 35%, #fff 50%, rgba(60, 130, 255, 0.9) 65%, transparent);
-  box-shadow: 0 0 18px 3px rgba(60, 130, 255, 0.55);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9) 35%, #fff 50%, rgba(255, 255, 255, 0.9) 65%, transparent);
+  box-shadow: 0 0 18px 3px rgba(255, 255, 255, 0.55);
   opacity: 0;
   transform: translateX(-70%);
   animation: introStreak 1.25s cubic-bezier(0.5, 0, 0.2, 1) 1.5s both;
@@ -244,8 +244,8 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   font-weight: 600;
   font-size: clamp(13px, 3.4vw, 22px);
   letter-spacing: 0.1em;
-  color: #9fc0ff;
-  text-shadow: 0 0 12px rgba(60, 130, 255, 0.6);
+  color: #c9ced6;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
 }
 .intro-sub span { animation: introSub 0.7s cubic-bezier(0.2, 0.75, 0.2, 1) var(--d) both; }
 
@@ -263,15 +263,15 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   position: absolute;
   inset: 0;
   transform-origin: left center;
-  background: linear-gradient(90deg, #1f5bff, #6aa8ff 70%, #fff);
-  box-shadow: 0 0 12px rgba(60, 130, 255, 0.9);
+  background: linear-gradient(90deg, #8a8f98, #d4d8de 70%, #fff);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
   transition: transform 0.2s linear;
 }
 .intro-pct {
   margin-top: 12px;
   font-size: 11px;
   letter-spacing: 0.3em;
-  color: rgba(159, 192, 255, 0.75);
+  color: rgba(201, 206, 214, 0.75);
   font-variant-numeric: tabular-nums;
   animation: introSub 0.7s ease 1.3s both;
 }

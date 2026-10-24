@@ -40,7 +40,7 @@ export default function TgStrip() {
               <div key={i} className="h-44 w-52 flex-none animate-pulse rounded-2xl border border-line bg-white/[0.04]" />
             ))
           : items.map((p) => {
-              const c = p.rarityColor || '#c6ff00';
+              const c = p.rarityColor || '#ffffff';
               return (
                 <Link
                   key={p.id}

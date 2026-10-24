@@ -87,7 +87,7 @@ export default function TelegramSkinsClient() {
         <button
           onClick={() => setWear('all')}
           className={`flex-none rounded-full border px-4 py-2 text-xs font-semibold transition-all ${
-            wear === 'all' ? 'border-accent/60 bg-accent/15 text-white shadow-[0_0_14px_rgba(198,255,0,0.25)]' : 'border-line text-white/75 hover:border-white/40'
+            wear === 'all' ? 'border-accent/60 bg-accent/15 text-white shadow-[0_0_14px_rgba(255,255,255,0.25)]' : 'border-line text-white/75 hover:border-white/40'
           }`}
         >
           {t('catalog_all')}
