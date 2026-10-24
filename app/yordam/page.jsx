@@ -1,72 +1,28 @@
 'use client';
 
+import Link from 'next/link';
 import { useStore } from '@/components/StoreProvider';
 import Reveal from '@/components/Reveal';
 import { site } from '@/lib/site';
 
+// Huquqiy hujjatlarning to'liq matni alohida sahifalarda (/oferta, /maxfiylik, /qaytarish).
 const content = {
   uz: {
     intro: "Savollaringiz bo'lsa Telegram orqali yozing — o'rtacha 10 daqiqada javob beramiz.",
-    blocks: [
-      {
-        id: 'qaytarish',
-        title: 'Qaytarish shartlari',
-        text: [
-          'Mahsulotni olganingizdan keyin 14 kun ichida qaytarish mumkin.',
-          'Mahsulot ishlatilmagan, o\'z qadog\'ida va tovar ko\'rinishi saqlangan bo\'lishi kerak.',
-          'Yetkazib berish xarajati xaridor zimmasida bo\'ladi (nuqsonli mahsulotdan tashqari).',
-          'Raqamli mahsulotlar (skinlar) uzatilgandan keyin qaytarilmaydi.',
-        ],
-      },
-      {
-        id: 'oferta',
-        title: 'Ommaviy oferta',
-        text: [
-          'Saytda buyurtma berish orqali siz ushbu shartlarga rozilik bildirasiz.',
-          'Narxlar so\'mda ko\'rsatilgan va o\'zgarishi mumkin.',
-          'Buyurtma menejer tasdiqlagandan keyin kuchga kiradi.',
-        ],
-      },
-      {
-        id: 'maxfiylik',
-        title: 'Maxfiylik siyosati',
-        text: [
-          'Ism, telefon va Telegram ma\'lumotlari faqat buyurtmani rasmiylashtirish uchun ishlatiladi.',
-          'Ma\'lumotlar uchinchi shaxslarga berilmaydi.',
-        ],
-      },
+    docsTitle: 'Hujjatlar va shartlar',
+    docs: [
+      { href: '/qaytarish', title: 'Qaytarish shartlari', text: "Pulni qaytarish va mahsulotni almashtirish tartibi" },
+      { href: '/oferta', title: 'Ommaviy oferta', text: "Buyurtma, to'lov, yetkazish va taraflar javobgarligi" },
+      { href: '/maxfiylik', title: 'Maxfiylik siyosati', text: "Qanday ma'lumotlar yig'iladi va qanday himoyalanadi" },
     ],
   },
   ru: {
     intro: 'Есть вопросы? Напишите в Telegram — отвечаем в среднем за 10 минут.',
-    blocks: [
-      {
-        id: 'qaytarish',
-        title: 'Условия возврата',
-        text: [
-          'Вернуть товар можно в течение 14 дней после получения.',
-          'Товар должен быть не использован, в оригинальной упаковке и с сохранённым товарным видом.',
-          'Стоимость доставки оплачивает покупатель (кроме брака).',
-          'Цифровые товары (скины) возврату после передачи не подлежат.',
-        ],
-      },
-      {
-        id: 'oferta',
-        title: 'Публичная оферта',
-        text: [
-          'Оформляя заказ на сайте, вы соглашаетесь с данными условиями.',
-          'Цены указаны в сумах и могут меняться.',
-          'Заказ вступает в силу после подтверждения менеджером.',
-        ],
-      },
-      {
-        id: 'maxfiylik',
-        title: 'Политика конфиденциальности',
-        text: [
-          'Имя, телефон и Telegram используются только для оформления заказа.',
-          'Данные не передаются третьим лицам.',
-        ],
-      },
+    docsTitle: 'Документы и условия',
+    docs: [
+      { href: '/qaytarish', title: 'Условия возврата', text: 'Порядок возврата денег и обмена товара' },
+      { href: '/oferta', title: 'Публичная оферта', text: 'Заказ, оплата, доставка и ответственность сторон' },
+      { href: '/maxfiylik', title: 'Политика конфиденциальности', text: 'Какие данные собираются и как защищаются' },
     ],
   },
 };
@@ -88,19 +44,18 @@ export default function SupportPage() {
         <a href={`tel:${site.phone.replace(/\s/g, '')}`} className="btn-ghost">{site.phone}</a>
       </Reveal>
 
-      <Reveal stagger className="mt-12 space-y-4">
-        {c.blocks.map((b) => (
-          <div key={b.id} id={b.id} className="card scroll-mt-24 p-7">
-            <h2 className="text-lg font-medium">{b.title}</h2>
-            <ul className="mt-4 space-y-2.5 text-sm leading-relaxed text-white/75">
-              {b.text.map((x, i) => (
-                <li key={i} className="flex gap-3">
-                  <span className="text-accent">—</span>
-                  <span>{x}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+      <Reveal className="mt-12">
+        <h2 className="label">{c.docsTitle}</h2>
+      </Reveal>
+      <Reveal stagger className="mt-4 grid gap-4 sm:grid-cols-3">
+        {c.docs.map((d) => (
+          <Link key={d.href} href={d.href} className="card card-hover group flex flex-col p-6">
+            <span className="flex items-center justify-between text-base font-medium">
+              {d.title}
+              <span className="text-muted transition-all duration-300 group-hover:translate-x-1 group-hover:text-accent">→</span>
+            </span>
+            <span className="mt-2 text-sm leading-relaxed text-muted">{d.text}</span>
+          </Link>
         ))}
       </Reveal>
     </section>
