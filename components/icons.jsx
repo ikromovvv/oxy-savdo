@@ -14,6 +14,7 @@ export {
   ShieldCheck,
   Headset,
   Tag,
+  ArrowLeft,
 } from 'lucide-react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { ShoppingCart, Check, Send, ArrowUpRight } from './icons';
 import { useStore } from './StoreProvider';
 import { WearBar } from './SkinCard';
@@ -31,9 +32,8 @@ export default function TgSkinCard({ item: p, onOpen }) {
       />
 
       {/* rasm */}
-      <button
-        type="button"
-        onClick={() => p.image && onOpen?.(p)}
+      <Link
+        href={`/telegram-skinlar/${String(p.id).split('/')[1]}`}
         className="relative block w-full px-3 pb-1 pt-5 text-left"
         aria-label={p.name}
       >
@@ -72,7 +72,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
             </span>
           )}
         </div>
-      </button>
+      </Link>
 
       {p.stattrak && (
         <span className="absolute left-4 top-6 z-20 rounded-md border border-line bg-black/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent backdrop-blur">
@@ -82,7 +82,9 @@ export default function TgSkinCard({ item: p, onOpen }) {
 
       {/* tana */}
       <div className="flex flex-1 flex-col px-4 pb-4 pt-2">
-        <div className="line-clamp-2 min-h-[2.5em] text-[15px] font-semibold leading-tight">{p.name}</div>
+        <Link href={`/telegram-skinlar/${String(p.id).split('/')[1]}`} className="line-clamp-2 min-h-[2.5em] text-[15px] font-semibold leading-tight hover:text-white/80">
+          {p.name}
+        </Link>
 
         {p.quality && <WearBar wear={p.quality} minFloat={p.minFloat} maxFloat={p.maxFloat} value={p.float} />}
 

@@ -44,7 +44,7 @@ export default function TgStrip() {
               return (
                 <Link
                   key={p.id}
-                  href="/telegram-skinlar"
+                  href={`/telegram-skinlar/${String(p.id).split('/')[1]}`}
                   className="hero-skin w-52"
                   style={{ '--rc': rarityRgb(c) }}
                 >
