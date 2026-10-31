@@ -15,6 +15,8 @@ export {
   Headset,
   Tag,
   ArrowLeft,
+  X,
+  ZoomIn,
 } from 'lucide-react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 

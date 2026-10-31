@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
-import { ArrowLeft, ArrowUpRight, Check, Send, ShoppingCart } from './icons';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ArrowUpRight, Check, Send, ShoppingCart, X, ZoomIn } from './icons';
 import { useStore } from './StoreProvider';
 import { WearBar } from './SkinCard';
 import { rarityRgb } from '@/lib/skinMeta';
@@ -27,6 +27,21 @@ export default function TgSkinDetail({ item: p }) {
   const rgb = rarityRgb(color);
   const title = `${p.stattrak ? 'StatTrak™ ' : ''}${p.name}`;
   const imgRef = useRef(null);
+  const [zoom, setZoom] = useState(false);
+  const shownSrc = () => imgRef.current?.currentSrc || imgRef.current?.src || p.image || p.fallbackImage;
+
+  // zoom oynasi: Esc bilan yopiladi, orqa fon aylanmaydi
+  useEffect(() => {
+    if (!zoom) return undefined;
+    const onKey = (e) => e.key === 'Escape' && setZoom(false);
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [zoom]);
 
   // Sahifa serverda chizilgani uchun rasm xatosi gidratsiyadan oldin bo'lishi mumkin — shuni qayta tekshiramiz
   useEffect(() => {
@@ -60,7 +75,7 @@ export default function TgSkinDetail({ item: p }) {
         {t('tg_title')}
       </Link>
 
-      <div className="mt-5 grid gap-6 md:grid-cols-[1.15fr_1fr]">
+      <div className="mt-5 grid items-start gap-6 md:grid-cols-[1.15fr_1fr]">
         {/* rasm */}
         <div
           className="relative overflow-hidden rounded-2xl border p-4 backdrop-blur-md"
@@ -76,7 +91,17 @@ export default function TgSkinDetail({ item: p }) {
             className="pointer-events-none absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20 blur-3xl"
             style={{ background: color }}
           />
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-white/5 bg-black/40">
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label="Rasmni kattalashtirish"
+            onClick={() => setZoom(true)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setZoom(true)}
+            className="group relative aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-xl border border-white/5 bg-black/40"
+          >
+            <span className="pointer-events-none absolute right-2 top-2 z-10 grid h-8 w-8 place-items-center rounded-full bg-black/60 text-white/80 opacity-0 backdrop-blur transition group-hover:opacity-100">
+              <ZoomIn className="h-4 w-4" strokeWidth={2} />
+            </span>
             {p.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -191,6 +216,33 @@ export default function TgSkinDetail({ item: p }) {
           )}
         </div>
       </div>
+
+      {zoom && (
+        <div
+          className="fixed inset-0 z-[80] grid place-items-center bg-black/90 p-4 backdrop-blur-sm"
+          onClick={() => setZoom(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={title}
+        >
+          <button
+            type="button"
+            onClick={() => setZoom(false)}
+            aria-label="Yopish"
+            className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full border border-white/20 bg-black/60 text-white transition hover:bg-white/15"
+          >
+            <X className="h-5 w-5" strokeWidth={2} />
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={shownSrc()}
+            alt={title}
+            referrerPolicy="no-referrer"
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-[90vh] max-w-full rounded-xl object-contain shadow-[0_0_60px_rgba(0,0,0,0.6)]"
+          />
+        </div>
+      )}
     </section>
   );
 }
