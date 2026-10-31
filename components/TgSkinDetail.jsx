@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowUpRight, Check, Send, ShoppingCart, X, ZoomIn } from './icons';
+import { ArrowLeft, ArrowUpRight, Box, Check, Send, ShoppingCart, X, ZoomIn } from './icons';
 import { useStore } from './StoreProvider';
 import { WearBar } from './SkinCard';
 import { rarityRgb } from '@/lib/skinMeta';
@@ -193,6 +193,18 @@ export default function TgSkinDetail({ item: p }) {
                   {inCart ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ShoppingCart className="h-4 w-4" strokeWidth={2.25} />}
                   {inCart ? t('tg_in_cart') : t('tg_add')}
                 </button>
+              )}
+              {p.view3dUrl && (
+                <a
+                  href={p.view3dUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 py-3 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/10"
+                >
+                  <Box className="h-4 w-4" strokeWidth={2.25} />
+                  {t('tg_3d')}
+                  <ArrowUpRight className="h-3.5 w-3.5 text-muted" strokeWidth={2.25} />
+                </a>
               )}
               <a
                 href={p.buyUrl}

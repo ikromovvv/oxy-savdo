@@ -155,3 +155,19 @@ test('toPublic: USD narx so\'mga o\'giriladi, rasm manbai, Telegram admin havola
 test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch {}
 });
+
+// -------- 3D ko'ruvchi (SkinHub) --------
+
+test(`extractInspect: steam:// va csfloat havolalarini topadi, yo'q bo'lsa null`, async () => {
+  const { extractInspect, skinhubUrl } = await imp('lib/tgListings.js');
+  const steam = 'steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S76561198000000000A123456789D987654321';
+  assert.equal(extractInspect(`M4A4 | Full Throttle\nFloat: 0.11\n${steam}\nAdmin: @oxy_skins`), steam);
+  const cf = 'https://csfloat.com/checker?inspectLink=steam%3A%2F%2Frungame%2F730';
+  assert.equal(extractInspect(`narx 100\n${cf} tail`), cf);
+  assert.equal(extractInspect('oddiy post, havola yoq'), null);
+
+  const withLink = skinhubUrl({ rawText: steam, name: 'M4A4 | Full Throttle', quality: 'MW', stattrak: false });
+  assert.ok(withLink.startsWith('https://skinhub.gg/inspect?i='));
+  const byName = skinhubUrl({ rawText: '', name: 'M4A4 | Full Throttle', quality: 'MW', stattrak: false });
+  assert.equal(byName, 'https://skinhub.gg/inspect?hash=' + encodeURIComponent('M4A4 | Full Throttle (Minimal Wear)'));
+});
