@@ -5,7 +5,6 @@ import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import SmoothScroll from '@/components/SmoothScroll';
 import ScrollToTop from '@/components/ScrollToTop';
-import CursorFx from '@/components/CursorFx';
 import TgWebApp from '@/components/TgWebApp';
 import IntroLoader from '@/components/IntroLoader';
 
@@ -71,7 +70,6 @@ export default function RootLayout({ children }) {
         <StoreProvider>
           <SmoothScroll />
           <ScrollToTop />
-          <CursorFx />
           <TgWebApp />
           <div className="relative z-10">
             <Header />
