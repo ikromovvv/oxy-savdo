@@ -56,6 +56,14 @@ export default function TgStrip() {
                       alt={p.name}
                       loading="lazy"
                       referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        const el = e.currentTarget;
+                        if (p.fallbackImage && el.dataset.fb !== '1') {
+                          el.dataset.fb = '1';
+                          el.src = p.fallbackImage;
+                          el.className = el.className.replace('object-cover', 'object-contain p-2');
+                        }
+                      }}
                       className="aspect-[4/3] w-full rounded-lg border border-white/5 object-cover"
                     />
                   </div>

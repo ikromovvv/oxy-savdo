@@ -50,6 +50,14 @@ export default function TgSkinCard({ item: p, onOpen }) {
               alt={p.name}
               loading="lazy"
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                const el = e.currentTarget;
+                if (p.fallbackImage && el.dataset.fb !== '1') {
+                  el.dataset.fb = '1';
+                  el.src = p.fallbackImage;
+                  el.className = el.className.replace('object-cover', 'object-contain p-2');
+                }
+              }}
               draggable={false}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
