@@ -23,7 +23,10 @@ export async function GET(request) {
       exp: Date.now() + THIRTY_DAYS * 1000,
     });
 
-    const res = NextResponse.redirect(`${origin}/`);
+    const next = request.cookies.get('oxy_next')?.value || '';
+    const safeNext = next.startsWith('/') && !next.startsWith('//') ? next : '/';
+    const res = NextResponse.redirect(`${origin}${safeNext}`);
+    res.cookies.set('oxy_next', '', { path: '/', maxAge: 0 });
     res.cookies.set(SESSION_COOKIE, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

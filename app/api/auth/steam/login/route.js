@@ -7,5 +7,17 @@ export async function GET(request) {
     returnTo: `${origin}/api/auth/steam/callback`,
     realm: origin,
   });
-  return NextResponse.redirect(url);
+  const res = NextResponse.redirect(url);
+  // Kirgandan keyin qaytish sahifasi (faqat sayt ichidagi yo'l): masalan /rozigrish?t=...
+  const next = new URL(request.url).searchParams.get('next') || '';
+  if (next.startsWith('/') && !next.startsWith('//') && next.length < 600) {
+    res.cookies.set('oxy_next', next, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 15 * 60,
+    });
+  }
+  return res;
 }
