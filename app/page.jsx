@@ -32,7 +32,10 @@ function AccentDots({ text }) {
 }
 
 export default function Home() {
-  const { t, lang, add } = useStore();
+  const { t, lang, add, user, userLoading } = useStore();
+  // Steam orqali kirgan foydalanuvchiga hero (kirish taklifi) kerak emas
+  // (yuklanish paytida ham ko'rsatilmaydi — kirgan foydalanuvchida hero ko'rinib-yo'qolib qolmasin)
+  const showHero = !userLoading && !user;
   const heroRef = useRef(null);
 
   // Kovriklar endi admin panel orqali boshqariladi — real vaqtda olib kelamiz
@@ -84,12 +87,13 @@ export default function Home() {
       ctx.revert();
       gsap.set(all, { clearProps: 'all' });
     };
-  }, []);
+  }, [showHero]);
 
   // Steam orqali kirilgan bo'lsa, bosh sahifa "skin sotib olish" katalogiga almashadi
   return (
     <>
       {/* HERO */}
+      {showHero && (
       <section ref={heroRef} className="grid-fade relative overflow-hidden border-b border-line">
         <div className="hero-glow" aria-hidden="true" />
         <div className="container-site relative flex min-h-[80vh] flex-col items-center justify-center py-20 text-center">
@@ -129,9 +133,10 @@ export default function Home() {
           {/* <HeroSkins /> */}
         </div>
       </section>
+      )}
 
       {/* TELEGRAM KANALDAGI YANGI SKINLAR */}
-      <div className="container-site pt-10">
+      <div className={`container-site ${showHero ? 'pt-10' : 'pt-8'}`}>
         <TgStrip />
       </div>
 
