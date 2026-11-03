@@ -307,3 +307,6 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   .intro-logo { letter-spacing: -0.02em; padding-left: 0; }
   .intro-streak { display: none; }
 }
+
+/* Telegram Mini App (/rozigrish/app): sayt sarlavhasi va pastki qismi kerak emas */
+.tg-mini header, .tg-mini footer, .tg-mini .grid-bg { display: none; }
