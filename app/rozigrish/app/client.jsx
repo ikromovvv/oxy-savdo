@@ -23,6 +23,7 @@ export default function MiniAppClient() {
   const [phase, setPhase] = useState('loading'); // loading | ready | outside | error
   const [st, setSt] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [linkErr, setLinkErr] = useState('');
   const tgRef = useRef(null);
 
   const check = useCallback(async () => {
@@ -58,7 +59,21 @@ export default function MiniAppClient() {
       } catch {
         /* Mini App tashqarisida */
       }
-      check();
+      // Steam'dan qaytganda (?t=token): akkauntni Telegramga bog'laymiz, so'ng holatni tekshiramiz
+      const t = new URLSearchParams(window.location.search).get('t');
+      if (!t) return check();
+      fetch('/api/giveaway/link', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ t }),
+      })
+        .then((r) => r.json().catch(() => ({})))
+        .then((d) => {
+          if (d.error === 'steam_taken') setLinkErr("Bu Steam akkaunt boshqa Telegram akkauntga ulangan.");
+          else if (!d.ok) setLinkErr("Steam ulanmadi. Qayta urinib ko'ring.");
+        })
+        .catch(() => setLinkErr("Aloqa xatosi. Qayta urinib ko'ring."))
+        .finally(check);
     };
     s.onerror = () => setPhase('error');
     document.head.appendChild(s);
@@ -92,6 +107,7 @@ export default function MiniAppClient() {
 
       {phase === 'ready' && st && (
         <div className="mt-6 space-y-3">
+          {linkErr && <p className="rounded-xl border border-rose-400/40 bg-rose-400/10 p-3 text-center text-sm text-rose-200">{linkErr}</p>}
           <Row ok={st.subscribed} warn={st.checkFailed}>
             {st.channelLabel} kanaliga obuna
             {st.checkFailed && <span className="block text-xs text-amber-300">Obunani tekshirib bo&apos;lmadi</span>}
@@ -114,7 +130,7 @@ export default function MiniAppClient() {
                 </button>
               )}
               {!st.steam && st.steamUrl && (
-                <button onClick={() => open(st.steamUrl, false)} className="btn-primary w-full">
+                <button onClick={() => { window.location.href = st.steamUrl; }} className="btn-primary w-full">
                   🎮 Saytda Steam bilan kirish
                 </button>
               )}
