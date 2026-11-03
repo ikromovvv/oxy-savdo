@@ -37,7 +37,7 @@ export async function POST(req) {
   if (body.action !== 'draw') return NextResponse.json({ error: 'bad_action' }, { status: 400 });
   if (!giveawayEnabled()) return NextResponse.json({ error: 'giveaway_not_configured' }, { status: 503 });
 
-  const candidates = (await listEntries()).filter((e) => e.steamid);
+  const candidates = (await listEntries()).filter((e) => e.steamid && e.joined);
   const valid = [];
   for (const e of candidates) {
     let sub = e.subscribed;

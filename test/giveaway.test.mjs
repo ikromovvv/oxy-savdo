@@ -62,6 +62,24 @@ test(`havola tokeni: imzo, muddat va turi tekshiriladi`, async () => {
 test(`holat matni: shartlar belgilanadi`, () => {
   const none = bot.statusText({ subscribed: false, steamid: null });
   assert.ok(none.includes('\u274C') && !none.includes('ishtirok etyapsiz'));
-  const full = bot.statusText({ subscribed: true, steamid: '1' });
+  const full = bot.statusText({ subscribed: true, steamid: '1', joined: true });
   assert.ok(full.includes('ishtirok etyapsiz'));
+});
+
+test(`yangi rozigrish: reset qatnashishni nolga tushiradi, Steam bog'lanishi saqlanadi`, async () => {
+  await store.upsertEntry({ tgId: 3001, username: 'x', name: 'X', subscribed: true });
+  await store.linkSteam({ tgId: 3001, steamid: '76561198000003001', steamName: 'X' });
+  assert.equal(store.isEligible(await store.getEntry(3001)), true);
+  await store.recordWinner({ tgId: 3001, steamid: '76561198000003001' });
+
+  const n = await store.resetEntries();
+  assert.ok(n >= 1);
+  const e = await store.getEntry(3001);
+  assert.equal(e.steamid, '76561198000003001'); // Steam saqlandi
+  assert.equal(store.isEligible(e), false); // qatnashish nolga tushdi
+  assert.equal((await store.listWinners()).length, 0);
+
+  // foydalanuvchi qayta bot/Mini App bilan aloqa qilsa, o'zi qatnashadi (Steam'ni qayta ulamasdan)
+  const again = await store.upsertEntry({ tgId: 3001, username: 'x', name: 'X', subscribed: true });
+  assert.equal(store.isEligible(again), true);
 });
