@@ -172,7 +172,7 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   opacity: 1;
   transition: opacity 0.85s ease 0.1s, transform 0.95s cubic-bezier(0.6, 0, 0.2, 1);
   /* JS ishlamasa ham 9 soniyadan keyin yopiladi */
-  animation: introBgIn 0.5s ease both, introFailsafe 0.01s linear 9s forwards;
+  animation: introBgIn 0.5s ease backwards, introFailsafe 0.01s linear 10s forwards;
 }
 .intro-root[data-phase='out'] { opacity: 0; transform: scale(1.04); pointer-events: none; }
 

@@ -7,9 +7,9 @@ import { playIntro, playSfx } from '@/lib/sfx';
 // Foiz: haqiqiy yuklanish bosqichlariga (shrift + sahifa `load`) bog'langan, vaqt bilan
 // ushlab turiladi — animatsiya ketma-ketligi tugamaguncha 100% bo'lmaydi.
 const KEY = 'oxy:intro';
-const MIN_MS = 2800; // animatsiya to'liq ko'rinishi uchun
-const MIN_MS_REDUCED = 350;
-const MAX_MS = 6500; // hech qachon qotib qolmasin
+const MIN_MS = 3600; // SAVDO harflari to'liq chiqib, biroz ko'rinib turishi uchun (CSS ketma-ketligi ~3 s)
+const MIN_MS_REDUCED = 1200; // harakatsiz rejimda ham yozuvlar o'qib bo'lguncha ko'rinadi
+const MAX_MS = 8000; // hech qachon qotib qolmasin
 
 const SAVDO = ['S', 'A', 'V', 'D', 'O'];
 
@@ -35,7 +35,10 @@ export default function IntroLoader() {
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const minMs = reduce ? MIN_MS_REDUCED : MIN_MS;
-    const start = performance.now();
+    // CSS animatsiyalar birinchi chizilishdan boshlanadi — hisobni ham shundan boshlaymiz
+    // (gidratsiya kechiksa ham foiz va yopilish animatsiya bilan sinxron bo'ladi)
+    const paint = performance.getEntriesByName('first-paint')[0] || performance.getEntriesByName('first-contentful-paint')[0];
+    const start = paint ? Math.min(paint.startTime, performance.now()) : performance.now();
 
     // Ovoz animatsiya bilan birga: avtoplay ruxsat bo'lsa darrov, bo'lmasa birinchi bosishda
     // (qolgan qismi o'tib ketgan bo'lsa, tugash "whoosh"i baribir chiqadi).
@@ -102,6 +105,8 @@ export default function IntroLoader() {
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
+    // rAF to'xtab qolsa (fon tab, sekin qurilma) ham yopilish kafolatlanadi
+    timers.current.push(setTimeout(finish, MAX_MS + 1500));
 
     return () => {
       cancelAnimationFrame(raf);
