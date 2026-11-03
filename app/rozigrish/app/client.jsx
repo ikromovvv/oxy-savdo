@@ -5,7 +5,7 @@ import { Check, X } from '@/components/icons';
 
 function Row({ ok, warn, children }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm">
+    <div className="flex items-center justify-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-center text-sm">
       <span
         className={`grid h-7 w-7 flex-none place-items-center rounded-full border ${
           ok ? 'border-emerald-400/60 bg-emerald-400/15 text-emerald-300' : warn ? 'border-amber-400/50 text-amber-300' : 'border-white/25 text-white/60'
@@ -13,7 +13,7 @@ function Row({ ok, warn, children }) {
       >
         {ok ? <Check className="h-4 w-4" strokeWidth={2.5} /> : warn ? '!' : <X className="h-4 w-4" strokeWidth={2.5} />}
       </span>
-      <span className="min-w-0">{children}</span>
+      <span className="min-w-0 text-center">{children}</span>
     </div>
   );
 }
