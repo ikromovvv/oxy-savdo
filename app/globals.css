@@ -211,6 +211,8 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 
 .intro-letter {
   display: inline-block;
+  padding: 0 0.06em; /* background-clip:text harf chetini (masalan Y ning o'ng tomonini) kesib qo'ymasligi uchun */
+  margin: 0 -0.06em;
   background: linear-gradient(180deg, #ffffff 0%, #eef0f3 45%, #aeb4bd 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -238,12 +240,13 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 
 .intro-sub {
   display: flex;
-  gap: 0.62em;
+  justify-content: center;
+  gap: 0.9em; /* harflar orasi (letter-spacing ishlatilmaydi — shunda yozuv aniq markazda turadi) */
   margin-top: clamp(10px, 2.4vw, 20px);
   font-family: 'Manrope', system-ui, sans-serif;
   font-weight: 600;
   font-size: clamp(13px, 3.4vw, 22px);
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   color: #c9ced6;
   text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
 }
@@ -283,8 +286,9 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   to { opacity: 1; transform: none; }
 }
 @keyframes introJoin {
-  from { letter-spacing: 0.16em; }
-  to { letter-spacing: -0.02em; }
+  /* padding-left har lahzada letter-spacing'ga teng: oxirgi harfdan keyingi bo'sh joy kompensatsiya qilinadi, logotip aniq markazda qoladi */
+  from { letter-spacing: 0.16em; padding-left: 0.16em; }
+  to { letter-spacing: -0.02em; padding-left: 0; }
 }
 @keyframes introStreak {
   0% { opacity: 0; transform: translateX(-70%); }
