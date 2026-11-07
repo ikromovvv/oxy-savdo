@@ -1,0 +1,112 @@
+// Narx qoidalari (lib/pricing.js) — node:test, tarmoqsiz.
+
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+const P = await import(pathToFileURL(path.join(process.cwd(), 'lib', 'pricing.js')).href);
+const { baseProfit, premiumFor, sellPrice, MIN_PROFIT_USD, FEE_BUFFER } = P;
+
+test('arzon skin: foyda qat\'iy $1.5', () => {
+  assert.equal(baseProfit(0.5), 1.5);
+  assert.equal(baseProfit(3), 1.5);
+  assert.equal(baseProfit(8), 1.5);
+});
+
+test('$8–30: 15%, lekin $1.5 dan kam emas', () => {
+  assert.equal(baseProfit(9), 1.5); // 15% = 1.35 -> 1.5
+  assert.equal(baseProfit(20), 3);
+  assert.equal(baseProfit(30), 4.5);
+});
+
+test('foyda pog\'onalarda monoton: sotuv narxi tannarx bilan birga o\'sadi', () => {
+  let prev = 0;
+  for (let c = 0.5; c <= 2000; c += 0.5) {
+    const sell = sellPrice({ costUsd: c, marketHashName: 'X | Y (Field-Tested)' }).sellUsd;
+    assert.ok(sell >= prev, `${c}$ da narx kamaydi: ${sell} < ${prev}`);
+    prev = sell;
+  }
+});
+
+test('katta narxlarda foiz pasayadi: 10% / 7% / 5%', () => {
+  assert.equal(baseProfit(100), 10);
+  assert.equal(baseProfit(300), 21);
+  assert.equal(baseProfit(1000), 50);
+});
+
+test('har qanday skinda foyda >= $1.5', () => {
+  for (const c of [0.03, 1, 5, 50, 500, 5000]) {
+    const r = sellPrice({ costUsd: c, marketHashName: 'X | Y (Field-Tested)' });
+    assert.ok(r.profitUsd >= MIN_PROFIT_USD, `${c}$: foyda ${r.profitUsd}`);
+  }
+});
+
+test('sellPrice: oddiy skin = (cost + foyda) * (1 + komissiya)', () => {
+  const r = sellPrice({ costUsd: 2, marketHashName: 'AK-47 | Redline (Field-Tested)' });
+  assert.equal(r.sellUsd, Math.round((2 + 1.5) * (1 + FEE_BUFFER) * 100) / 100);
+  assert.equal(r.premiumPct, 0);
+});
+
+test('ustama: StatTrak +5%, Doppler Ruby +25%', () => {
+  assert.equal(premiumFor({ marketHashName: 'StatTrak™ AK-47 | Redline (Field-Tested)' }).pct, 0.05);
+  assert.equal(premiumFor({ marketHashName: '★ Karambit | Doppler (Factory New)', phase: 'Ruby' }).pct, 0.25);
+  assert.equal(premiumFor({ marketHashName: '★ Karambit | Doppler (Factory New)', phase: 'Phase 1' }).pct, 0);
+});
+
+test('ustama: past float (FN 0.00–0.01 yuqori, o\'rtacha float ustamasiz)', () => {
+  const name = 'AK-47 | Redline (Factory New)';
+  assert.equal(premiumFor({ marketHashName: name, floatValue: 0.005 }).pct, 0.12);
+  assert.equal(premiumFor({ marketHashName: name, floatValue: 0.06 }).pct, 0);
+  assert.equal(premiumFor({ marketHashName: 'AK-47 | Redline (Minimal Wear)', floatValue: 0.075 }).pct, 0.08);
+  assert.equal(premiumFor({ marketHashName: 'AK-47 | Redline (Minimal Wear)', floatValue: 0.12 }).pct, 0);
+  // Battle-Scarred / Well-Worn uchun float ustamasi yo'q
+  assert.equal(premiumFor({ marketHashName: 'AK-47 | Redline (Battle-Scarred)', floatValue: 0.46 }).pct, 0);
+});
+
+test('ustama: mashhur naqsh (AK Case Hardened blue gem) va jami cheklov', () => {
+  const name = 'AK-47 | Case Hardened (Field-Tested)';
+  assert.equal(premiumFor({ marketHashName: name, paintSeed: 661 }).pct, 0.25);
+  assert.equal(premiumFor({ marketHashName: name, paintSeed: 1 }).pct, 0);
+  // StatTrak + Ruby + past float > 40% bo'lmaydi
+  const big = premiumFor({
+    marketHashName: 'StatTrak™ ★ Karambit | Doppler (Factory New)',
+    phase: 'Ruby',
+    floatValue: 0.001,
+  });
+  assert.equal(big.pct, 0.4);
+});
+
+test('ustama sotuv narxiga qo\'shiladi', () => {
+  const plain = sellPrice({ costUsd: 100, marketHashName: 'AK-47 | Redline (Factory New)' });
+  const low = sellPrice({ costUsd: 100, marketHashName: 'AK-47 | Redline (Factory New)', floatValue: 0.003 });
+  assert.ok(low.sellUsd > plain.sellUsd);
+  assert.ok(low.reasons.some((r) => r.startsWith('float:')));
+});
+
+test('override: addUsd foydaga qo\'shiladi, minus ham ruxsat, lekin foyda >= $1.5', () => {
+  const name = 'AK-47 | Redline (Field-Tested)';
+  const base = sellPrice({ costUsd: 2, marketHashName: name });
+  const plus = sellPrice({ costUsd: 2, marketHashName: name }, { [name]: { addUsd: 3 } });
+  assert.ok(plus.sellUsd > base.sellUsd);
+  assert.equal(plus.sellUsd, Math.round((2 + 1.5 + 3) * (1 + FEE_BUFFER) * 100) / 100);
+
+  const minus = sellPrice({ costUsd: 2, marketHashName: name }, { [name]: { addUsd: -5 } });
+  assert.equal(minus.sellUsd, base.sellUsd); // taglik: foyda 1.5 dan pasaymaydi
+});
+
+test('override: fixedUsd qat\'iy narx, listingId nomdan ustun', () => {
+  const name = 'AK-47 | Redline (Field-Tested)';
+  const r = sellPrice(
+    { costUsd: 10, marketHashName: name, listingId: 'L1' },
+    { [name]: { fixedUsd: 25 }, L1: { fixedUsd: 30 } }
+  );
+  assert.equal(r.sellUsd, 30);
+  assert.equal(r.override, true);
+});
+
+test('noto\'g\'ri kirish: NaN/manfiy tannarx xavfsiz', () => {
+  const r = sellPrice({ costUsd: 'abc', marketHashName: 'X' });
+  assert.ok(Number.isFinite(r.sellUsd));
+  assert.ok(r.sellUsd >= MIN_PROFIT_USD);
+});
