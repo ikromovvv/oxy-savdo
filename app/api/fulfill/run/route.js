@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/adminAuth';
 import { runFulfillmentTick, activeProvider } from '@/lib/fulfillment';
 import { recoverDeposits } from '@/lib/settle';
+import { checkLowBalance } from '@/lib/cs2shopAlerts';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,8 @@ export const dynamic = 'force-dynamic';
 async function run() {
   const deposits = await recoverDeposits().catch(() => ({ fixed: 0 }));
   const summary = await runFulfillmentTick();
-  return NextResponse.json({ ok: true, provider: activeProvider(), summary, deposits });
+  const cs2shopBalance = activeProvider() === 'cs2shop' ? await checkLowBalance().catch((e) => ({ error: e.message })) : undefined;
+  return NextResponse.json({ ok: true, provider: activeProvider(), summary, deposits, cs2shopBalance });
 }
 
 function authorized(req) {

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { verifyWebhook } from '@/lib/fulfill/cs2shop';
 import { pollFulfillment } from '@/lib/fulfillment';
-import { notifyTelegram } from '@/lib/orderStore';
+import { notifyCs2shop } from '@/lib/cs2shopAlerts';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,7 +46,7 @@ export async function POST(req) {
 
   // Yetkazilgandan keyin REVERSED bo'lsa — buyurtma 'done' bo'lib poll o'tkazib yuboradi, adminni ogohlantiramiz
   if (String(ev.status).toUpperCase() === 'REVERSED') {
-    notifyTelegram(
+    notifyCs2shop(
       `⚠️ cs2shop: savdo REVERSED — ${ref}\nSabab: ${ev.failReason || "noma'lum"}\nTekshiring: pul qaytarilishi / skin holati.`
     ).catch(() => {});
   }
