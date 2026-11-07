@@ -25,6 +25,7 @@ export default function BuyCatalogHome() {
 
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
+  const [weaponCounts, setWeaponCounts] = useState({});
   const [availableWeaponTypes, setAvailableWeaponTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -63,6 +64,7 @@ export default function BuyCatalogHome() {
         } else {
           setItems((prev) => (append ? [...prev, ...data.items] : data.items));
           setTotal(data.total || 0);
+          if (data.weaponCounts) setWeaponCounts(data.weaponCounts);
           if (data.weaponTypes?.length) setAvailableWeaponTypes(data.weaponTypes);
         }
       } catch (e) {
@@ -99,71 +101,47 @@ export default function BuyCatalogHome() {
 
   const tabs = weaponTypeLabels.filter((w) => availableWeaponTypes.includes(w.slug));
   const hasMore = items.length < total;
+  const allCount = Object.values(weaponCounts).reduce((a, b) => a + b, 0);
+
+  const sortOptions = [
+    { value: 'price_desc', label: <SortLabel text={t('catalog_sort_price')} dir="desc" /> },
+    { value: 'price_asc', label: <SortLabel text={t('catalog_sort_price')} dir="asc" /> },
+  ];
+  const inputCls =
+    'w-full rounded-xl border border-line bg-panel px-3 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40';
+  const tabCls = (active) =>
+    `flex-none whitespace-nowrap rounded-2xl border px-4 py-2 text-left transition-all duration-300 ${
+      active
+        ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(255,255,255,0.3)]'
+        : 'border-line text-white/80 hover:border-white/40'
+    }`;
 
   return (
     <section className="container-site py-10">
-      <div className="mb-6">
-        <span className="label">OXY</span>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{t('catalog_title')}</h1>
-        <p className="mt-2 max-w-lg text-sm text-muted">{t('catalog_subtitle')}</p>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-6">
+        <div>
+          <span className="label">OXY</span>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{t('catalog_title')}</h1>
+          <p className="mt-2 max-w-lg text-sm text-muted">{t('catalog_subtitle')}</p>
+        </div>
+        <div className="pr-2">
+          <div className="text-xs text-muted">{t('catalog_found')}</div>
+          <div className="text-3xl font-semibold tracking-tight">{loading && !total ? '…' : total.toLocaleString('ru-RU')}</div>
+        </div>
       </div>
 
-      {/* QUROL TURI TABLARI */}
-      <div className="no-scrollbar -mx-5 mb-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
-        <button
-          onClick={() => setWeaponType('all')}
-          className={`flex-none whitespace-nowrap rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
-            weaponType === 'all'
-              ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(255,255,255,0.3)]'
-              : 'border-line text-white/80 hover:border-white/40'
-          }`}
-        >
-          {t('catalog_all')}
-        </button>
-        {tabs.map((w) => (
-          <button
-            key={w.slug}
-            onClick={() => setWeaponType(w.slug)}
-            className={`flex-none whitespace-nowrap rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
-              weaponType === w.slug
-                ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(255,255,255,0.3)]'
-                : 'border-line text-white/80 hover:border-white/40'
-            }`}
-          >
-            {w[lang]}
-          </button>
-        ))}
-      </div>
-
-      {/* TOOLBAR */}
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        <button
-          onClick={resetFilters}
-          title={t('catalog_reset')}
-          className="grid h-10 w-10 flex-none place-items-center rounded-full border border-line transition hover:border-white/40"
-        >
-          <RotateCw className="h-4 w-4" strokeWidth={2} />
-        </button>
-
+      {/* MOBIL: qidiruv + saralash (lg dan boshlab chap panelda) */}
+      <div className="mb-4 flex flex-wrap items-center gap-2 lg:hidden">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t('catalog_search_ph')}
           className="min-w-[180px] flex-1 rounded-full border border-line bg-panel px-4 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
         />
-
-        <Select
-          value={sort}
-          onChange={setSort}
-          options={[
-            { value: 'price_desc', label: <SortLabel text={t('catalog_sort_price')} dir="desc" /> },
-            { value: 'price_asc', label: <SortLabel text={t('catalog_sort_price')} dir="asc" /> },
-          ]}
-        />
+        <Select value={sort} onChange={setSort} options={sortOptions} />
       </div>
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        {/* CHAP: FILTRLAR */}
         <button
           onClick={() => setFiltersOpen((v) => !v)}
           aria-expanded={filtersOpen}
@@ -173,8 +151,25 @@ export default function BuyCatalogHome() {
           <span className={`text-muted transition-transform ${filtersOpen ? 'rotate-180' : ''}`}>⌄</span>
         </button>
 
-        <aside className={`card w-full flex-none p-5 lg:block lg:w-[240px] ${filtersOpen ? 'block' : 'hidden'}`}>
-          <div className="label mb-3">{t('catalog_sort_price')}</div>
+        {/* CHAP: FILTRLAR — sahifa aylantirilganda birga yuradi (sticky) */}
+        <aside
+          className={`card w-full flex-none p-5 lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:w-[260px] lg:overflow-y-auto ${
+            filtersOpen ? 'block' : 'hidden'
+          }`}
+        >
+          <div className="hidden lg:block">
+            <div className="label mb-3">{t('catalog_search')}</div>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t('catalog_search_ph')}
+              className={inputCls}
+            />
+            <div className="label mb-3 mt-6">{t('catalog_sort')}</div>
+            <Select value={sort} onChange={setSort} options={sortOptions} />
+          </div>
+
+          <div className="label mb-3 lg:mt-6">{t('catalog_sort_price')}</div>
           <div className="flex flex-col gap-2">
             <input
               type="number"
@@ -182,7 +177,7 @@ export default function BuyCatalogHome() {
               value={priceFrom}
               onChange={(e) => setPriceFrom(e.target.value)}
               placeholder={t('catalog_price_from')}
-              className="w-full rounded-xl border border-line bg-panel px-3 py-2 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
+              className={inputCls}
             />
             <input
               type="number"
@@ -190,7 +185,7 @@ export default function BuyCatalogHome() {
               value={priceTo}
               onChange={(e) => setPriceTo(e.target.value)}
               placeholder={t('catalog_price_to')}
-              className="w-full rounded-xl border border-line bg-panel px-3 py-2 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
+              className={inputCls}
             />
           </div>
 
@@ -227,10 +222,34 @@ export default function BuyCatalogHome() {
               );
             })}
           </div>
+
+          <button
+            onClick={resetFilters}
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-line py-2.5 text-sm transition hover:border-white/40"
+          >
+            <RotateCw className="h-4 w-4" strokeWidth={2} />
+            {t('catalog_reset')}
+          </button>
         </aside>
 
-        {/* O'NG: GRID */}
+        {/* O'NG: KATEGORIYALAR + GRID */}
         <div className="min-w-0 flex-1">
+          {/* QUROL TURI TABLARI (soni bilan) */}
+          <div className="no-scrollbar -mx-5 mb-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+            <button onClick={() => setWeaponType('all')} className={tabCls(weaponType === 'all')}>
+              <div className="text-sm font-medium">{t('catalog_all')}</div>
+              <div className="text-[11px] text-muted">{allCount ? allCount.toLocaleString('ru-RU') : ''}</div>
+            </button>
+            {tabs.map((w) => (
+              <button key={w.slug} onClick={() => setWeaponType(w.slug)} className={tabCls(weaponType === w.slug)}>
+                <div className="text-sm font-medium">{w[lang]}</div>
+                <div className="text-[11px] text-muted">
+                  {weaponCounts[w.slug] ? weaponCounts[w.slug].toLocaleString('ru-RU') : ''}
+                </div>
+              </button>
+            ))}
+          </div>
+
           {loading ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
               {Array.from({ length: 8 }).map((_, i) => (

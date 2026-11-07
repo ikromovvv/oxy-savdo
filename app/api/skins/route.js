@@ -20,7 +20,7 @@ export async function GET(request) {
   };
 
   try {
-    const { total, items, weaponTypes } = await queryCatalog(filters);
+    const { total, items, weaponTypes, weaponCounts } = await queryCatalog(filters);
 
     let meta = {};
     try {
@@ -41,7 +41,7 @@ export async function GET(request) {
       };
     });
 
-    return NextResponse.json({ total, items: enriched, weaponTypes });
+    return NextResponse.json({ total, items: enriched, weaponTypes, weaponCounts });
   } catch (e) {
     console.error('[api/skins] xato:', e?.code || e?.message || e, e?.status ? `HTTP ${e.status}` : '', e?.stack || '');
     return NextResponse.json(
