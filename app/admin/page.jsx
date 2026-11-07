@@ -6,12 +6,14 @@ import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminProducts from '@/components/admin/AdminProducts';
 import AdminOrders from '@/components/admin/AdminOrders';
 import AdminFailed from '@/components/admin/AdminFailed';
+import AdminCs2shop from '@/components/admin/AdminCs2shop';
 
 const NAV = [
   { key: 'dashboard', label: 'Panel', icon: Icon.grid },
   { key: 'products', label: 'Mahsulotlar', icon: Icon.box },
   { key: 'orders', label: 'Buyurtmalar', icon: Icon.cart },
   { key: 'failed', label: 'Yetkazish xatolari', icon: Icon.warn },
+  { key: 'cs2shop', label: 'cs2shop', icon: Icon.wallet },
 ];
 
 function Sidebar({ view, setView, onLogout, onNav }) {
@@ -190,11 +192,12 @@ export default function AdminPage() {
         </header>
 
         <main className="flex-1 p-4 md:p-8">
-          <div className="mx-auto max-w-5xl">
+          <div className={`mx-auto ${view === 'cs2shop' ? 'max-w-7xl' : 'max-w-5xl'}`}>
             {view === 'dashboard' && <AdminDashboard onGo={setView} />}
             {view === 'products' && <AdminProducts onToast={flash} />}
             {view === 'orders' && <AdminOrders />}
             {view === 'failed' && <AdminFailed onOpenOrders={() => setView('orders')} />}
+            {view === 'cs2shop' && <AdminCs2shop />}
           </div>
         </main>
       </div>

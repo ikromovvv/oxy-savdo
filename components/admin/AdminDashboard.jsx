@@ -117,68 +117,6 @@ function Chart({ series }) {
   );
 }
 
-// cs2shop: ulanish holati, balans va webhook'ni ro'yxatdan o'tkazish
-function Cs2ShopCard() {
-  const [info, setInfo] = useState(null);
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState('');
-
-  const load = () =>
-    fetch('/api/admin/cs2shop', { cache: 'no-store' })
-      .then((r) => r.json())
-      .then(setInfo)
-      .catch(() => setInfo({ error: 'network' }));
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  async function connectWebhook() {
-    setBusy(true);
-    setMsg('');
-    try {
-      const r = await fetch('/api/admin/cs2shop', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action: 'webhook' }),
-      });
-      const d = await r.json().catch(() => ({}));
-      setMsg(r.ok && d.ok ? `Webhook ulandi: ${d.webhookUrl}` : `Xato: ${d.error || r.status}`);
-    } catch {
-      setMsg('Xato: aloqa');
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  if (!info) return null;
-  return (
-    <div className="card mt-4 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div className="label">cs2shop</div>
-          {!info.configured ? (
-            <div className="mt-1 text-sm text-rose-400">Sozlanmagan (CS2SHOP_MERCHANT_ID / CS2SHOP_API_KEY)</div>
-          ) : info.balanceError ? (
-            <div className="mt-1 text-sm text-rose-400">Balansni o&apos;qib bo&apos;lmadi: {info.balanceError}</div>
-          ) : (
-            <div className="mt-1 text-2xl font-bold tracking-tight">${Number(info.available || 0).toFixed(2)}</div>
-          )}
-          <div className="mt-0.5 text-xs text-muted">
-            Katalog: {info.skinsSource} · Yetkazish: {info.fulfillProvider}
-          </div>
-        </div>
-        {info.configured && (
-          <button onClick={connectWebhook} disabled={busy} className="btn-ghost disabled:opacity-50">
-            {busy ? 'Ulanmoqda...' : "Webhook'ni ulash"}
-          </button>
-        )}
-      </div>
-      {msg && <div className="mt-3 break-all text-xs text-muted">{msg}</div>}
-    </div>
-  );
-}
-
 export default function AdminDashboard({ onGo }) {
   const [data, setData] = useState(null);
   const [err, setErr] = useState(false);
@@ -238,8 +176,6 @@ export default function AdminDashboard({ onGo }) {
         </div>
       )}
 
-      <Cs2ShopCard />
-
       <div className="mt-6 flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">So&apos;nggi buyurtmalar</h2>
         <button onClick={() => onGo?.('orders')} className="py-2 text-xs text-accent hover:underline">
@@ -280,7 +216,7 @@ export default function AdminDashboard({ onGo }) {
         )}
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <button onClick={() => onGo?.('products')} className="card card-hover flex items-center gap-3 p-4 text-left">
           <span className="grid h-10 w-10 place-items-center rounded-xl border border-line text-accent">
             <Svg d={Icon.box} className="h-5 w-5" />
@@ -297,6 +233,15 @@ export default function AdminDashboard({ onGo }) {
           <div>
             <div className="text-sm font-semibold">Buyurtmalar</div>
             <div className="text-xs text-muted">Holat, to&apos;lov, yetkazish</div>
+          </div>
+        </button>
+        <button onClick={() => onGo?.('cs2shop')} className="card card-hover flex items-center gap-3 p-4 text-left">
+          <span className="grid h-10 w-10 place-items-center rounded-xl border border-line text-accent">
+            <Svg d={Icon.wallet} className="h-5 w-5" />
+          </span>
+          <div>
+            <div className="text-sm font-semibold">cs2shop</div>
+            <div className="text-xs text-muted">Balans, savdolar, test savdo, webhook</div>
           </div>
         </button>
       </div>
