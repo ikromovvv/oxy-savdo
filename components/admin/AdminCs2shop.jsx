@@ -68,7 +68,99 @@ function Tabs({ tab, setTab }) {
   );
 }
 
+const STEAM_IMAGE_RE = /steamstatic\.com\/economy\/image\//;
+const bigImage = (u) => (u && STEAM_IMAGE_RE.test(u) && !/\/\d+fx\d+f$/.test(u) ? `${u}/512fx384f` : u || '');
+
+function Row({ k, v, mono }) {
+  if (v == null || v === '') return null;
+  return (
+    <div className="flex items-start justify-between gap-4 py-2.5 text-sm">
+      <dt className="flex-none text-muted">{k}</dt>
+      <dd className={`min-w-0 break-all text-right ${mono ? 'font-mono text-xs' : ''}`}>{v}</dd>
+    </div>
+  );
+}
+
+// Savdo qilingan skin haqida modal: rasm + to'liq ma'lumot
+function TradeModal({ trade: t, onClose }) {
+  useEffect(() => {
+    const h = (e) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [onClose]);
+  if (!t) return null;
+
+  const color = t.rarityColor || '#4b69ff';
+  const m = String(t.item || '').match(/^(.*?)(?:\s*\(([^)]+)\))?$/);
+  const title = (m?.[1] || t.item || 'Noma\'lum skin').trim();
+  const wear = m?.[2] || null;
+
+  return (
+    <div className="fixed inset-0 z-[70] grid place-items-center p-4" role="dialog" aria-modal="true">
+      <div onClick={onClose} className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-line bg-panel shadow-[0_20px_80px_rgba(0,0,0,0.6)]">
+        <button
+          onClick={onClose}
+          aria-label="Yopish"
+          className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full border border-line bg-black/50 text-white/80 transition hover:bg-black/80"
+        >
+          <Svg d={Icon.close} className="h-4 w-4" />
+        </button>
+
+        <div className="relative px-6 pt-8">
+          <span aria-hidden className="pointer-events-none absolute left-1/2 top-24 h-40 w-40 -translate-x-1/2 rounded-full opacity-30 blur-3xl" style={{ background: color }} />
+          <div className="relative grid aspect-[4/3] max-h-64 w-full place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-white/[0.06] to-black/40">
+            {t.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={bigImage(t.image)} alt={title} draggable={false} className="h-full w-full object-contain p-3" />
+            ) : (
+              <span className="px-6 text-center text-lg font-semibold text-white/70">{title}</span>
+            )}
+          </div>
+        </div>
+
+        <div className="px-6 pb-6 pt-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Chip status={t.status} />
+            {t.rarity && (
+              <span className="rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider" style={{ borderColor: `${color}80`, color }}>
+                {t.rarity}
+              </span>
+            )}
+          </div>
+          <h3 className="mt-3 text-xl font-semibold tracking-tight">{title}</h3>
+          {wear && <div className="mt-0.5 text-sm text-muted">{wear}</div>}
+
+          <div className="mt-4 text-2xl font-bold">{t.priceUsd != null ? usd(t.priceUsd) : '—'}</div>
+
+          <dl className="mt-3 divide-y divide-line border-t border-line">
+            <Row k="Savdo ID" v={t.tradeId} mono />
+            <Row k="Buyurtma (ref)" v={t.externalRef} mono />
+            <Row k="Steam offer ID" v={t.offerId} mono />
+            <Row k="Xaridor (Steam partner)" v={t.partner} mono />
+            <Row k="Yaratilgan" v={t.createdAt ? fmtDate(t.createdAt) : null} />
+            <Row k="Yangilangan" v={t.updatedAt ? fmtDate(t.updatedAt) : null} />
+            <Row k="Yakunlangan" v={t.completedAt ? fmtDate(t.completedAt) : null} />
+            <Row k="Bekor qilingan" v={t.cancelledAt ? fmtDate(t.cancelledAt) : null} />
+            <Row k="Webhook holati" v={t.webhookStatus} />
+            <Row k="Xato kodi" v={t.errorCode} />
+          </dl>
+
+          {t.failReason && (
+            <div className="mt-4 rounded-xl border border-rose-400/30 bg-rose-400/10 p-3 text-xs leading-relaxed text-rose-200">
+              <div className="mb-1 font-semibold uppercase tracking-wider">Sabab</div>
+              {t.failReason}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Overview({ data, loading, err, reload }) {
+  const [open, setOpen] = useState(null);
+
   if (loading && !data) {
     return (
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -89,6 +181,13 @@ function Overview({ data, loading, err, reload }) {
   }
   const c = data.counts || {};
   const trades = data.trades || [];
+  const by = data.byStatus || {};
+  const maxBy = Math.max(1, ...Object.values(by));
+  const BAR = {
+    COMPLETED: 'bg-emerald-400/70', SENT: 'bg-sky-400/70', PENDING: 'bg-sky-400/70',
+    FAILED: 'bg-rose-400/70', REVERSED: 'bg-rose-400/70', EXPIRED: 'bg-amber-400/70', CANCELLED: 'bg-amber-400/70',
+  };
+
   return (
     <>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -98,26 +197,43 @@ function Overview({ data, loading, err, reload }) {
         <Stat label="Xarid quvvati" value={usd(data.available)} sub="Ochiq balansdan sarflash imkoni" accent />
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-        <div className="card p-5">
+      <div className="mt-4 grid items-stretch gap-4 lg:grid-cols-[minmax(320px,4fr)_minmax(0,8fr)]">
+        {/* CHAP: statistika (o'ngdagi jadval bilan bir xil balandlikda) */}
+        <div className="card flex flex-col p-5 lg:h-[calc(100vh-17rem)] lg:min-h-[560px] lg:overflow-y-auto">
           <div className="label">So&apos;nggi faollik</div>
           <div className="mt-1 text-lg font-semibold">So&apos;nggi {c.sample || 0} savdo</div>
           <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
             <div>
               <dt className="label">Faol</dt>
-              <dd className="mt-1 text-2xl font-bold">{c.active || 0}</dd>
+              <dd className="mt-1 text-3xl font-bold">{c.active || 0}</dd>
             </div>
             <div>
               <dt className="label">Yakunlangan</dt>
-              <dd className="mt-1 text-2xl font-bold text-emerald-300">{c.completed || 0}</dd>
+              <dd className="mt-1 text-3xl font-bold text-emerald-300">{c.completed || 0}</dd>
             </div>
             <div>
               <dt className="label">Xato</dt>
-              <dd className={`mt-1 text-2xl font-bold ${c.failed ? 'text-rose-400' : ''}`}>{c.failed || 0}</dd>
+              <dd className={`mt-1 text-3xl font-bold ${c.failed ? 'text-rose-400' : ''}`}>{c.failed || 0}</dd>
             </div>
           </dl>
 
-          <div className="mt-5 space-y-2 rounded-xl border border-line p-3 text-xs">
+          <div className="mt-6">
+            <div className="label mb-3">Holatlar bo&apos;yicha</div>
+            <div className="space-y-2.5">
+              {Object.entries(by).sort((a, b) => b[1] - a[1]).map(([st, n]) => (
+                <div key={st} className="flex items-center gap-3 text-xs">
+                  <span className="w-24 flex-none font-mono text-[11px] text-white/80">{st}</span>
+                  <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                    <span className={`block h-full rounded-full ${BAR[st] || 'bg-white/40'}`} style={{ width: `${Math.max(6, (n / maxBy) * 100)}%` }} />
+                  </span>
+                  <span className="w-8 flex-none text-right tabular-nums">{n}</span>
+                </div>
+              ))}
+              {Object.keys(by).length === 0 && <div className="text-xs text-muted">Ma&apos;lumot yo&apos;q</div>}
+            </div>
+          </div>
+
+          <div className="mt-auto space-y-2 rounded-xl border border-line p-3 text-xs">
             <div className="flex justify-between gap-3"><span className="text-muted">Merchant ID</span><span className="font-mono">{data.merchantId}</span></div>
             <div className="flex justify-between gap-3"><span className="text-muted">Jami savdolar</span><span>{c.total}</span></div>
             <div className="flex justify-between gap-3"><span className="text-muted">Katalog manbasi</span><span>{data.skinsSource}</span></div>
@@ -126,11 +242,12 @@ function Overview({ data, loading, err, reload }) {
           </div>
         </div>
 
-        <div className="card overflow-hidden p-0">
-          <div className="flex items-center justify-between border-b border-line px-5 py-4">
+        {/* O'NG: o'z ichida aylanadigan jadval */}
+        <div className="card flex flex-col overflow-hidden p-0 lg:h-[calc(100vh-17rem)] lg:min-h-[560px]">
+          <div className="flex flex-none items-center justify-between border-b border-line px-5 py-4">
             <div>
               <div className="label">So&apos;nggi ulgurji savdolar</div>
-              <div className="mt-1 text-lg font-semibold">Oxirgi faollik</div>
+              <div className="mt-1 text-lg font-semibold">Oxirgi faollik <span className="text-sm font-normal text-muted">· bosing — skin haqida</span></div>
             </div>
             <button onClick={reload} className="btn-ghost inline-flex items-center gap-2">
               <Svg d={Icon.refresh} className="h-4 w-4" />
@@ -140,9 +257,9 @@ function Overview({ data, loading, err, reload }) {
           {trades.length === 0 ? (
             <div className="p-10 text-center text-sm text-muted">Hali savdo yo&apos;q.</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] text-left text-xs">
-                <thead className="border-b border-line text-[10px] uppercase tracking-wider text-muted">
+            <div className="min-h-0 flex-1 overflow-auto max-lg:max-h-[60vh]">
+              <table className="w-full min-w-[720px] text-left text-xs">
+                <thead className="sticky top-0 z-10 bg-panel text-[10px] uppercase tracking-wider text-muted shadow-[0_1px_0_var(--line,rgba(255,255,255,0.08))]">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Savdo ID</th>
                     <th className="px-4 py-3 font-semibold">Buyurtma</th>
@@ -153,15 +270,30 @@ function Overview({ data, loading, err, reload }) {
                 </thead>
                 <tbody className="divide-y divide-line">
                   {trades.map((t) => (
-                    <tr key={t.tradeId} className="align-top">
+                    <tr
+                      key={t.tradeId}
+                      onClick={() => setOpen(t)}
+                      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setOpen(t))}
+                      tabIndex={0}
+                      role="button"
+                      className="cursor-pointer align-top outline-none transition hover:bg-white/[0.04] focus-visible:bg-white/[0.06]"
+                    >
                       <td className="px-4 py-3 font-mono text-[11px] text-white/80">{String(t.tradeId).slice(0, 8)}…</td>
                       <td className="px-4 py-3">
-                        <div className="break-all font-mono text-[11px]">{t.externalRef}</div>
-                        {t.item && <div className="mt-0.5 text-muted">{t.item}{t.priceUsd != null ? ` · ${usd(t.priceUsd)}` : ''}</div>}
+                        <div className="flex items-center gap-3">
+                          {t.image && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={t.image} alt="" loading="lazy" className="h-9 w-12 flex-none rounded-md bg-white/[0.05] object-contain" />
+                          )}
+                          <div className="min-w-0">
+                            <div className="break-all font-mono text-[11px]">{t.externalRef}</div>
+                            {t.item && <div className="mt-0.5 text-muted">{t.item}{t.priceUsd != null ? ` · ${usd(t.priceUsd)}` : ''}</div>}
+                          </div>
+                        </div>
                       </td>
                       <td className="px-4 py-3"><Chip status={t.status} /></td>
                       <td className="whitespace-nowrap px-4 py-3 text-muted">{fmtDate(t.updatedAt)}</td>
-                      <td className="max-w-[220px] px-4 py-3 text-muted">{t.failReason || '—'}</td>
+                      <td className="max-w-[240px] px-4 py-3 text-muted">{t.failReason || '—'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -170,6 +302,8 @@ function Overview({ data, loading, err, reload }) {
           )}
         </div>
       </div>
+
+      {open && <TradeModal trade={open} onClose={() => setOpen(null)} />}
     </>
   );
 }

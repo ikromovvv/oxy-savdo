@@ -4,6 +4,8 @@ import { activeProvider } from '@/lib/fulfillment';
 import { configured, balance, setWebhook, buy, status, tradesHistory, walletHistory } from '@/lib/fulfill/cs2shop';
 import { fetchListings } from '@/lib/cs2shopFeed';
 import { parseTradeUrl } from '@/lib/steamTrade';
+import { getSkinMeta } from '@/lib/skinImages';
+import { parseSkinName } from '@/lib/skinNames';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +33,19 @@ export async function GET(req) {
         return NextResponse.json({ configured: true, ...(await walletHistory({ page, limit: 25 })), page });
       }
       const [bal, hist] = await Promise.all([balance(), tradesHistory({ page: 1, limit: 100 })]);
+      const shown = hist.trades.slice(0, 50);
+      // CSGO-API nomi wear'siz va StatTrak'siz ("AK-47 | Redline") — market_hash_name'dan shuni ajratamiz
+      const baseName = (n) => {
+        const p = parseSkinName(n || '');
+        return p ? `${p.weaponBase} | ${p.skinName}` : n;
+      };
+      const names = [...new Set(shown.map((t) => baseName(t.marketHashName || t.market_hash_name)).filter(Boolean))];
+      const meta = names.length ? await getSkinMeta(names).catch(() => ({})) : {};
+      const byStatus = {};
+      for (const t of hist.trades) {
+        const k = String(t.status).toUpperCase();
+        byStatus[k] = (byStatus[k] || 0) + 1;
+      }
       const by = (...st) => hist.trades.filter((t) => st.includes(String(t.status).toUpperCase())).length;
       return NextResponse.json({
         configured: true,
@@ -46,15 +61,30 @@ export async function GET(req) {
           sample: hist.trades.length,
           total: hist.total,
         },
-        trades: hist.trades.slice(0, 20).map((t) => ({
-          tradeId: t.tradeId,
-          externalRef: t.externalRef,
-          status: t.status,
-          item: t.marketHashName || t.market_hash_name || null,
-          priceUsd: t.priceUsd ?? t.price ?? null,
-          updatedAt: t.updatedAt,
-          failReason: t.failReason || null,
-        })),
+        byStatus,
+        trades: shown.map((t) => {
+          const item = t.marketHashName || t.market_hash_name || null;
+          const m = meta[baseName(item)] || {};
+          return {
+            tradeId: t.tradeId,
+            externalRef: t.externalRef,
+            status: t.status,
+            item,
+            priceUsd: t.priceUsd ?? t.price ?? null,
+            updatedAt: t.updatedAt,
+            createdAt: t.createdAt || null,
+            completedAt: t.completedAt || null,
+            cancelledAt: t.cancelledAt || null,
+            failReason: t.failReason || null,
+            errorCode: t.errorCode ?? null,
+            webhookStatus: t.webhookStatus || null,
+            offerId: t.offerId || null,
+            partner: parseTradeUrl(t.tradeUrl || '')?.partner || null, // token ko'rsatilmaydi
+            image: m.image || null,
+            rarity: m.rarity || null,
+            rarityColor: m.rarityColor || null,
+          };
+        }),
       });
     } catch (e) {
       return NextResponse.json({ configured: true, error: e.message }, { status: 502 });

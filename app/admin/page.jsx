@@ -192,7 +192,7 @@ export default function AdminPage() {
         </header>
 
         <main className="flex-1 p-4 md:p-8">
-          <div className={`mx-auto ${view === 'cs2shop' ? 'max-w-7xl' : 'max-w-5xl'}`}>
+          <div className={`mx-auto ${view === 'cs2shop' ? 'max-w-none' : 'max-w-5xl'}`}>
             {view === 'dashboard' && <AdminDashboard onGo={setView} />}
             {view === 'products' && <AdminProducts onToast={flash} />}
             {view === 'orders' && <AdminOrders />}
