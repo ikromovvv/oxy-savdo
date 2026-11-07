@@ -7,17 +7,18 @@ import { pathToFileURL } from 'node:url';
 
 const P = await import(pathToFileURL(path.join(process.cwd(), 'lib', 'pricing.js')).href);
 const { baseProfit, premiumFor, sellPrice, MIN_PROFIT_USD, FEE_BUFFER } = P;
+const r2 = (n) => Math.round(n * 100) / 100;
 
-test('arzon skin: foyda qat\'iy $1.5', () => {
-  assert.equal(baseProfit(0.5), 1.5);
-  assert.equal(baseProfit(3), 1.5);
-  assert.equal(baseProfit(8), 1.5);
+test('arzon skin: foyda qat\'iy $1', () => {
+  assert.equal(baseProfit(0.5), 1);
+  assert.equal(baseProfit(3), 1);
+  assert.equal(baseProfit(8), 1);
 });
 
-test('$8–30: 15%, lekin $1.5 dan kam emas', () => {
-  assert.equal(baseProfit(9), 1.5); // 15% = 1.35 -> 1.5
-  assert.equal(baseProfit(20), 3);
-  assert.equal(baseProfit(30), 4.5);
+test('$8–30: 12%, lekin $1 dan kam emas', () => {
+  assert.equal(baseProfit(9), 1.08);
+  assert.equal(baseProfit(20), 2.4);
+  assert.equal(baseProfit(30), 3.6);
 });
 
 test('foyda pog\'onalarda monoton: sotuv narxi tannarx bilan birga o\'sadi', () => {
@@ -29,13 +30,13 @@ test('foyda pog\'onalarda monoton: sotuv narxi tannarx bilan birga o\'sadi', () 
   }
 });
 
-test('katta narxlarda foiz pasayadi: 10% / 7% / 5%', () => {
-  assert.equal(baseProfit(100), 10);
-  assert.equal(baseProfit(300), 21);
-  assert.equal(baseProfit(1000), 50);
+test('katta narxlarda foiz pasayadi: 8% / 6% / 4%', () => {
+  assert.equal(baseProfit(100), 8);
+  assert.equal(baseProfit(300), 18);
+  assert.equal(baseProfit(1000), 40);
 });
 
-test('har qanday skinda foyda >= $1.5', () => {
+test('har qanday skinda foyda >= minimal ($1)', () => {
   for (const c of [0.03, 1, 5, 50, 500, 5000]) {
     const r = sellPrice({ costUsd: c, marketHashName: 'X | Y (Field-Tested)' });
     assert.ok(r.profitUsd >= MIN_PROFIT_USD, `${c}$: foyda ${r.profitUsd}`);
@@ -44,7 +45,7 @@ test('har qanday skinda foyda >= $1.5', () => {
 
 test('sellPrice: oddiy skin = (cost + foyda) * (1 + komissiya)', () => {
   const r = sellPrice({ costUsd: 2, marketHashName: 'AK-47 | Redline (Field-Tested)' });
-  assert.equal(r.sellUsd, Math.round((2 + 1.5) * (1 + FEE_BUFFER) * 100) / 100);
+  assert.equal(r.sellUsd, r2((2 + 1) * (1 + FEE_BUFFER)));
   assert.equal(r.premiumPct, 0);
 });
 
@@ -84,15 +85,15 @@ test('ustama sotuv narxiga qo\'shiladi', () => {
   assert.ok(low.reasons.some((r) => r.startsWith('float:')));
 });
 
-test('override: addUsd foydaga qo\'shiladi, minus ham ruxsat, lekin foyda >= $1.5', () => {
+test('override: addUsd foydaga qo\'shiladi, minus ham ruxsat, lekin foyda >= minimal', () => {
   const name = 'AK-47 | Redline (Field-Tested)';
   const base = sellPrice({ costUsd: 2, marketHashName: name });
   const plus = sellPrice({ costUsd: 2, marketHashName: name }, { [name]: { addUsd: 3 } });
   assert.ok(plus.sellUsd > base.sellUsd);
-  assert.equal(plus.sellUsd, Math.round((2 + 1.5 + 3) * (1 + FEE_BUFFER) * 100) / 100);
+  assert.equal(plus.sellUsd, r2((2 + 1 + 3) * (1 + FEE_BUFFER)));
 
   const minus = sellPrice({ costUsd: 2, marketHashName: name }, { [name]: { addUsd: -5 } });
-  assert.equal(minus.sellUsd, base.sellUsd); // taglik: foyda 1.5 dan pasaymaydi
+  assert.equal(minus.sellUsd, base.sellUsd); // taglik: foyda minimaldan pasaymaydi
 });
 
 test('override: fixedUsd qat\'iy narx, listingId nomdan ustun', () => {
@@ -109,4 +110,19 @@ test('noto\'g\'ri kirish: NaN/manfiy tannarx xavfsiz', () => {
   const r = sellPrice({ costUsd: 'abc', marketHashName: 'X' });
   assert.ok(Number.isFinite(r.sellUsd));
   assert.ok(r.sellUsd >= MIN_PROFIT_USD);
+});
+
+test('$5 skin ~$6.2, ustamalar bilan ham $6.5 dan oshmaydi', () => {
+  const plain = sellPrice({ costUsd: 5, marketHashName: 'AK-47 | Redline (Field-Tested)' });
+  assert.ok(plain.sellUsd >= 6 && plain.sellUsd <= 6.5, String(plain.sellUsd));
+  // past float (+12%) + StatTrak (+5%) ham chegaradan oshirmaydi
+  const fancy = sellPrice({ costUsd: 5, marketHashName: 'StatTrak™ AK-47 | Redline (Factory New)', floatValue: 0.002 });
+  assert.ok(fancy.sellUsd <= 6.5, String(fancy.sellUsd));
+  assert.ok(fancy.sellUsd >= plain.sellUsd);
+});
+
+test('arzon skin cheklovi qo\'lda override\'ga tegmaydi', () => {
+  const name = 'X | Y (Field-Tested)';
+  const r = sellPrice({ costUsd: 5, marketHashName: name }, { [name]: { addUsd: 3 } });
+  assert.equal(r.sellUsd, r2((5 + 1 + 3) * (1 + FEE_BUFFER)));
 });

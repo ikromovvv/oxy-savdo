@@ -195,7 +195,7 @@ test('aggregate: nom bo\'yicha eng arzon, qulflanmagan listing; sotuv narxi pric
   assert.equal(ak.costUsd, 3);
   assert.equal(ak.listingId, 'b');
   assert.equal(ak.quantity, 2); // qulflangan hisoblanmaydi
-  assert.ok(ak.min_price >= 3 + 1.5); // tannarx + minimal foyda
+  assert.ok(ak.min_price >= 3 + 1); // tannarx + minimal foyda
 });
 
 test('aggregate: override sotuv narxiga ta\'sir qiladi', () => {
