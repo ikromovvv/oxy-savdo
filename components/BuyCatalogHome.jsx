@@ -110,10 +110,14 @@ export default function BuyCatalogHome() {
   const inputCls =
     'w-full rounded-xl border border-line bg-panel px-3 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40';
   const tabCls = (active) =>
-    `flex-none whitespace-nowrap rounded-2xl border px-4 py-2 text-left transition-all duration-300 ${
+    `cat-tab group flex flex-none items-center gap-2.5 whitespace-nowrap rounded-full border py-2 pl-4 pr-2 text-sm font-medium transition-all duration-300 ease-out active:scale-[0.97] ${
       active
-        ? 'border-accent/60 bg-gradient-to-r from-accent/25 to-accent/10 text-white shadow-[0_0_16px_rgba(255,255,255,0.3)]'
-        : 'border-line text-white/80 hover:border-white/40'
+        ? 'border-white bg-white text-black shadow-[0_10px_28px_-10px_rgba(255,255,255,0.55)]'
+        : 'border-line bg-white/[0.03] text-white/75 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/[0.07] hover:text-white'
+    }`;
+  const countCls = (active) =>
+    `min-w-[1.9rem] rounded-full px-2 py-0.5 text-center text-[11px] font-semibold tabular-nums transition-colors duration-300 ${
+      active ? 'bg-black/10 text-black/70' : 'bg-white/[0.08] text-white/55 group-hover:text-white/80'
     }`;
 
   return (
@@ -236,16 +240,25 @@ export default function BuyCatalogHome() {
         <div className="min-w-0 flex-1">
           {/* QUROL TURI TABLARI (soni bilan) */}
           <div className="no-scrollbar -mx-5 mb-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
-            <button onClick={() => setWeaponType('all')} className={tabCls(weaponType === 'all')}>
-              <div className="text-sm font-medium">{t('catalog_all')}</div>
-              <div className="text-[11px] text-muted">{allCount ? allCount.toLocaleString('ru-RU') : ''}</div>
+            <button
+              onClick={() => setWeaponType('all')}
+              className={tabCls(weaponType === 'all')}
+              style={{ animationDelay: '0ms' }}
+            >
+              <span>{t('catalog_all')}</span>
+              <span className={countCls(weaponType === 'all')}>{allCount ? allCount.toLocaleString('ru-RU') : '–'}</span>
             </button>
-            {tabs.map((w) => (
-              <button key={w.slug} onClick={() => setWeaponType(w.slug)} className={tabCls(weaponType === w.slug)}>
-                <div className="text-sm font-medium">{w[lang]}</div>
-                <div className="text-[11px] text-muted">
-                  {weaponCounts[w.slug] ? weaponCounts[w.slug].toLocaleString('ru-RU') : ''}
-                </div>
+            {tabs.map((w, i) => (
+              <button
+                key={w.slug}
+                onClick={() => setWeaponType(w.slug)}
+                className={tabCls(weaponType === w.slug)}
+                style={{ animationDelay: `${(i + 1) * 45}ms` }}
+              >
+                <span>{w[lang]}</span>
+                <span className={countCls(weaponType === w.slug)}>
+                  {weaponCounts[w.slug] ? weaponCounts[w.slug].toLocaleString('ru-RU') : '0'}
+                </span>
               </button>
             ))}
           </div>

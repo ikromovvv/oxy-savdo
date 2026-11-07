@@ -279,6 +279,14 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   animation: introSub 0.7s ease 1.3s both;
 }
 
+/* Katalog kategoriya tablari: chiqish animatsiyasi */
+@keyframes catTabIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+.cat-tab { animation: catTabIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@media (prefers-reduced-motion: reduce) { .cat-tab { animation: none; } }
+
 @keyframes introBgIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes introPulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 @keyframes introLetter {
