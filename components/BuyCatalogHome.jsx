@@ -21,6 +21,8 @@ export default function BuyCatalogHome() {
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
   const [sort, setSort] = useState('price_desc');
+  const [rarity, setRarity] = useState('all');
+  const [availability, setAvailability] = useState('all');
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [items, setItems] = useState([]);
@@ -46,6 +48,8 @@ export default function BuyCatalogHome() {
         query,
         weaponType,
         wear,
+        rarity,
+        availability,
         priceFrom,
         priceTo,
         sort,
@@ -77,7 +81,7 @@ export default function BuyCatalogHome() {
         setLoadingMore(false);
       }
     },
-    [query, weaponType, wear, priceFrom, priceTo, sort]
+    [query, weaponType, wear, rarity, availability, priceFrom, priceTo, sort]
   );
 
   // filtr o'zgarsa — kutib turib (debounce) 0-offsetdan qayta yuklaymiz
@@ -85,12 +89,14 @@ export default function BuyCatalogHome() {
     const timer = setTimeout(() => fetchPage(0, false), 350);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, weaponType, wear, priceFrom, priceTo, sort]);
+  }, [query, weaponType, wear, rarity, availability, priceFrom, priceTo, sort]);
 
   function resetFilters() {
     setQuery('');
     setWeaponType('all');
     setWear('all');
+    setRarity('all');
+    setAvailability('all');
     setPriceFrom('');
     setPriceTo('');
   }
@@ -106,6 +112,23 @@ export default function BuyCatalogHome() {
   const sortOptions = [
     { value: 'price_desc', label: <SortLabel text={t('catalog_sort_price')} dir="desc" /> },
     { value: 'price_asc', label: <SortLabel text={t('catalog_sort_price')} dir="asc" /> },
+    { value: 'float_asc', label: t('sort_float_asc') },
+  ];
+  const rarityOptions = [
+    { value: 'all', label: t('catalog_all') },
+    { value: 'Consumer Grade', label: 'Consumer' },
+    { value: 'Industrial Grade', label: 'Industrial' },
+    { value: 'Mil-Spec Grade', label: 'Mil-Spec' },
+    { value: 'Restricted', label: 'Restricted' },
+    { value: 'Classified', label: 'Classified' },
+    { value: 'Covert', label: 'Covert' },
+    { value: 'Extraordinary', label: 'Extraordinary' },
+    { value: 'Contraband', label: 'Contraband' },
+  ];
+  const availOptions = [
+    { value: 'all', label: t('avail_all') },
+    { value: 'now', label: t('avail_now') },
+    { value: 'later', label: t('avail_later') },
   ];
   const inputCls =
     'w-full rounded-xl border border-line bg-panel px-3 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40';
@@ -225,6 +248,26 @@ export default function BuyCatalogHome() {
                 </button>
               );
             })}
+          </div>
+
+          <div className="label mb-3 mt-6">{t('catalog_rarity')}</div>
+          <Select value={rarity} onChange={setRarity} options={rarityOptions} />
+
+          <div className="label mb-3 mt-6">{t('catalog_avail')}</div>
+          <div className="flex flex-wrap gap-1.5">
+            {availOptions.map((o) => (
+              <button
+                key={o.value}
+                onClick={() => setAvailability(o.value)}
+                className={`rounded-full border px-3.5 py-2 text-xs font-medium transition-all duration-300 ${
+                  availability === o.value
+                    ? 'border-white/50 bg-white/10 text-white'
+                    : 'border-line text-white/70 hover:border-white/40'
+                }`}
+              >
+                {o.label}
+              </button>
+            ))}
           </div>
 
           <button

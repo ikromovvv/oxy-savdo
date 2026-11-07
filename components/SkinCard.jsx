@@ -6,7 +6,7 @@ import { useStore } from './StoreProvider';
 import { ProductMedia } from './ProductCard';
 import { ShoppingCart } from './icons';
 import { weaponTypes, formatPrice } from '@/lib/products';
-import { wearInfo, rarityInfo, rarityRgb, WEAR_TIERS } from '@/lib/skinMeta';
+import { wearInfo, rarityInfo, rarityRgb, WEAR_TIERS, unlockLabel } from '@/lib/skinMeta';
 
 // Skin holati (exterior) — segmentlangan neon progress bar + taxminiy pointer.
 // minFloat/maxFloat (CSGO-API'dan) berilsa, erishib bo'lmaydigan oraliq xiralashadi.
@@ -81,12 +81,15 @@ export default function SkinCard({ product: p }) {
   const rarity = rarityInfo(p);
   const rgb = rarityRgb(rarity.color);
   const fav = favorites.some((f) => f.id === p.id);
+  const lockText = p.availableAfter ? unlockLabel(p.availableAfter, lang) : null;
+  const locked = Boolean(lockText);
   const stock =
     Number.isFinite(p.count) && p.count > 0
       ? p.count
       : 1 + ((p.id.length + p.id.charCodeAt(0)) % 4);
 
   function onAdd() {
+    if (locked) return;
     add(p);
     setAdded(true);
     setTimeout(() => setAdded(false), 1200);
@@ -158,27 +161,41 @@ export default function SkinCard({ product: p }) {
           {p.name}
         </Link>
 
-        {p.wear && <WearBar wear={p.wear} minFloat={p.minFloat} maxFloat={p.maxFloat} />}
+        {p.wear && <WearBar wear={p.wear} minFloat={p.minFloat} maxFloat={p.maxFloat} value={p.floatValue ?? undefined} />}
+
+        {p.floatValue != null && (
+          <div className="mt-2 flex items-center justify-between text-[11px] text-muted">
+            <span>{t('skin_float')}</span>
+            <span className="font-mono text-white/85">{p.floatValue.toFixed(5)}</span>
+          </div>
+        )}
+        {(p.phase || p.paintSeed != null) && (
+          <div className="mt-1.5 flex flex-wrap gap-1.5 text-[10px]">
+            {p.phase && <span className="rounded-md border border-white/15 bg-white/[0.06] px-1.5 py-0.5 text-white/85">{p.phase}</span>}
+            {p.paintSeed != null && <span className="rounded-md border border-white/10 px-1.5 py-0.5 text-muted">#{p.paintSeed}</span>}
+          </div>
+        )}
 
         <div className="mt-auto pt-3">
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-[10px] uppercase tracking-wide text-muted">{t('from')}</div>
+              {!p.listingId && <div className="text-[10px] uppercase tracking-wide text-muted">{t('from')}</div>}
               <div className="text-lg font-bold leading-tight">{formatPrice(p.price)}</div>
             </div>
-            <span className="pb-0.5 text-xs text-muted">×{stock}</span>
+            {!p.listingId && <span className="pb-0.5 text-xs text-muted">×{stock}</span>}
           </div>
 
           <button
             onClick={onAdd}
-            className={`mt-3 flex w-full items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold backdrop-blur-md transition-all duration-300 hover:scale-[1.02] ${
+            disabled={locked}
+            className={`${locked ? 'cursor-not-allowed opacity-60 ' : ''}mt-3 flex w-full items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold backdrop-blur-md transition-all duration-300 hover:scale-[1.02] ${
               added
                 ? 'border-accent/60 bg-accent text-ink'
                 : 'border-white/15 bg-white/[0.06] text-white hover:border-accent/50 hover:bg-white/10 hover:shadow-[0_0_18px_rgba(255,255,255,0.3)] hover:text-accent'
             }`}
           >
             <ShoppingCart className="h-4 w-4" strokeWidth={2} />
-            {added ? t('added') : t('add_to_cart')}
+            {locked ? `${t('btn_locked')} · ${lockText}` : added ? t('added') : t('add_to_cart')}
           </button>
         </div>
       </div>

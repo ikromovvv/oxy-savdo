@@ -77,7 +77,7 @@ export function StoreProvider({ children }) {
       playSfx('add');
       return setItems((prev) => {
         const i = prev.findIndex((x) => x.id === product.id);
-        if (i > -1 && product.kind === 'tgskin') return prev; // yagona nusxa
+        if (i > -1 && (product.kind === 'tgskin' || product.listingId)) return prev; // yagona nusxa
         if (i > -1) {
           const next = [...prev];
           next[i] = { ...next[i], qty: next[i].qty + qty };
@@ -90,11 +90,13 @@ export function StoreProvider({ children }) {
             id: product.id,
             name: product.name,
             price: product.price,
-            qty,
+            qty: product.listingId ? 1 : qty,
             image: product.image || '',
             wear: product.wear || null,
             kind: product.kind === 'tgskin' ? 'tgskin' : isSkin ? 'skin' : 'product',
             marketHashName: isSkin ? product.fullName || product.name : undefined,
+            listingId: product.listingId || undefined,
+            floatValue: product.floatValue ?? undefined,
           },
         ];
       });
@@ -112,7 +114,7 @@ export function StoreProvider({ children }) {
       },
       setQty: (id, qty) =>
         setItems((p) =>
-          qty <= 0 ? p.filter((x) => x.id !== id) : p.map((x) => (x.id === id ? { ...x, qty } : x))
+          qty <= 0 ? p.filter((x) => x.id !== id) : p.map((x) => (x.id === id ? { ...x, qty: x.listingId ? 1 : qty } : x))
         ),
       clear: () => setItems([]),
       count: items.reduce((s, x) => s + x.qty, 0),

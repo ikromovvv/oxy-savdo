@@ -34,7 +34,8 @@ export default async function sitemap() {
 
   // eng qimmat ~500 skin (Skinport keshidan)
   let skinRoutes = [];
-  try {
+  // cs2shop rejimida mahsulot ID'si — nusxa ID'si (tez sotiladi), sitemap'ga qo'shilmaydi
+  if ((process.env.SKINS_SOURCE || '').toLowerCase() !== 'cs2shop') try {
     const { items } = await queryCatalog({ limit: 120, offset: 0, sort: 'price_desc' });
     const all = [];
     for (let off = 0; off < 500; off += 120) {

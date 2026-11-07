@@ -201,7 +201,10 @@ export default function CartDrawer() {
                             {it.wear && (
                               <span className="rounded-lg bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">{it.wear}</span>
                             )}
-                            {it.kind !== 'tgskin' && <div className="flex items-center gap-0.5">
+                            {it.floatValue != null && (
+                              <span className="rounded-lg bg-white/[0.07] px-2 py-0.5 font-mono text-[11px] text-white/80">{Number(it.floatValue).toFixed(4)}</span>
+                            )}
+                            {it.kind !== 'tgskin' && !it.listingId && <div className="flex items-center gap-0.5">
                               <button aria-label="−" onClick={() => setQty(it.id, it.qty - 1)} className="h-8 w-8 rounded-full border border-line text-sm">−</button>
                               <span className="w-6 text-center text-sm">{it.qty}</span>
                               <button aria-label="+" onClick={() => setQty(it.id, it.qty + 1)} className="h-8 w-8 rounded-full border border-line text-sm">+</button>

@@ -10,7 +10,7 @@ import Gallery from '@/components/Gallery';
 import Reveal from '@/components/Reveal';
 import SteamLoginGate from '@/components/SteamLoginGate';
 import { formatPrice, weaponTypes } from '@/lib/products';
-import { rarityInfo } from '@/lib/skinMeta';
+import { rarityInfo, unlockLabel } from '@/lib/skinMeta';
 
 // Kovrik/aksessuar bo'lsa /api/products/[id] dan (admin panel boshqaradi),
 // skin bo'lsa /api/skins/[id] dan (LIS-SKINS'dan real vaqtda) olamiz.
@@ -121,12 +121,15 @@ export default function ProductPage({ params }) {
 
   const typeLabel = weaponTypes.find((w) => w.slug === product.weaponType)?.[lang];
   const isSkin = product.category === 'skins';
+  const isListing = Boolean(product.listingId);
+  const lockText = product.availableAfter ? unlockLabel(product.availableAfter, lang) : null;
+  const locked = Boolean(lockText);
 
   return (
     <>
       <section className="container-site py-10">
         <Link
-          href={isSkin ? '/' : `/katalog/${product.category}`}
+          href={isSkin ? '/skinlar' : `/katalog/${product.category}`}
           className="inline-block py-2 text-sm text-muted hover:text-white"
         >
           ← {t('all_products')}
@@ -174,10 +177,38 @@ export default function ProductPage({ params }) {
                       <dt className="text-muted">{t('catalog_wear')}</dt>
                       <dd>{product.wear || '—'}</dd>
                     </div>
-                    <div className="flex justify-between py-2.5 text-sm">
-                      <dt className="text-muted">{t('skin_stock')}</dt>
-                      <dd>{Number.isFinite(product.count) ? product.count : '—'}</dd>
-                    </div>
+                    {product.floatValue != null && (
+                      <div className="flex justify-between py-2.5 text-sm">
+                        <dt className="text-muted">{t('skin_float')}</dt>
+                        <dd className="font-mono">{product.floatValue.toFixed(8)}</dd>
+                      </div>
+                    )}
+                    {product.phase && (
+                      <div className="flex justify-between py-2.5 text-sm">
+                        <dt className="text-muted">{t('skin_phase')}</dt>
+                        <dd>{product.phase}</dd>
+                      </div>
+                    )}
+                    {product.paintSeed != null && (
+                      <div className="flex justify-between py-2.5 text-sm">
+                        <dt className="text-muted">{t('skin_pattern')}</dt>
+                        <dd className="font-mono">{product.paintSeed}</dd>
+                      </div>
+                    )}
+                    {isListing && (
+                      <div className="flex justify-between py-2.5 text-sm">
+                        <dt className="text-muted">{t('skin_unlock')}</dt>
+                        <dd className={locked ? 'text-amber-300' : 'text-emerald-300'}>
+                          {locked ? `${t('skin_unlock_in')}: ${lockText}` : t('skin_available_now')}
+                        </dd>
+                      </div>
+                    )}
+                    {!isListing && (
+                      <div className="flex justify-between py-2.5 text-sm">
+                        <dt className="text-muted">{t('skin_stock')}</dt>
+                        <dd>{Number.isFinite(product.count) ? product.count : '—'}</dd>
+                      </div>
+                    )}
                     {product.stattrak && (
                       <div className="flex justify-between py-2.5 text-sm">
                         <dt className="text-muted">StatTrak™</dt>
@@ -214,18 +245,28 @@ export default function ProductPage({ params }) {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 rounded-full border border-line px-2 py-1.5">
-                <button onClick={() => setQty(Math.max(1, qty - 1))} className="h-9 w-9 rounded-full hover:bg-white/10">−</button>
-                <span className="w-6 text-center text-sm">{qty}</span>
-                <button onClick={() => setQty(qty + 1)} className="h-9 w-9 rounded-full hover:bg-white/10">+</button>
-              </div>
-              <button onClick={() => add(product, qty)} className="btn-ghost">{t('add_to_cart')}</button>
+              {!isListing && (
+                <div className="flex items-center gap-2 rounded-full border border-line px-2 py-1.5">
+                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="h-9 w-9 rounded-full hover:bg-white/10">−</button>
+                  <span className="w-6 text-center text-sm">{qty}</span>
+                  <button onClick={() => setQty(qty + 1)} className="h-9 w-9 rounded-full hover:bg-white/10">+</button>
+                </div>
+              )}
+              <button onClick={() => add(product, isListing ? 1 : qty)} disabled={locked} className="btn-ghost disabled:cursor-not-allowed disabled:opacity-50">
+                {locked ? `${t('btn_locked')} · ${lockText}` : t('add_to_cart')}
+              </button>
               <button
-                onClick={() => { add(product, qty); setCartOpen(true); }}
-                className="btn-primary"
+                onClick={() => { add(product, isListing ? 1 : qty); setCartOpen(true); }}
+                disabled={locked}
+                className="btn-primary disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {t('buy_now')}
               </button>
+              {product.inspectLink && (
+                <a href={product.inspectLink} className="text-xs text-muted underline-offset-2 hover:text-white hover:underline">
+                  {t('skin_inspect')}
+                </a>
+              )}
             </div>
           </Reveal>
         </div>

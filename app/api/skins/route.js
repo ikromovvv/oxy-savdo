@@ -12,6 +12,8 @@ export async function GET(request) {
     query: searchParams.get('query') || '',
     weaponType: searchParams.get('weaponType') || 'all',
     wear: searchParams.get('wear') || 'all',
+    rarity: searchParams.get('rarity') || 'all',
+    availability: searchParams.get('availability') || 'all',
     priceFrom: searchParams.get('priceFrom') || '',
     priceTo: searchParams.get('priceTo') || '',
     sort: searchParams.get('sort') || 'price_desc',
