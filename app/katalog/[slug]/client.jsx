@@ -10,10 +10,9 @@ import { categories } from '@/lib/products';
 export default function CatalogPage({ params }) {
   const { lang } = useStore();
 
-  // Skinlar endi alohida katalog sahifasida emas — Steam orqali kirgach,
-  // bosh sahifaning o'zi skinlar katalogiga aylanadi
+  // Skinlar katalogi alohida sahifada (cs2shop skinlari)
   if (params.slug === 'skins') {
-    redirect('/');
+    redirect('/skinlar');
   }
 
   const cat = categories.find((c) => c.slug === params.slug);

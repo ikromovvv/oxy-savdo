@@ -24,7 +24,8 @@ export default function Footer() {
         <div>
           <div className="label">{t('footer_shop')}</div>
           <ul className="mt-4 space-y-2.5 text-sm text-white/70">
-            <li><Link href="/katalog/skins" className="inline-block py-1 hover:text-white">{t('nav_skins')}</Link></li>
+            <li><Link href="/skinlar" className="inline-block py-1 hover:text-white">{t('nav_skins')}</Link></li>
+            <li><Link href="/telegram-skinlar" className="inline-block py-1 hover:text-white">{t('nav_tg')}</Link></li>
             <li><Link href="/katalog/kovriklar" className="inline-block py-1 hover:text-white">{t('nav_pads')}</Link></li>
             <li><Link href="/katalog/aksessuar" className="inline-block py-1 hover:text-white">{t('nav_acc')}</Link></li>
           </ul>
