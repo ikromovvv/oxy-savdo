@@ -160,7 +160,7 @@ export default function AdminPage() {
 
   // ——— shell ———
   return (
-    <div className="min-h-screen bg-ink text-white">
+    <div className={`min-h-screen bg-ink text-white ${view === 'cs2shop' ? 'lg:h-screen lg:overflow-hidden' : ''}`}>
       {/* desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 border-r border-line bg-panel/50 md:block">
         <Sidebar view={view} setView={setView} onLogout={doLogout} />
@@ -183,7 +183,7 @@ export default function AdminPage() {
         </aside>
       </div>
 
-      <div className="flex min-h-screen flex-col md:pl-60">
+      <div className={`flex min-h-screen flex-col md:pl-60 ${view === 'cs2shop' ? 'lg:h-screen lg:min-h-0' : ''}`}>
         <header className="sticky top-0 z-30 flex h-14 flex-none items-center gap-3 border-b border-line bg-ink/85 px-4 backdrop-blur-xl md:px-8">
           <button onClick={() => setDrawer(true)} aria-label="Menyu" className="grid h-9 w-9 place-items-center rounded-lg border border-line text-white/80 md:hidden">
             <Svg d={Icon.menu} className="h-4 w-4" />
@@ -191,8 +191,8 @@ export default function AdminPage() {
           <h1 className="text-base font-bold tracking-tight">{active?.label}</h1>
         </header>
 
-        <main className="flex-1 p-4 md:p-8">
-          <div className={`mx-auto ${view === 'cs2shop' ? 'max-w-none' : 'max-w-5xl'}`}>
+        <main className={`flex-1 p-4 md:p-8 ${view === 'cs2shop' ? 'admin-scroll lg:min-h-0 lg:overflow-y-auto' : ''}`}>
+          <div className={`mx-auto ${view === 'cs2shop' ? 'max-w-none lg:h-full' : 'max-w-5xl'}`}>
             {view === 'dashboard' && <AdminDashboard onGo={setView} />}
             {view === 'products' && <AdminProducts onToast={flash} />}
             {view === 'orders' && <AdminOrders />}

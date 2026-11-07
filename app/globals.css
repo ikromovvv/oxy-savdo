@@ -279,6 +279,14 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   animation: introSub 0.7s ease 1.3s both;
 }
 
+/* Admin: ichki scroll konteynerlari uchun ingichka qora scrollbar */
+.admin-scroll { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.22) transparent; }
+.admin-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.admin-scroll::-webkit-scrollbar-track { background: transparent; }
+.admin-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 999px; }
+.admin-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.35); }
+.admin-scroll::-webkit-scrollbar-corner { background: transparent; }
+
 /* Katalog kategoriya tablari: chiqish animatsiyasi */
 @keyframes catTabIn {
   from { opacity: 0; transform: translateY(8px) scale(0.96); }

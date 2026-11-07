@@ -189,37 +189,37 @@ function Overview({ data, loading, err, reload }) {
   };
 
   return (
-    <>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="flex min-h-0 flex-col lg:h-full">
+      <div className="grid flex-none gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Sarflash mumkin" value={usd(data.balance)} sub="Hozir xarid uchun ochiq balans" accent />
         <Stat label="Yechib olish mumkin" value={usd(data.balance)} sub="Payout so'rash mumkin bo'lgan balans" />
         <Stat label="Muzlatilgan" value={usd(data.frozen)} sub="Qo'yib yuborilmaguncha ishlatib bo'lmaydi" />
         <Stat label="Xarid quvvati" value={usd(data.available)} sub="Ochiq balansdan sarflash imkoni" accent />
       </div>
 
-      <div className="mt-4 grid items-stretch gap-4 lg:grid-cols-[minmax(320px,4fr)_minmax(0,8fr)]">
+      <div className="mt-4 grid items-stretch gap-4 lg:min-h-[420px] lg:flex-1 lg:grid-cols-[minmax(320px,4fr)_minmax(0,8fr)] lg:grid-rows-[minmax(0,1fr)]">
         {/* CHAP: statistika (o'ngdagi jadval bilan bir xil balandlikda) */}
-        <div className="card flex flex-col p-5 lg:h-[calc(100vh-17rem)] lg:min-h-[560px] lg:overflow-y-auto">
+        <div className="card admin-scroll flex min-h-0 flex-col p-5 lg:overflow-y-auto">
           <div className="label">So&apos;nggi faollik</div>
           <div className="mt-1 text-lg font-semibold">So&apos;nggi {c.sample || 0} savdo</div>
           <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
             <div>
               <dt className="label">Faol</dt>
-              <dd className="mt-1 text-3xl font-bold">{c.active || 0}</dd>
+              <dd className="mt-1 text-2xl font-bold">{c.active || 0}</dd>
             </div>
             <div>
               <dt className="label">Yakunlangan</dt>
-              <dd className="mt-1 text-3xl font-bold text-emerald-300">{c.completed || 0}</dd>
+              <dd className="mt-1 text-2xl font-bold text-emerald-300">{c.completed || 0}</dd>
             </div>
             <div>
               <dt className="label">Xato</dt>
-              <dd className={`mt-1 text-3xl font-bold ${c.failed ? 'text-rose-400' : ''}`}>{c.failed || 0}</dd>
+              <dd className={`mt-1 text-2xl font-bold ${c.failed ? 'text-rose-400' : ''}`}>{c.failed || 0}</dd>
             </div>
           </dl>
 
-          <div className="mt-6">
-            <div className="label mb-3">Holatlar bo&apos;yicha</div>
-            <div className="space-y-2.5">
+          <div className="mt-4">
+            <div className="label mb-2">Holatlar bo&apos;yicha</div>
+            <div className="space-y-1.5">
               {Object.entries(by).sort((a, b) => b[1] - a[1]).map(([st, n]) => (
                 <div key={st} className="flex items-center gap-3 text-xs">
                   <span className="w-24 flex-none font-mono text-[11px] text-white/80">{st}</span>
@@ -233,7 +233,7 @@ function Overview({ data, loading, err, reload }) {
             </div>
           </div>
 
-          <div className="mt-auto space-y-2 rounded-xl border border-line p-3 text-xs">
+          <div className="mt-4 space-y-1.5 rounded-xl border border-line p-3 text-xs lg:mt-auto">
             <div className="flex justify-between gap-3"><span className="text-muted">Merchant ID</span><span className="font-mono">{data.merchantId}</span></div>
             <div className="flex justify-between gap-3"><span className="text-muted">Jami savdolar</span><span>{c.total}</span></div>
             <div className="flex justify-between gap-3"><span className="text-muted">Katalog manbasi</span><span>{data.skinsSource}</span></div>
@@ -243,7 +243,7 @@ function Overview({ data, loading, err, reload }) {
         </div>
 
         {/* O'NG: o'z ichida aylanadigan jadval */}
-        <div className="card flex flex-col overflow-hidden p-0 lg:h-[calc(100vh-17rem)] lg:min-h-[560px]">
+        <div className="card flex min-h-0 flex-col overflow-hidden p-0">
           <div className="flex flex-none items-center justify-between border-b border-line px-5 py-4">
             <div>
               <div className="label">So&apos;nggi ulgurji savdolar</div>
@@ -257,7 +257,7 @@ function Overview({ data, loading, err, reload }) {
           {trades.length === 0 ? (
             <div className="p-10 text-center text-sm text-muted">Hali savdo yo&apos;q.</div>
           ) : (
-            <div className="min-h-0 flex-1 overflow-auto max-lg:max-h-[60vh]">
+            <div className="admin-scroll min-h-0 flex-1 overflow-auto max-lg:max-h-[60vh]">
               <table className="w-full min-w-[720px] text-left text-xs">
                 <thead className="sticky top-0 z-10 bg-panel text-[10px] uppercase tracking-wider text-muted shadow-[0_1px_0_var(--line,rgba(255,255,255,0.08))]">
                   <tr>
@@ -304,7 +304,7 @@ function Overview({ data, loading, err, reload }) {
       </div>
 
       {open && <TradeModal trade={open} onClose={() => setOpen(null)} />}
-    </>
+    </div>
   );
 }
 
@@ -503,15 +503,18 @@ export default function AdminCs2shop() {
   }, [load]);
 
   return (
-    <div>
-      <div className="mb-5">
+    <div className="flex min-h-0 flex-col lg:h-full">
+      <div className="mb-5 flex-none">
         <h2 className="text-2xl font-bold tracking-tight">{data?.merchantId || 'cs2shop'}</h2>
         <p className="mt-1 text-sm text-muted">Balans va so&apos;nggi faollik. Ulgurji skin yetkazib beruvchi: cs2shop.</p>
       </div>
-      <Tabs tab={tab} setTab={setTab} />
-      {tab === 'overview' && <Overview data={data} loading={loading} err={err} reload={load} />}
-      {tab === 'wallet' && <WalletTab />}
-      {tab === 'tools' && <Tools onChanged={load} />}
+      <div className="flex-none"><Tabs tab={tab} setTab={setTab} /></div>
+      {/* Sahifa aylanmaydi: faqat ichki konteynerlar aylanadi */}
+      <div className={`min-h-0 flex-1 ${tab === 'overview' ? '' : 'admin-scroll lg:overflow-y-auto'}`}>
+        {tab === 'overview' && <Overview data={data} loading={loading} err={err} reload={load} />}
+        {tab === 'wallet' && <WalletTab />}
+        {tab === 'tools' && <Tools onChanged={load} />}
+      </div>
     </div>
   );
 }
