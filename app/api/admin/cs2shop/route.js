@@ -175,8 +175,14 @@ export async function POST(req) {
         customId: ref,
       });
       if (!r.ok) return NextResponse.json({ ok: false, error: r.error }, { status: 502 });
+      // guruhga ham xabar: test savdo yuborilganini ko'rish uchun (keyingi holatlar webhook orqali keladi)
+      const tg = await sendCs2shop(
+        `🧪 cs2shop test savdo ${ref}\n${pick.market_hash_name} · $${pick.price}\nHolat: ${r.state || 'processing'} (offer yuborildi, Steam'da qabul qiling)`
+      );
       return NextResponse.json({
         ok: true,
+        notified: tg.ok,
+        notifyError: tg.ok ? undefined : tg.error,
         ref,
         item: pick.market_hash_name,
         priceUsd: pick.price,

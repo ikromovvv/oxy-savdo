@@ -35,6 +35,15 @@ export async function POST(req) {
     return NextResponse.json({ ok: true });
   }
 
+  // Admin paneldagi test savdo (TEST-...): holat o'zgarishi guruhga xabar bo'lib boradi
+  if (/^TEST-[A-Za-z0-9]+/.test(String(ev.externalId || ''))) {
+    await notifyCs2shop(
+      `🧪 cs2shop test ${ev.externalId}: ${String(ev.status || '').toUpperCase()}` +
+        (ev.failReason ? `\nSabab: ${ev.failReason}` : '')
+    ).catch(() => {});
+    return NextResponse.json({ ok: true });
+  }
+
   const ref = refOf(ev.externalId);
   if (!ref) return NextResponse.json({ ok: true });
 
