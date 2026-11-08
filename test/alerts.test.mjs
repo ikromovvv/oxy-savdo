@@ -92,3 +92,44 @@ test('checkLowBalance: balans yetarli bo\'lsa xabar yo\'q', async () => {
   assert.equal(r.low, false);
   assert.equal(sent.length, 0);
 });
+
+// ---- xato sababi (admin "Test xabar" tugmasi uchun) ----
+
+function mockTelegramError(description, status = 400) {
+  globalThis.fetch = async (url) => {
+    if (String(url).includes('api.telegram.org')) {
+      return new Response(JSON.stringify({ ok: false, description }), { status, headers: { 'content-type': 'application/json' } });
+    }
+    if (String(url).includes('/v1/merchant/wallet')) {
+      return new Response(JSON.stringify({ balance: 0.74, total_available: 0.74, total_frozen: 0 }), { status: 200, headers: { 'content-type': 'application/json' } });
+    }
+    return new Response('{}', { status: 404 });
+  };
+}
+
+test('sendCs2shop: Telegram xatosi sababi bilan qaytadi', async () => {
+  process.env.TELEGRAM_CS2SHOP_CHAT_ID = '-100999';
+  mockTelegramError('Bad Request: chat not found');
+  const r = await alerts.sendCs2shop('x');
+  assert.equal(r.ok, false);
+  assert.equal(r.dedicated, true);
+  assert.match(r.error, /chat not found/);
+});
+
+test('sendCs2shop: chat ID umuman yo\'q bo\'lsa aniq xabar', async () => {
+  delete process.env.TELEGRAM_CS2SHOP_CHAT_ID;
+  delete process.env.TELEGRAM_CHAT_ID;
+  const r = await alerts.sendCs2shop('x');
+  assert.equal(r.ok, false);
+  assert.match(r.error, /sozlanmagan/);
+  process.env.TELEGRAM_CS2SHOP_CHAT_ID = '-100999';
+});
+
+test('checkLowBalance({force}): balans kam, lekin guruhga yuborib bo\'lmasa — sabab qaytadi', async () => {
+  process.env.TELEGRAM_CS2SHOP_CHAT_ID = '-100999';
+  mockTelegramError('Forbidden: bot is not a member of the supergroup chat', 403);
+  const r = await alerts.checkLowBalance({ force: true });
+  assert.equal(r.low, true);
+  assert.equal(r.notified, false);
+  assert.match(r.error, /not a member/);
+});

@@ -383,6 +383,34 @@ function Tools({ onChanged }) {
   const [tradeUrl, setTradeUrl] = useState('');
   const [testBusy, setTestBusy] = useState(false);
   const [test, setTest] = useState(null); // { ref, item, priceUsd, float, state, detail, error }
+  const [tgBusy, setTgBusy] = useState(false);
+  const [tgMsg, setTgMsg] = useState('');
+
+  async function tgAction(action) {
+    setTgBusy(true);
+    setTgMsg('');
+    try {
+      const r = await fetch('/api/admin/cs2shop', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (action === 'test_alert') {
+        setTgMsg(d.ok ? `Yuborildi ✓ ${d.dedicated ? '(cs2shop guruhiga)' : '(TELEGRAM_CS2SHOP_CHAT_ID yo\'q — umumiy chatga)'}` : `Xato: ${d.error || r.status}`);
+      } else if (d.ok === false) {
+        setTgMsg(`Xato: ${d.error || r.status}`);
+      } else if (!d.low) {
+        setTgMsg(`Balans yetarli: $${Number(d.available).toFixed(2)} (chegara $${d.limit}). Ogohlantirish kerak emas.`);
+      } else {
+        setTgMsg(`Balans kam: $${Number(d.available).toFixed(2)} (chegara $${d.limit}). ${d.notified ? 'Guruhga ogohlantirish yuborildi ✓' : `Yuborilmadi: ${d.error || 'noma\'lum'}`}`);
+      }
+    } catch {
+      setTgMsg('Xato: aloqa');
+    } finally {
+      setTgBusy(false);
+    }
+  }
 
   async function connectWebhook() {
     setBusy(true);
@@ -447,6 +475,22 @@ function Tools({ onChanged }) {
           {busy ? 'Ulanmoqda...' : "Webhook'ni ulash"}
         </button>
         {msg && <div className="mt-3 break-all text-xs text-muted">{msg}</div>}
+      </div>
+
+      <div className="card p-5">
+        <div className="label">Telegram guruh (ogohlantirishlar)</div>
+        <p className="mt-2 text-sm text-muted">
+          Yetkazish xatolari, REVERSED va &quot;balans kam&quot; xabarlari shu guruhga boradi. Ulanishni tekshiring.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button onClick={() => tgAction('test_alert')} disabled={tgBusy} className="btn-primary disabled:opacity-50">
+            {tgBusy ? '...' : 'Test xabar yuborish'}
+          </button>
+          <button onClick={() => tgAction('check_balance')} disabled={tgBusy} className="btn-ghost disabled:opacity-50">
+            Balansni tekshirish
+          </button>
+        </div>
+        {tgMsg && <div className="mt-3 break-words text-xs text-muted">{tgMsg}</div>}
       </div>
 
       <div className="card p-5">

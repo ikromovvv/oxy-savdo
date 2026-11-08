@@ -4,6 +4,7 @@ import { activeProvider } from '@/lib/fulfillment';
 import { configured, balance, setWebhook, buy, status, tradesHistory, walletHistory } from '@/lib/fulfill/cs2shop';
 import { fetchListings } from '@/lib/cs2shopFeed';
 import { parseTradeUrl } from '@/lib/steamTrade';
+import { sendCs2shop, checkLowBalance, cs2shopChatId } from '@/lib/cs2shopAlerts';
 import { getSkinMeta } from '@/lib/skinImages';
 import { parseSkinName } from '@/lib/skinNames';
 
@@ -120,6 +121,21 @@ export async function POST(req) {
     try {
       const r = await setWebhook(`${SITE}/api/cs2shop/webhook`);
       return NextResponse.json({ ok: true, ...r });
+    } catch (e) {
+      return NextResponse.json({ ok: false, error: e.message }, { status: 502 });
+    }
+  }
+
+  // Telegram guruhga test xabar: guruh to'g'ri ulanganini tekshiradi (xato sababi bilan)
+  if (body.action === 'test_alert') {
+    const r = await sendCs2shop('✅ OXY SAVDO: cs2shop guruhi ulandi. Bu test xabar.');
+    return NextResponse.json({ ...r, chatConfigured: Boolean(cs2shopChatId()) }, { status: r.ok ? 200 : 502 });
+  }
+
+  // Balansni hozir tekshirish; kam bo'lsa guruhga ogohlantirish yuboradi (takrorlanmaslik qoidasiz)
+  if (body.action === 'check_balance') {
+    try {
+      return NextResponse.json({ ok: true, ...(await checkLowBalance({ force: true })) });
     } catch (e) {
       return NextResponse.json({ ok: false, error: e.message }, { status: 502 });
     }
