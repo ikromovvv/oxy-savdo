@@ -15,6 +15,7 @@ process.chdir(TMP);
 
 process.env.SESSION_SECRET = 'test-secret';
 process.env.SKINS_SOURCE = 'cs2shop';
+process.env.PRICING_MODE = 'markup';
 process.env.FULFILL_PROVIDER = 'cs2shop';
 process.env.CS2SHOP_MERCHANT_ID = 'Oxy';
 process.env.CS2SHOP_API_KEY = 'cs2_testkey';
@@ -183,4 +184,19 @@ test('yetkazish: nusxa sotilib ketgan bo\'lsa — xato (arzon boshqa nusxa jimgi
   const r = await fulfillOrder(res.order.id);
   assert.ok(r.error);
   assert.equal((await getOrder(res.order.id)).status, 'paid');
+});
+
+// ---- cost rejimi: sayt narxi = cs2shop narxi (so'mda), $ narx alohida ----
+
+test('cost rejimi: nusxa narxi = cs2shop narxi * kurs, priceUsd = cs2shop narxi', async () => {
+  process.env.PRICING_MODE = 'cost';
+  try {
+    L.__seedListingsForTest([raw('c1', 'AK-47 | Redline (Field-Tested)', 12.34, { floatValue: 0.151 })]);
+    const it = await getSkinById('c1');
+    assert.equal(it.priceUsd, 12.34);
+    assert.equal(it.price, Math.round(12.34 * 12700));
+    assert.equal(it.costUsd, 12.34);
+  } finally {
+    process.env.PRICING_MODE = 'markup';
+  }
 });

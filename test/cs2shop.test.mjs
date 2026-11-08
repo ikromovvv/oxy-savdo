@@ -9,6 +9,7 @@ import { pathToFileURL } from 'node:url';
 process.env.CS2SHOP_MERCHANT_ID = 'Oxy';
 process.env.CS2SHOP_API_KEY = 'cs2_testkey';
 process.env.CS2SHOP_MIN_MARGIN_USD = '0.5';
+process.env.PRICING_MODE = 'markup';
 
 const imp = (rel) => import(pathToFileURL(path.join(process.cwd(), rel)).href);
 const cs2 = await imp('lib/fulfill/cs2shop.js');
@@ -202,4 +203,28 @@ test('aggregate: override sotuv narxiga ta\'sir qiladi', () => {
   const plain = feed.aggregate([L('a', 3)])[0].min_price;
   const bumped = feed.aggregate([L('a', 3)], { [NAME]: { addUsd: 2 } })[0].min_price;
   assert.ok(bumped > plain);
+});
+
+// ---- cost rejimida limit: sotuv narxi + tolerans (marja ayirilmaydi) ----
+
+test('cost rejimi: narx maxPriceUSD (sotuv + 3%) gacha ko\'tarilsa ham sotib oladi, undan oshsa yo\'q', async () => {
+  process.env.PRICING_MODE = 'cost';
+  try {
+    mockFetch((c) => {
+      if (c.path === '/v1/merchant/listings') return { body: { items: [L('a', 5.1)], total: 1 } };
+      if (c.path === '/v1/merchant/trades') return { body: trade('PENDING') };
+    });
+    // sotuv $5, tolerans 3% -> limit $5.15: $5.10 o'tadi
+    const ok = await cs2.buy({ marketHashName: NAME, salePriceUSD: 5, maxPriceUSD: 5.15, tradeUrl: TRADE_URL, customId: 'C1' });
+    assert.equal(ok.ok, true);
+
+    mockFetch((c) => {
+      if (c.path === '/v1/merchant/listings') return { body: { items: [L('a', 5.3)], total: 1 } };
+    });
+    const no = await cs2.buy({ marketHashName: NAME, salePriceUSD: 5, maxPriceUSD: 5.15, tradeUrl: TRADE_URL, customId: 'C2' });
+    assert.equal(no.ok, false);
+    assert.match(no.error, /narxi oshib ketdi/);
+  } finally {
+    process.env.PRICING_MODE = 'markup';
+  }
 });

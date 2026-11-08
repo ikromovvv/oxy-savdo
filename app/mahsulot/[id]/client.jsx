@@ -236,6 +236,9 @@ export default function ProductPage({ params }) {
             <div>
               {/* asosiy narx — bitta dona uchun, o'zgarmaydi */}
               <div className="text-2xl font-semibold">{formatPrice(product.price)}</div>
+              {product.priceUsd != null && (
+                <div className="mt-1 text-sm text-muted">${Number(product.priceUsd).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              )}
               {qty > 1 && (
                 <span className="mt-1 block text-sm text-muted">
                   {qty} × {formatPrice(product.price)} ={' '}

@@ -181,6 +181,9 @@ export default function SkinCard({ product: p }) {
             <div>
               {!p.listingId && <div className="text-[10px] uppercase tracking-wide text-muted">{t('from')}</div>}
               <div className="text-lg font-bold leading-tight">{formatPrice(p.price)}</div>
+              {p.priceUsd != null && (
+                <div className="mt-0.5 text-[11px] text-muted">${Number(p.priceUsd).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              )}
             </div>
             {!p.listingId && <span className="pb-0.5 text-xs text-muted">×{stock}</span>}
           </div>

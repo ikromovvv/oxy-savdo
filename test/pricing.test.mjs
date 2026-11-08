@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+process.env.PRICING_MODE = 'markup'; // bu fayl foyda/ustama qoidalarini tekshiradi
 const P = await import(pathToFileURL(path.join(process.cwd(), 'lib', 'pricing.js')).href);
 const { baseProfit, premiumFor, sellPrice, MIN_PROFIT_USD, FEE_BUFFER } = P;
 const r2 = (n) => Math.round(n * 100) / 100;
@@ -125,4 +126,41 @@ test('arzon skin cheklovi qo\'lda override\'ga tegmaydi', () => {
   const name = 'X | Y (Field-Tested)';
   const r = sellPrice({ costUsd: 5, marketHashName: name }, { [name]: { addUsd: 3 } });
   assert.equal(r.sellUsd, r2((5 + 1 + 3) * (1 + FEE_BUFFER)));
+});
+
+// ---- cost rejimi (birlamchi): sotuv narxi = cs2shop narxi ----
+
+test('cost rejimi: sotuv narxi tannarx bilan bir xil, ustama va foyda yo\'q', () => {
+  process.env.PRICING_MODE = 'cost';
+  try {
+    for (const c of [0.5, 5, 13392.94]) {
+      const r = sellPrice({ costUsd: c, marketHashName: 'StatTrak™ AK-47 | Redline (Factory New)', floatValue: 0.001, phase: 'Ruby' });
+      assert.equal(r.sellUsd, c);
+      assert.equal(r.profitUsd, 0);
+      assert.equal(r.premiumPct, 0);
+    }
+  } finally {
+    process.env.PRICING_MODE = 'markup';
+  }
+});
+
+test('cost rejimi: qo\'lda override ishlaydi (addUsd / fixedUsd)', () => {
+  process.env.PRICING_MODE = 'cost';
+  try {
+    const name = 'X | Y (Field-Tested)';
+    assert.equal(sellPrice({ costUsd: 5, marketHashName: name }, { [name]: { addUsd: 1 } }).sellUsd, 6);
+    assert.equal(sellPrice({ costUsd: 5, marketHashName: name }, { [name]: { fixedUsd: 7.5 } }).sellUsd, 7.5);
+  } finally {
+    process.env.PRICING_MODE = 'markup';
+  }
+});
+
+test('PRICING_MODE o\'rnatilmasa — birlamchi cost', () => {
+  delete process.env.PRICING_MODE;
+  try {
+    assert.equal(P.pricingMode(), 'cost');
+    assert.equal(sellPrice({ costUsd: 5, marketHashName: 'X | Y (Field-Tested)' }).sellUsd, 5);
+  } finally {
+    process.env.PRICING_MODE = 'markup';
+  }
 });
