@@ -12,8 +12,9 @@ export const dynamic = 'force-dynamic';
 async function run() {
   const deposits = await recoverDeposits().catch(() => ({ fixed: 0 }));
   const summary = await runFulfillmentTick();
-  const cs2shopBalance = activeProvider() === 'cs2shop' ? await checkLowBalance().catch((e) => ({ error: e.message })) : undefined;
-  return NextResponse.json({ ok: true, provider: activeProvider(), summary, deposits, cs2shopBalance });
+  const sp = activeProvider();
+  const supplierBalance = sp === 'cs2shop' || sp === 'lis' ? await checkLowBalance().catch((e) => ({ error: e.message })) : undefined;
+  return NextResponse.json({ ok: true, provider: sp, summary, deposits, supplierBalance });
 }
 
 function authorized(req) {

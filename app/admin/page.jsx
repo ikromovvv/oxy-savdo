@@ -7,16 +7,18 @@ import AdminProducts from '@/components/admin/AdminProducts';
 import AdminOrders from '@/components/admin/AdminOrders';
 import AdminFailed from '@/components/admin/AdminFailed';
 import AdminCs2shop from '@/components/admin/AdminCs2shop';
+import AdminLis from '@/components/admin/AdminLis';
 
 const NAV = [
   { key: 'dashboard', label: 'Panel', icon: Icon.grid },
   { key: 'products', label: 'Mahsulotlar', icon: Icon.box },
   { key: 'orders', label: 'Buyurtmalar', icon: Icon.cart },
   { key: 'failed', label: 'Yetkazish xatolari', icon: Icon.warn },
-  { key: 'cs2shop', label: 'cs2shop', icon: Icon.wallet },
+  { key: 'cs2shop', label: 'cs2shop', icon: Icon.wallet, provider: 'cs2shop' },
+  { key: 'lis', label: 'LIS-SKINS', icon: Icon.wallet, provider: 'lis' },
 ];
 
-function Sidebar({ view, setView, onLogout, onNav }) {
+function Sidebar({ view, setView, onLogout, onNav, nav = NAV }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-14 items-center gap-2.5 border-b border-line px-5">
@@ -25,7 +27,7 @@ function Sidebar({ view, setView, onLogout, onNav }) {
       </div>
 
       <nav className="flex-1 space-y-1 p-3">
-        {NAV.map((n) => (
+        {nav.map((n) => (
           <button
             key={n.key}
             onClick={() => { setView(n.key); onNav?.(); }}
@@ -56,6 +58,7 @@ export default function AdminPage() {
   const [checking, setChecking] = useState(true);
   const [authed, setAuthed] = useState(false);
   const [configured, setConfigured] = useState(true);
+  const [provider, setProvider] = useState('');
 
   const [password, setPassword] = useState('');
   const [loginErr, setLoginErr] = useState('');
@@ -75,6 +78,7 @@ export default function AdminPage() {
       .then((r) => r.json())
       .then((d) => {
         setAuthed(Boolean(d.admin));
+        setProvider(d.provider || '');
         setConfigured(d.configured !== false);
       })
       .catch(() => {})
@@ -156,14 +160,16 @@ export default function AdminPage() {
     );
   }
 
-  const active = NAV.find((n) => n.key === view);
+  // Yetkazib beruvchi bo'limi faqat faol provayderga (FULFILL_PROVIDER) ko'rinadi
+  const nav = NAV.filter((n) => !n.provider || n.provider === provider);
+  const active = nav.find((n) => n.key === view);
 
   // ——— shell ———
   return (
-    <div className={`min-h-screen bg-ink text-white ${view === 'cs2shop' ? 'lg:h-screen lg:overflow-hidden' : ''}`}>
+    <div className={`min-h-screen bg-ink text-white ${view === 'cs2shop' || view === 'lis' ? 'lg:h-screen lg:overflow-hidden' : ''}`}>
       {/* desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 border-r border-line bg-panel/50 md:block">
-        <Sidebar view={view} setView={setView} onLogout={doLogout} />
+        <Sidebar view={view} setView={setView} onLogout={doLogout} nav={nav} />
       </aside>
 
       {/* mobile drawer — chapdan sirg'alib chiqadi */}
@@ -179,11 +185,11 @@ export default function AdminPage() {
             drawer ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <Sidebar view={view} setView={setView} onLogout={doLogout} onNav={() => setDrawer(false)} />
+          <Sidebar view={view} setView={setView} onLogout={doLogout} onNav={() => setDrawer(false)} nav={nav} />
         </aside>
       </div>
 
-      <div className={`flex min-h-screen flex-col md:pl-60 ${view === 'cs2shop' ? 'lg:h-screen lg:min-h-0' : ''}`}>
+      <div className={`flex min-h-screen flex-col md:pl-60 ${view === 'cs2shop' || view === 'lis' ? 'lg:h-screen lg:min-h-0' : ''}`}>
         <header className="sticky top-0 z-30 flex h-14 flex-none items-center gap-3 border-b border-line bg-ink/85 px-4 backdrop-blur-xl md:px-8">
           <button onClick={() => setDrawer(true)} aria-label="Menyu" className="grid h-9 w-9 place-items-center rounded-lg border border-line text-white/80 md:hidden">
             <Svg d={Icon.menu} className="h-4 w-4" />
@@ -191,13 +197,14 @@ export default function AdminPage() {
           <h1 className="text-base font-bold tracking-tight">{active?.label}</h1>
         </header>
 
-        <main className={`flex-1 p-4 md:p-8 ${view === 'cs2shop' ? 'admin-scroll lg:min-h-0 lg:overflow-y-auto' : ''}`}>
-          <div className={`mx-auto ${view === 'cs2shop' ? 'max-w-none lg:h-full' : 'max-w-5xl'}`}>
-            {view === 'dashboard' && <AdminDashboard onGo={setView} />}
+        <main className={`flex-1 p-4 md:p-8 ${view === 'cs2shop' || view === 'lis' ? 'admin-scroll lg:min-h-0 lg:overflow-y-auto' : ''}`}>
+          <div className={`mx-auto ${view === 'cs2shop' || view === 'lis' ? 'max-w-none lg:h-full' : 'max-w-5xl'}`}>
+            {view === 'dashboard' && <AdminDashboard onGo={setView} provider={provider} />}
             {view === 'products' && <AdminProducts onToast={flash} />}
             {view === 'orders' && <AdminOrders />}
             {view === 'failed' && <AdminFailed onOpenOrders={() => setView('orders')} />}
             {view === 'cs2shop' && <AdminCs2shop />}
+            {view === 'lis' && <AdminLis />}
           </div>
         </main>
       </div>

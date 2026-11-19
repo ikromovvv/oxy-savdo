@@ -117,7 +117,7 @@ function Chart({ series }) {
   );
 }
 
-export default function AdminDashboard({ onGo }) {
+export default function AdminDashboard({ onGo, provider }) {
   const [data, setData] = useState(null);
   const [err, setErr] = useState(false);
   const [prodCount, setProdCount] = useState(null);
@@ -235,15 +235,15 @@ export default function AdminDashboard({ onGo }) {
             <div className="text-xs text-muted">Holat, to&apos;lov, yetkazish</div>
           </div>
         </button>
-        <button onClick={() => onGo?.('cs2shop')} className="card card-hover flex items-center gap-3 p-4 text-left">
+        {(provider === 'cs2shop' || provider === 'lis') && <button onClick={() => onGo?.(provider)} className="card card-hover flex items-center gap-3 p-4 text-left">
           <span className="grid h-10 w-10 place-items-center rounded-xl border border-line text-accent">
             <Svg d={Icon.wallet} className="h-5 w-5" />
           </span>
           <div>
-            <div className="text-sm font-semibold">cs2shop</div>
-            <div className="text-xs text-muted">Balans, savdolar, test savdo, webhook</div>
+            <div className="text-sm font-semibold">{provider === 'lis' ? 'LIS-SKINS' : 'cs2shop'}</div>
+            <div className="text-xs text-muted">Balans, xaridlar, test savdo</div>
           </div>
-        </button>
+        </button>}
       </div>
     </div>
   );
