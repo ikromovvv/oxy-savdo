@@ -19,6 +19,10 @@ export {
   ZoomIn,
   Box,
   Eye,
+  Clock,
+  Copy,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 

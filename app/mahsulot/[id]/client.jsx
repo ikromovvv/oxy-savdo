@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import ProductCard from '@/components/ProductCard';
 import SkinCard from '@/components/SkinCard';
-import SkinListings from '@/components/SkinListings';
+import SkinDetail from '@/components/SkinDetail';
 import Gallery from '@/components/Gallery';
 import Reveal from '@/components/Reveal';
 import SteamLoginGate from '@/components/SteamLoginGate';
@@ -21,6 +21,7 @@ export default function ProductPage({ params }) {
 
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
+  const [variants, setVariants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false); // haqiqatan topilmadi -> 404
   const [errored, setErrored] = useState(false); // tarmoq/server xatosi -> qayta urinish
@@ -33,6 +34,7 @@ export default function ProductPage({ params }) {
     setErrored(false);
     setProduct(null);
     setRelated([]);
+    setVariants([]);
 
     (async () => {
       // skin so'rovini darhol boshlaymiz (kovrik tekshiruvi bilan parallel) — sahifa ~1 s tezroq ochiladi
@@ -71,6 +73,7 @@ export default function ProductPage({ params }) {
         if (d.item) {
           setProduct(d.item);
           setRelated(d.related || []);
+          setVariants(d.variants || []);
         } else if (d.error) {
           setErrored(true); // server xatosi — qayta urinish mumkin
         } else {
@@ -128,6 +131,9 @@ export default function ProductPage({ params }) {
   const isListing = Boolean(product.listingId);
   const lockText = product.availableAfter ? unlockLabel(product.availableAfter, lang) : null;
   const locked = Boolean(lockText);
+
+  // Skinlar uchun alohida (LIS uslubidagi) sahifa
+  if (isSkin) return <SkinDetail product={product} related={related} variants={variants} />;
 
   return (
     <>
@@ -278,8 +284,6 @@ export default function ProductPage({ params }) {
           </Reveal>
         </div>
       </section>
-
-      {isSkin && !isListing && <SkinListings product={product} />}
 
       {related.length > 0 && (
         <section className="container-site py-10">

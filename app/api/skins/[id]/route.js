@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSkinById, getRelatedSkins } from '@/lib/skinportFeed';
+import { getSkinById, getRelatedSkins, getSkinVariants } from '@/lib/skinportFeed';
 import { getSkinMeta } from '@/lib/skinImages';
 
 function withMeta(p, meta) {
@@ -23,7 +23,8 @@ export async function GET(request, { params }) {
       return NextResponse.json({ item: null }, { status: 404 });
     }
 
-    const related = await getRelatedSkins(item.id, item.weaponType, 4);
+    const related = await getRelatedSkins(item.id, item.weaponType, 12);
+    const variants = await getSkinVariants(item);
     const names = [item.name, ...related.map((r) => r.name)];
 
     let meta = {};
@@ -35,6 +36,7 @@ export async function GET(request, { params }) {
       {
         item: withMeta(item, meta),
         related: related.map((r) => withMeta(r, meta)),
+        variants,
       },
       { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } }
     );
