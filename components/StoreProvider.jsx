@@ -96,6 +96,7 @@ export function StoreProvider({ children }) {
             kind: product.kind === 'tgskin' ? 'tgskin' : isSkin ? 'skin' : 'product',
             marketHashName: isSkin ? product.fullName || product.name : undefined,
             listingId: product.listingId || undefined,
+            lisId: product.lisId || undefined,
             floatValue: product.floatValue ?? undefined,
           },
         ];

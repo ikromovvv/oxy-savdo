@@ -1,17 +1,20 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { playIntro, playSfx } from '@/lib/sfx';
+import { playSfx } from '@/lib/sfx';
 
 // Brendlangan kirish animatsiyasi (faqat bir sessiyada bir marta, route almashganda qaytmaydi).
-// Foiz: haqiqiy yuklanish bosqichlariga (shrift + sahifa `load`) bog'langan, vaqt bilan
-// ushlab turiladi — animatsiya ketma-ketligi tugamaguncha 100% bo'lmaydi.
+// Qisqa va silliq: harflar pastdan "ko'tariladi", logotip joylashadi, ingichka chiziq yuklanishni ko'rsatadi,
+// sahifa tayyor bo'lishi bilan yuqoriga "parda" bo'lib ochiladi (~1.5 s, eng ko'pi 3.2 s).
+// Foiz haqiqiy yuklanish bosqichlariga (shrift + sahifa `load`) bog'langan.
 const KEY = 'oxy:intro';
-const MIN_MS = 3600; // SAVDO harflari to'liq chiqib, biroz ko'rinib turishi uchun (CSS ketma-ketligi ~3 s)
-const MIN_MS_REDUCED = 1200; // harakatsiz rejimda ham yozuvlar o'qib bo'lguncha ko'rinadi
-const MAX_MS = 8000; // hech qachon qotib qolmasin
+const MIN_MS = 1500; // harflar to'liq chiqib, bir lahza ko'rinib turishi uchun
+const MIN_MS_REDUCED = 500;
+const MAX_MS = 3200; // hech qachon qotib qolmasin
+const EXIT_MS = 850; // "parda" ochilish animatsiyasi (CSS bilan bir xil)
 
-const SAVDO = ['S', 'A', 'V', 'D', 'O'];
+const LETTERS = ['O', 'X', 'Y'];
+const SAVDO = 'SAVDO'.split('');
 
 export default function IntroLoader() {
   const [phase, setPhase] = useState('on'); // on | out | gone
@@ -36,24 +39,8 @@ export default function IntroLoader() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const minMs = reduce ? MIN_MS_REDUCED : MIN_MS;
     // CSS animatsiyalar birinchi chizilishdan boshlanadi — hisobni ham shundan boshlaymiz
-    // (gidratsiya kechiksa ham foiz va yopilish animatsiya bilan sinxron bo'ladi)
     const paint = performance.getEntriesByName('first-paint')[0] || performance.getEntriesByName('first-contentful-paint')[0];
     const start = paint ? Math.min(paint.startTime, performance.now()) : performance.now();
-
-    // Ovoz animatsiya bilan birga: avtoplay ruxsat bo'lsa darrov, bo'lmasa birinchi bosishda
-    // (qolgan qismi o'tib ketgan bo'lsa, tugash "whoosh"i baribir chiqadi).
-    let soundStarted = false;
-    const startSound = async () => {
-      if (soundStarted) return;
-      soundStarted = await playIntro();
-      if (soundStarted) {
-        window.removeEventListener('pointerdown', startSound);
-        window.removeEventListener('keydown', startSound);
-      }
-    };
-    startSound();
-    window.addEventListener('pointerdown', startSound);
-    window.addEventListener('keydown', startSound);
 
     let loaded = document.readyState === 'complete';
     let fonts = !document.fonts;
@@ -85,7 +72,7 @@ export default function IntroLoader() {
         setTimeout(() => {
           setPhase('gone');
           root.classList.remove('intro-lock');
-        }, reduce ? 200 : 1000)
+        }, reduce ? 150 : EXIT_MS)
       );
     };
 
@@ -94,7 +81,7 @@ export default function IntroLoader() {
       const milestone = loaded && fonts ? 100 : loaded || fonts ? 72 : 28;
       const timeCap = Math.min(100, (el / minMs) * 100);
       const goal = Math.min(milestone, timeCap);
-      shown += (goal - shown) * 0.12;
+      shown += (goal - shown) * 0.14;
       const p = Math.min(100, Math.round(shown));
       setPct((prev) => (prev === p ? prev : p));
 
@@ -106,13 +93,11 @@ export default function IntroLoader() {
     };
     raf = requestAnimationFrame(tick);
     // rAF to'xtab qolsa (fon tab, sekin qurilma) ham yopilish kafolatlanadi
-    timers.current.push(setTimeout(finish, MAX_MS + 1500));
+    timers.current.push(setTimeout(finish, MAX_MS + 1200));
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('load', onLoad);
-      window.removeEventListener('pointerdown', startSound);
-      window.removeEventListener('keydown', startSound);
       timers.current.forEach(clearTimeout);
       root.classList.remove('intro-lock');
     };
@@ -132,22 +117,23 @@ export default function IntroLoader() {
 
       <div className="intro-stage">
         <div className="intro-logo" aria-hidden="true">
-          <span className="intro-letter" style={{ '--d': '0.35s' }}>O</span>
-          <span className="intro-letter" style={{ '--d': '0.7s' }}>X</span>
-          <span className="intro-letter" style={{ '--d': '1.05s' }}>Y</span>
-          <span className="intro-streak" />
+          {LETTERS.map((c, i) => (
+            <span key={c} className="intro-mask">
+              <span className="intro-letter" style={{ '--d': `${0.12 + i * 0.1}s` }}>{c}</span>
+            </span>
+          ))}
+          <span className="intro-shine" />
         </div>
 
         <div className="intro-sub" aria-hidden="true">
           {SAVDO.map((c, i) => (
-            <span key={i} style={{ '--d': `${1.9 + i * 0.09}s` }}>{c}</span>
+            <span key={i} style={{ '--d': `${0.75 + i * 0.07}s` }}>{c}</span>
           ))}
         </div>
 
         <div className="intro-bar" aria-hidden="true">
           <span className="intro-bar-fill" style={{ transform: `scaleX(${pct / 100})` }} />
         </div>
-        <div className="intro-pct" aria-hidden="true">{String(pct).padStart(2, '0')}%</div>
       </div>
     </div>
   );

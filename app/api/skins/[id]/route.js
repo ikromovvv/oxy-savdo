@@ -31,10 +31,13 @@ export async function GET(request, { params }) {
       meta = await getSkinMeta(names);
     } catch (e) {}
 
-    return NextResponse.json({
-      item: withMeta(item, meta),
-      related: related.map((r) => withMeta(r, meta)),
-    });
+    return NextResponse.json(
+      {
+        item: withMeta(item, meta),
+        related: related.map((r) => withMeta(r, meta)),
+      },
+      { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } }
+    );
   } catch (e) {
     console.error('[api/skins/[id]] xato:', e?.code || e?.message || e);
     return NextResponse.json(

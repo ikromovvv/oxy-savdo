@@ -104,17 +104,9 @@ export default function Header() {
 
   // menyu ochiq bo'lsa orqa fon scroll qilmasin
   useEffect(() => {
-    const lenis = typeof window !== 'undefined' ? window.__lenis : null;
-    if (open) {
-      document.body.style.overflow = 'hidden';
-      lenis?.stop();
-    } else {
-      document.body.style.overflow = '';
-      lenis?.start();
-    }
+    document.body.style.overflow = open ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
-      lenis?.start();
     };
   }, [open]);
 

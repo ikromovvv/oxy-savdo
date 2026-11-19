@@ -70,10 +70,12 @@ export default function CartDrawer() {
 
   // savat ochiq bo'lganda orqa fon scroll qilmasin
   useEffect(() => {
-    const lenis = typeof window !== 'undefined' ? window.__lenis : null;
-    if (cartOpen) lenis?.stop();
-    else lenis?.start();
-    return () => lenis?.start();
+    if (typeof document === 'undefined') return undefined;
+    const el = document.documentElement;
+    if (cartOpen) el.style.overflow = 'hidden';
+    return () => {
+      el.style.overflow = '';
+    };
   }, [cartOpen]);
 
   if (!cartOpen) return null;

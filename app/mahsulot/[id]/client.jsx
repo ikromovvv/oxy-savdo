@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import ProductCard from '@/components/ProductCard';
 import SkinCard from '@/components/SkinCard';
+import SkinListings from '@/components/SkinListings';
 import Gallery from '@/components/Gallery';
 import Reveal from '@/components/Reveal';
 import SteamLoginGate from '@/components/SteamLoginGate';
@@ -34,6 +35,9 @@ export default function ProductPage({ params }) {
     setRelated([]);
 
     (async () => {
+      // skin so'rovini darhol boshlaymiz (kovrik tekshiruvi bilan parallel) — sahifa ~1 s tezroq ochiladi
+      const skinReq = fetch(`/api/skins/${params.id}`).catch(() => null);
+
       // 1) kovrik / aksessuar
       try {
         const r = await fetch(`/api/products/${params.id}`, { cache: 'no-store' });
@@ -60,8 +64,8 @@ export default function ProductPage({ params }) {
 
       // 2) skin
       try {
-        const r = await fetch(`/api/skins/${params.id}`);
-        if (!r.ok) throw new Error('http');
+        const r = await skinReq;
+        if (!r || !r.ok) throw new Error('http');
         const d = await r.json();
         if (!alive) return;
         if (d.item) {
@@ -274,6 +278,8 @@ export default function ProductPage({ params }) {
           </Reveal>
         </div>
       </section>
+
+      {isSkin && !isListing && <SkinListings product={product} />}
 
       {related.length > 0 && (
         <section className="container-site py-10">

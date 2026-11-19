@@ -97,6 +97,7 @@ export default function Gallery({ product }) {
         <ProductMedia
           product={product}
           src={list[i]}
+          priority
           innerRef={mainRef}
           className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-line"
         />

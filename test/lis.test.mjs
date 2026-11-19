@@ -267,3 +267,89 @@ test('yetkazish: LIS provayderi bilan paid buyurtma -> sotib olinadi -> sent -> 
   o = await getOrder(res.order.id);
   assert.equal(o.status, 'done');
 });
+
+// ---- aniq nusxalar (mahsulot sahifasi "Mavjud nusxalar") ----
+
+const LL = await imp('lib/lisListings.js');
+
+test('toListing: float, naqsh, inspect havola, stikerlar, tezkor yetkazish', () => {
+  const l = LL.toListing({
+    id: 901, name: NAME, price: 12.5, unlock_at: null, item_float: '0.153456789', item_paint_seed: 661, item_paint_index: 44,
+    item_link: 'steam://run/730//+csgo_econ_action_preview%20ABC', delivery_type: 1,
+    stickers: [{ name: 'S1', image: 'https://x/s1.png', slot: 0, wear: 0 }],
+  });
+  assert.equal(l.id, 901);
+  assert.equal(l.priceUsd, 12.5); // cost rejimi
+  assert.equal(l.price, Math.round(12.5 * 12700));
+  assert.equal(l.floatValue, 0.153456789);
+  assert.equal(l.paintSeed, 661);
+  assert.match(l.inspectLink, /^steam:\/\/run\/730/);
+  assert.equal(l.instant, true);
+  assert.equal(l.stickers.length, 1);
+});
+
+test('toListing: noto\'g\'ri inspect havola (steam:// emas) qabul qilinmaydi; sekin yetkazish', () => {
+  const l = LL.toListing({ id: 2, name: NAME, price: 1, item_link: 'https://evil.example/x', delivery_type: 2 });
+  assert.equal(l.inspectLink, null);
+  assert.equal(l.instant, false);
+});
+
+test('getLisListings: qulfli nusxalar tushmaydi, arzondan qimmatga', async () => {
+  const calls = mock((c) => {
+    if (c.path === '/v1/market/search') {
+      return json({ data: [skin(3, 9), skin(1, 5), skin(2, 7, { unlock_at: '2999-01-01T00:00:00Z' }), skin(4, 6)] });
+    }
+  });
+  const out = await LL.getLisListings(NAME);
+  assert.deepEqual(out.map((x) => x.id), [1, 4, 3]); // narx: 5, 6, 9 (id 2 qulfli — tushmaydi)
+  assert.ok(calls.some((c) => c.path === '/v1/market/search'));
+});
+
+test('buyurtma: aniq LIS nusxasi — narx LIS\'dan (klient narxiga ishonilmaydi), listingId saqlanadi', async () => {
+  mock((c) => {
+    if (c.path === '/v1/market/check-availability') return json({ data: { available_skins: { '555': 8.4 }, unavailable_skin_ids: [] } });
+  });
+  const res = await createOrder({
+    name: 'T', phone: '+998900000000', tradeUrl: TRADE_URL,
+    items: [{ id: 'lis-555', name: 'AK-47 | Redline', price: 1, qty: 3, kind: 'skin', lisId: 555, marketHashName: NAME }],
+  });
+  assert.ok(res.order, res.error);
+  const it = res.order.items[0];
+  assert.equal(it.price, Math.round(8.4 * 12700)); // 1 so'm emas
+  assert.equal(it.qty, 1);
+  assert.equal(it.listingId, '555');
+});
+
+test('buyurtma: sotilgan LIS nusxasi rad etiladi', async () => {
+  mock((c) => {
+    if (c.path === '/v1/market/check-availability') return json({ data: { available_skins: {}, unavailable_skin_ids: [556] } });
+  });
+  const res = await createOrder({
+    name: 'T', phone: '+998900000000', tradeUrl: TRADE_URL,
+    items: [{ id: 'lis-556', name: 'x', price: 1, qty: 1, kind: 'skin', lisId: 556, marketHashName: NAME }],
+  });
+  assert.match(res.error, /sotilgan|mavjud emas/);
+});
+
+test('yetkazish: aniq tanlangan LIS nusxasi (id) sotib olinadi, nom bo\'yicha qidirilmaydi', async () => {
+  mock((c) => {
+    if (c.path === '/v1/market/check-availability') return json({ data: { available_skins: { '557': 8 }, unavailable_skin_ids: [] } });
+  });
+  const res = await createOrder({
+    name: 'T', phone: '+998900000000', tradeUrl: TRADE_URL,
+    items: [{ id: 'lis-557', name: 'x', price: 1, qty: 1, kind: 'skin', lisId: 557, marketHashName: NAME }],
+  });
+  assert.ok(res.order, res.error);
+  await updateOrder(res.order.id, { status: 'paid', by: 'test' });
+
+  const calls = mock((c) => {
+    if (c.path === '/v1/market/info') return json({ data: [] });
+    if (c.path === '/v1/user/balance') return json({ data: { balance: 100 } });
+    if (c.path === '/v1/market/buy') return json({ data: purchase(c.body.custom_id, 'wait_accept') });
+  });
+  const r = await fulfillOrder(res.order.id);
+  assert.equal(r.ok, true, JSON.stringify(r));
+  const buyCall = calls.find((c) => c.path === '/v1/market/buy');
+  assert.deepEqual(buyCall.body.ids, [557]);
+  assert.equal(calls.some((c) => c.path === '/v1/market/search'), false);
+});

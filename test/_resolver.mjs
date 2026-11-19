@@ -1,7 +1,7 @@
 // Node ESM loader hooki: kengaytmasiz nisbiy importlarni (`./kv`) hal qiladi.
 // lib/ modullari Next.js/webpack uslubida `./kv` deb yozadi — bu Node'ning
 // standart ESM resolveriga yetmaydi, shu yerda `.js` / `/index.js` sinab ko'ramiz.
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 export async function resolve(specifier, context, nextResolve) {
@@ -24,4 +24,14 @@ export async function resolve(specifier, context, nextResolve) {
     }
     throw err;
   }
+}
+
+// JSON fayllarni (masalan lib/skinMetaData.json) `import data from './x.json'` ko'rinishida yuklash:
+// webpack buni o'zi hal qiladi, Node ESM esa import attribute talab qiladi — testlarda shu hook yetkazadi.
+export async function load(url, context, nextLoad) {
+  if (url.endsWith('.json')) {
+    const text = readFileSync(fileURLToPath(url), 'utf8');
+    return { format: 'module', source: `export default ${text};`, shortCircuit: true };
+  }
+  return nextLoad(url, context);
 }

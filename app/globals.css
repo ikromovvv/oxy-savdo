@@ -137,18 +137,6 @@ body {
   box-shadow: 0 0 28px rgba(var(--rc), 0.38);
 }
 
-/* Lenis smooth scroll */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -167,20 +155,27 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   z-index: 9999;
   display: grid;
   place-items: center;
-  background: #02040a;
   color: #fff;
-  opacity: 1;
-  transition: opacity 0.85s ease 0.1s, transform 0.95s cubic-bezier(0.6, 0, 0.2, 1);
-  /* JS ishlamasa ham 9 soniyadan keyin yopiladi */
-  animation: introBgIn 0.5s ease backwards, introFailsafe 0.01s linear 10s forwards;
+  background: radial-gradient(ellipse 85% 65% at 50% 44%, #10131a 0%, #070910 55%, #030409 100%);
+  clip-path: inset(0 0 0 0);
+  /* sahifa tayyor bo'lgach yuqoriga "parda" bo'lib ochiladi */
+  transition: clip-path 0.85s cubic-bezier(0.76, 0, 0.24, 1);
+  /* JS ishlamasa ham 6 soniyadan keyin yopiladi */
+  animation: introFailsafe 0.01s linear 6s forwards;
 }
-.intro-root[data-phase='out'] { opacity: 0; transform: scale(1.04); pointer-events: none; }
+.intro-root[data-phase='out'] { clip-path: inset(0 0 100% 0); pointer-events: none; }
 
 .intro-glow {
   position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 55% 40% at 50% 50%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 70%);
-  animation: introPulse 3.2s ease-in-out 0.4s infinite;
+  left: 50%;
+  top: 46%;
+  width: min(78vw, 680px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0) 64%);
+  animation: introGlow 2.6s ease-in-out infinite alternate;
+  pointer-events: none;
 }
 
 .intro-stage {
@@ -188,95 +183,80 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: min(92vw, 760px);
   padding: 0 16px;
+  transition: transform 0.85s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.5s ease;
 }
+.intro-root[data-phase='out'] .intro-stage { transform: translateY(-7vh) scale(0.97); opacity: 0; }
 
 .intro-logo {
   position: relative;
   display: flex;
   justify-content: center;
+  overflow: hidden;
   font-family: 'Manrope', system-ui, sans-serif;
   font-weight: 800;
-  font-size: clamp(88px, 24vw, 200px);
+  font-size: clamp(84px, 22vw, 184px);
   line-height: 1;
-  letter-spacing: 0.16em;
-  padding-left: 0.16em; /* letter-spacing optik markazlash */
-  animation: introJoin 0.9s cubic-bezier(0.65, 0, 0.2, 1) 1.45s both;
+  letter-spacing: 0.3em;
+  padding: 0.04em 0 0.1em 0.3em; /* chap padding = letter-spacing: logotip aniq markazda turadi */
+  animation: introSettle 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
 }
-.intro-root[data-phase='out'] .intro-logo {
-  transform: scale(1.08);
-  transition: transform 0.95s cubic-bezier(0.6, 0, 0.2, 1);
-}
-
+/* har harf o'z "niqobi" ichida pastdan ko'tariladi */
+.intro-mask { display: inline-block; overflow: hidden; padding: 0.04em 0.05em 0.1em; margin: -0.04em -0.05em -0.1em; }
 .intro-letter {
   display: inline-block;
-  padding: 0 0.06em; /* background-clip:text harf chetini (masalan Y ning o'ng tomonini) kesib qo'ymasligi uchun */
-  margin: 0 -0.06em;
-  background: linear-gradient(180deg, #ffffff 0%, #eef0f3 45%, #aeb4bd 100%);
+  transform: translateY(112%);
+  background: linear-gradient(180deg, #ffffff 0%, #e9ecf1 50%, #a9afb9 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.55));
-  animation: introLetter 0.95s cubic-bezier(0.2, 0.75, 0.2, 1) var(--d) both;
+  animation: introRise 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--d) both;
 }
-
-/* gorizontal ko'k nur — logotip orqali o'tadi */
-.intro-streak {
+/* bir marta o'tadigan yorug'lik chizig'i */
+.intro-shine {
   position: absolute;
-  left: -10%;
-  top: 50%;
-  width: 120%;
-  height: 2px;
-  margin-top: -1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9) 35%, #fff 50%, rgba(255, 255, 255, 0.9) 65%, transparent);
-  box-shadow: 0 0 18px 3px rgba(255, 255, 255, 0.55);
-  opacity: 0;
-  transform: translateX(-70%);
-  animation: introStreak 1.25s cubic-bezier(0.5, 0, 0.2, 1) 1.5s both;
+  top: 0;
+  bottom: 0;
+  left: -45%;
+  width: 28%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: skewX(-18deg);
+  mix-blend-mode: overlay;
   pointer-events: none;
+  animation: introShine 1.15s cubic-bezier(0.4, 0, 0.2, 1) 0.8s both;
 }
 
 .intro-sub {
   display: flex;
   justify-content: center;
-  gap: 0.9em; /* harflar orasi (letter-spacing ishlatilmaydi — shunda yozuv aniq markazda turadi) */
-  margin-top: clamp(10px, 2.4vw, 20px);
+  gap: 0.75em;
+  margin-top: clamp(4px, 1.4vw, 12px);
+  padding-left: 0.75em;
   font-family: 'Manrope', system-ui, sans-serif;
   font-weight: 600;
-  font-size: clamp(13px, 3.4vw, 22px);
-  letter-spacing: 0;
-  color: #c9ced6;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  font-size: clamp(11px, 2.6vw, 16px);
+  color: #9aa1ad;
 }
-.intro-sub span { animation: introSub 0.7s cubic-bezier(0.2, 0.75, 0.2, 1) var(--d) both; }
+.intro-sub span { animation: introFade 0.7s cubic-bezier(0.2, 0.75, 0.2, 1) var(--d) both; }
 
 .intro-bar {
   position: relative;
-  width: min(300px, 68vw);
+  width: min(220px, 56vw);
   height: 2px;
-  margin-top: clamp(36px, 8vw, 64px);
-  background: rgba(255, 255, 255, 0.09);
+  margin-top: clamp(34px, 7vw, 56px);
+  background: rgba(255, 255, 255, 0.1);
   overflow: hidden;
   border-radius: 2px;
-  animation: introSub 0.7s ease 1.2s both;
+  animation: introFade 0.6s ease 0.5s both;
 }
 .intro-bar-fill {
   position: absolute;
   inset: 0;
   transform-origin: left center;
-  background: linear-gradient(90deg, #8a8f98, #d4d8de 70%, #fff);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
-  transition: transform 0.2s linear;
-}
-.intro-pct {
-  margin-top: 12px;
-  font-size: 11px;
-  letter-spacing: 0.3em;
-  color: rgba(201, 206, 214, 0.75);
-  font-variant-numeric: tabular-nums;
-  animation: introSub 0.7s ease 1.3s both;
+  background: linear-gradient(90deg, #8a8f98, #e4e7ec 70%, #fff);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.85);
+  transition: transform 0.18s linear;
 }
 
 /* Admin: ichki scroll konteynerlari uchun ingichka qora scrollbar */
@@ -295,33 +275,26 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 .cat-tab { animation: catTabIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
 @media (prefers-reduced-motion: reduce) { .cat-tab { animation: none; } }
 
-@keyframes introBgIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes introPulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
-@keyframes introLetter {
-  from { opacity: 0; transform: translateY(36px) scale(0.94); }
-  to { opacity: 1; transform: none; }
+@keyframes introRise { from { transform: translateY(112%); } to { transform: none; } }
+@keyframes introSettle {
+  /* padding-left har lahzada letter-spacing'ga teng: logotip butun animatsiya davomida markazda qoladi */
+  from { letter-spacing: 0.3em; padding-left: 0.3em; }
+  to { letter-spacing: 0.06em; padding-left: 0.06em; }
 }
-@keyframes introJoin {
-  /* padding-left har lahzada letter-spacing'ga teng: oxirgi harfdan keyingi bo'sh joy kompensatsiya qilinadi, logotip aniq markazda qoladi */
-  from { letter-spacing: 0.16em; padding-left: 0.16em; }
-  to { letter-spacing: -0.02em; padding-left: 0; }
-}
-@keyframes introStreak {
-  0% { opacity: 0; transform: translateX(-70%); }
+@keyframes introShine {
+  0% { left: -45%; opacity: 0; }
   20% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { opacity: 0; transform: translateX(70%); }
+  100% { left: 120%; opacity: 0; }
 }
-@keyframes introSub {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: none; }
-}
+@keyframes introFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes introGlow { from { opacity: 0.55; transform: translate(-50%, -50%) scale(0.96); } to { opacity: 1; transform: translate(-50%, -50%) scale(1.04); } }
 @keyframes introFailsafe { to { opacity: 0; visibility: hidden; pointer-events: none; } }
 
 @media (prefers-reduced-motion: reduce) {
   .intro-root, .intro-root * { animation: none !important; transition: none !important; }
-  .intro-logo { letter-spacing: -0.02em; padding-left: 0; }
-  .intro-streak { display: none; }
+  .intro-letter { transform: none; }
+  .intro-logo { letter-spacing: 0.06em; padding-left: 0.06em; }
+  .intro-shine { display: none; }
 }
 
 /* Telegram Mini App (/rozigrish/app): sayt sarlavhasi va pastki qismi kerak emas */

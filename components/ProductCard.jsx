@@ -8,12 +8,14 @@ import { formatPrice } from '@/lib/products';
 
 const STEAM_IMAGE_RE = /steamstatic\.com\/economy\/image\//;
 
-export function ProductMedia({ product, className = '', innerRef, src }) {
+// priority — birinchi ekrandagi katta rasm (mahsulot sahifasi): darhol yuklanadi; qolganlari sust (lazy)
+export function ProductMedia({ product, className = '', innerRef, src, priority = false }) {
   const rawImage = src || product.image || '';
   // Steam CDN rasmlari — shaffof hoshiyali "icon" bo'lgani uchun kattaroq
   // o'lchamda so'raymiz va kartada TO'LIQ ko'rsatamiz (object-contain).
   const isSteamImage = STEAM_IMAGE_RE.test(rawImage) && !/\/\d+fx\d+f$/.test(rawImage);
-  const image = isSteamImage ? `${rawImage}/512fx384f` : rawImage;
+  // kartada 384x288 yetarli (512x384 ga nisbatan ~45% yengil); katta rasm (priority) — 512x384
+  const image = isSteamImage ? `${rawImage}/${priority ? '512fx384f' : '384fx288f'}` : rawImage;
 
   return (
     <div className={`product-media relative overflow-hidden ${className}`}>
@@ -27,6 +29,8 @@ export function ProductMedia({ product, className = '', innerRef, src }) {
             src={image}
             alt={product.name}
             draggable={false}
+            loading={priority ? 'eager' : 'lazy'}
+            decoding="async"
             className={
               isSteamImage
                 ? 'h-full w-full scale-105 object-contain p-2'

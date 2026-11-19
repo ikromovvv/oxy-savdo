@@ -43,7 +43,11 @@ export async function GET(request) {
       };
     });
 
-    return NextResponse.json({ total, items: enriched, weaponTypes, weaponCounts });
+    // Vercel CDN: bir xil so'rov 60 soniya (va yana 5 daqiqa 'eskirgan' holda) darhol beriladi
+    return NextResponse.json(
+      { total, items: enriched, weaponTypes, weaponCounts },
+      { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } }
+    );
   } catch (e) {
     console.error('[api/skins] xato:', e?.code || e?.message || e, e?.status ? `HTTP ${e.status}` : '', e?.stack || '');
     return NextResponse.json(

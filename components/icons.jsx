@@ -18,6 +18,7 @@ export {
   X,
   ZoomIn,
   Box,
+  Eye,
 } from 'lucide-react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 

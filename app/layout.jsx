@@ -3,7 +3,6 @@ import { StoreProvider } from '@/components/StoreProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
-import SmoothScroll from '@/components/SmoothScroll';
 import ScrollToTop from '@/components/ScrollToTop';
 import TgWebApp from '@/components/TgWebApp';
 import IntroLoader from '@/components/IntroLoader';
@@ -68,7 +67,6 @@ export default function RootLayout({ children }) {
         <IntroLoader />
         <div className="grid-bg" aria-hidden="true" />
         <StoreProvider>
-          <SmoothScroll />
           <ScrollToTop />
           <TgWebApp />
           <div className="relative z-10">
