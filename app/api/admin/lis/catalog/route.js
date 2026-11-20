@@ -47,6 +47,6 @@ export async function GET(req) {
     return NextResponse.json({ ...res, items });
   } catch (e) {
     console.error('[api/admin/lis/catalog]', e?.code || e?.message || e);
-    return NextResponse.json({ error: e?.code || 'fetch_failed' }, { status: 502 });
+    return NextResponse.json({ error: e?.code || 'fetch_failed', status: e?.status || null, detail: e?.detail || e?.message || null }, { status: 502 });
   }
 }

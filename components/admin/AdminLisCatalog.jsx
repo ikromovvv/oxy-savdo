@@ -180,7 +180,7 @@ export default function AdminLisCatalog({ onBack }) {
       const r = await fetch(`/api/admin/lis/catalog?${qs}`, { cache: 'no-store' });
       const d = await r.json().catch(() => ({}));
       if (id !== reqId.current) return;
-      if (!r.ok || d.error) setErr(d.error || `HTTP ${r.status}`);
+      if (!r.ok || d.error) setErr([d.error || `HTTP ${r.status}`, d.detail].filter(Boolean).join(' — '));
       else setData(d);
     } catch {
       if (id === reqId.current) setErr('aloqa xatosi');
