@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import ProductCard from '@/components/ProductCard';
 import SkinCard from '@/components/SkinCard';
@@ -12,6 +12,7 @@ import Reveal from '@/components/Reveal';
 import SteamLoginGate from '@/components/SteamLoginGate';
 import { formatPrice, weaponTypes } from '@/lib/products';
 import { rarityInfo, unlockLabel } from '@/lib/skinMeta';
+import { cachedSkin, fetchSkin } from '@/lib/skinClientCache';
 
 // Kovrik/aksessuar bo'lsa /api/products/[id] dan (admin panel boshqaradi),
 // skin bo'lsa /api/skins/[id] dan (LIS-SKINS'dan real vaqtda) olamiz.
@@ -27,69 +28,122 @@ export default function ProductPage({ params }) {
   const [errored, setErrored] = useState(false); // tarmoq/server xatosi -> qayta urinish
   const [reloadKey, setReloadKey] = useState(0);
 
+  // Joriy skin ID. Variant (FN/MW/FT/StatTrak) almashtirilganda sahifa qayta yuklanmaydi:
+  // URL history.pushState bilan o'zgaradi, oldingi ekran joyida qoladi, ma'lumot keshdan keladi.
+  const [currentId, setCurrentId] = useState(params.id);
+  const [switching, setSwitching] = useState(false);
+  const hasSkin = useRef(false);
+
+  useEffect(() => setCurrentId(params.id), [params.id]);
+  useEffect(() => {
+    const onPop = () => {
+      const m = window.location.pathname.match(/^\/mahsulot\/([^/]+)/);
+      if (m) setCurrentId(decodeURIComponent(m[1]));
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  const selectVariant = useCallback(
+    (id) => {
+      if (!id || id === currentId) return;
+      window.__keepScroll = true;
+      try {
+        window.history.pushState(null, '', `/mahsulot/${id}`);
+      } catch {
+        /* history ishlamasa ham ichki holat almashadi */
+      }
+      setCurrentId(id);
+    },
+    [currentId]
+  );
+
   useEffect(() => {
     let alive = true;
-    setLoading(true);
     setFailed(false);
     setErrored(false);
-    setProduct(null);
-    setRelated([]);
-    setVariants([]);
+
+    const apply = (d) => {
+      setProduct(d.item);
+      setRelated(d.related || []);
+      setVariants(d.variants || []);
+      hasSkin.current = true;
+      try {
+        document.title = `${d.item.name}${d.item.wear ? ` (${d.item.wear})` : ''} · OXY SAVDO`;
+      } catch {}
+    };
+
+    // 0) keshda bor — darhol (skeleton ham, kutish ham yo'q)
+    const cached = cachedSkin(currentId);
+    if (cached?.item) {
+      apply(cached);
+      setLoading(false);
+      setSwitching(false);
+      return () => {
+        alive = false;
+      };
+    }
+
+    // Keshda yo'q: skin ekranda turgan bo'lsa u joyida qoladi (xiralashadi), to'liq skeleton faqat birinchi yuklashda
+    if (hasSkin.current) {
+      setSwitching(true);
+    } else {
+      setLoading(true);
+      setProduct(null);
+      setRelated([]);
+      setVariants([]);
+    }
 
     (async () => {
-      // skin so'rovini darhol boshlaymiz (kovrik tekshiruvi bilan parallel) — sahifa ~1 s tezroq ochiladi
-      const skinReq = fetch(`/api/skins/${params.id}`).catch(() => null);
+      // skin so'rovini darhol boshlaymiz (kovrik tekshiruvi bilan parallel)
+      const skinReq = fetchSkin(currentId).catch(() => null);
 
-      // 1) kovrik / aksessuar
-      try {
-        const r = await fetch(`/api/products/${params.id}`, { cache: 'no-store' });
-        if (r.ok) {
-          const d = await r.json();
-          if (d.item && alive) {
-            setProduct(d.item);
-            try {
-              const lr = await fetch(`/api/products?category=${d.item.category}`, {
-                cache: 'no-store',
-              });
-              const ld = await lr.json();
-              if (alive) {
-                setRelated(
-                  (ld.items || []).filter((p) => p.id !== d.item.id).slice(0, 3)
-                );
-              }
-            } catch {}
-            if (alive) setLoading(false);
-            return;
+      // 1) kovrik / aksessuar (faqat skin ekranda turmaganda tekshiramiz)
+      if (!hasSkin.current) {
+        try {
+          const r = await fetch(`/api/products/${currentId}`, { cache: 'no-store' });
+          if (r.ok) {
+            const d = await r.json();
+            if (d.item && alive) {
+              setProduct(d.item);
+              try {
+                const lr = await fetch(`/api/products?category=${d.item.category}`, { cache: 'no-store' });
+                const ld = await lr.json();
+                if (alive) setRelated((ld.items || []).filter((p) => p.id !== d.item.id).slice(0, 3));
+              } catch {}
+              if (alive) setLoading(false);
+              return;
+            }
           }
-        }
-      } catch {}
+        } catch {}
+      }
 
       // 2) skin
       try {
-        const r = await skinReq;
-        if (!r || !r.ok) throw new Error('http');
-        const d = await r.json();
+        const d = await skinReq;
+        if (!d) throw new Error('http');
         if (!alive) return;
         if (d.item) {
-          setProduct(d.item);
-          setRelated(d.related || []);
-          setVariants(d.variants || []);
+          apply(d);
         } else if (d.error) {
-          setErrored(true); // server xatosi — qayta urinish mumkin
-        } else {
+          if (!hasSkin.current) setErrored(true); // server xatosi — qayta urinish mumkin
+        } else if (!hasSkin.current) {
           setFailed(true); // haqiqatan yo'q — 404
         }
       } catch {
-        if (alive) setErrored(true);
+        if (alive && !hasSkin.current) setErrored(true);
       } finally {
-        if (alive) setLoading(false);
+        if (alive) {
+          setLoading(false);
+          setSwitching(false);
+        }
       }
     })();
 
     return () => {
       alive = false;
     };
-  }, [params.id, reloadKey]);
+  }, [currentId, reloadKey]);
 
   if (loading) {
     return (
@@ -133,7 +187,7 @@ export default function ProductPage({ params }) {
   const locked = Boolean(lockText);
 
   // Skinlar uchun alohida (LIS uslubidagi) sahifa
-  if (isSkin) return <SkinDetail product={product} related={related} variants={variants} />;
+  if (isSkin) return <SkinDetail product={product} related={related} variants={variants} switching={switching} onSelectVariant={selectVariant} />;
 
   return (
     <>

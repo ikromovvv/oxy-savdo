@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Icon, Svg, inputCls } from './ui';
+import AdminLisCatalog from './AdminLisCatalog';
 
 const usd = (n) => {
   const v = Number(n || 0);
@@ -141,35 +142,6 @@ function Tools({ onChanged }) {
   const [tradeUrl, setTradeUrl] = useState('');
   const [testBusy, setTestBusy] = useState(false);
   const [test, setTest] = useState(null);
-  const [tgBusy, setTgBusy] = useState(false);
-  const [tgMsg, setTgMsg] = useState('');
-
-  async function tgAction(action) {
-    setTgBusy(true);
-    setTgMsg('');
-    try {
-      const r = await fetch('/api/admin/lis', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action }),
-      });
-      const d = await r.json().catch(() => ({}));
-      if (action === 'test_alert') {
-        setTgMsg(d.ok ? `Yuborildi ✓ ${d.dedicated ? '(guruhga)' : "(TELEGRAM_CS2SHOP_CHAT_ID yo'q — umumiy chatga)"}` : `Xato: ${d.error || r.status}`);
-      } else if (d.ok === false) {
-        setTgMsg(`Xato: ${d.error || r.status}`);
-      } else if (!d.low) {
-        setTgMsg(`Balans yetarli: $${Number(d.available).toFixed(2)} (chegara $${d.limit}). Ogohlantirish kerak emas.`);
-      } else {
-        setTgMsg(`Balans kam: $${Number(d.available).toFixed(2)} (chegara $${d.limit}). ${d.notified ? 'Guruhga ogohlantirish yuborildi ✓' : `Yuborilmadi: ${d.error || "noma'lum"}`}`);
-      }
-    } catch {
-      setTgMsg('Xato: aloqa');
-    } finally {
-      setTgBusy(false);
-    }
-  }
-
   async function testBuy() {
     if (!tradeUrl.trim()) return setTest({ error: 'Trade URL kiriting' });
     if (!window.confirm("LIS balansidan $2 gacha REAL pul yechiladi va eng arzon qulfsiz skin shu trade-linkka yuboriladi. Davom etamizmi?")) return;
@@ -206,22 +178,6 @@ function Tools({ onChanged }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <div className="card p-5">
-        <div className="label">Telegram guruh (ogohlantirishlar)</div>
-        <p className="mt-2 text-sm text-muted">
-          Yetkazish xatolari va &quot;balans kam&quot; xabarlari shu guruhga boradi. Ulanishni tekshiring.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button onClick={() => tgAction('test_alert')} disabled={tgBusy} className="btn-primary disabled:opacity-50">
-            {tgBusy ? '...' : 'Test xabar yuborish'}
-          </button>
-          <button onClick={() => tgAction('check_balance')} disabled={tgBusy} className="btn-ghost disabled:opacity-50">
-            Balansni tekshirish
-          </button>
-        </div>
-        {tgMsg && <div className="mt-3 break-words text-xs text-muted">{tgMsg}</div>}
-      </div>
-
       <div className="card p-5">
         <div className="label">Test savdo</div>
         <p className="mt-2 text-sm text-muted">
@@ -283,7 +239,7 @@ export default function AdminLis() {
         <p className="mt-1 text-sm text-muted">Yetkazib beruvchi: lis-skins.com. Balans, xaridlar va test savdo.</p>
       </div>
       <div className="no-scrollbar -mx-1 mb-5 flex flex-none gap-2 overflow-x-auto px-1">
-        {[['overview', 'Umumiy'], ['tools', 'Guruh va test savdo']].map(([k, l]) => (
+        {[['overview', 'Umumiy'], ['catalog', 'Katalog'], ['tools', 'Test savdo']].map(([k, l]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
@@ -296,7 +252,9 @@ export default function AdminLis() {
         ))}
       </div>
       <div className={`min-h-0 flex-1 ${tab === 'overview' ? '' : 'admin-scroll lg:overflow-y-auto'}`}>
-        {tab === 'overview' ? <Overview data={data} loading={loading} err={err} reload={load} /> : <Tools onChanged={load} />}
+        {tab === 'overview' && <Overview data={data} loading={loading} err={err} reload={load} />}
+        {tab === 'catalog' && <AdminLisCatalog />}
+        {tab === 'tools' && <Tools onChanged={load} />}
       </div>
     </div>
   );

@@ -353,3 +353,54 @@ test('yetkazish: aniq tanlangan LIS nusxasi (id) sotib olinadi, nom bo\'yicha qi
   assert.deepEqual(buyCall.body.ids, [557]);
   assert.equal(calls.some((c) => c.path === '/v1/market/search'), false);
 });
+
+// ---- admin katalog (qisqa ro'yxat ustida filtr / sahifalash) ----
+
+const { queryLisList } = await imp('lib/lisAdminCatalog.js');
+const SHORT = [
+  { name: 'AK-47 | Redline (Field-Tested)', price: 20, unlocked_price: 25, url: 'https://lis-skins.com/market/csgo/a/', count: 10 },
+  { name: 'AK-47 | Redline (Minimal Wear)', price: 40, unlocked_price: null, url: 'https://lis-skins.com/market/csgo/b/', count: 3 },
+  { name: 'StatTrak™ M4A4 | Howl (Factory New)', price: 9000, unlocked_price: 9500, url: 'x', count: 2 },
+  { name: '★ Karambit | Doppler (Factory New)', price: 700, unlocked_price: 720, url: 'https://evil.example/x', count: 5 },
+  { name: 'Sticker | Test', price: 1, unlocked_price: 1, url: 'x', count: 99 },
+  { name: 'MP9 | Hot Rod (Factory New)', price: 0, unlocked_price: null, url: 'x', count: 4 },
+];
+
+test('katalog: stiker va narxsiz nomlar tushmaydi; matched = nusxalar soni, qiymat = narx * soni', () => {
+  const r = queryLisList(SHORT, {});
+  assert.equal(r.total, 4); // AK x2, Howl, Karambit
+  assert.equal(r.matched, 10 + 3 + 2 + 5);
+  assert.equal(r.value, 25 * 10 + 40 * 3 + 9500 * 2 + 720 * 5);
+  assert.deepEqual(r.weaponCounts, { rifle: 15, knife: 5 });
+});
+
+test('katalog: filtrlar (qurol turi, wear, narx, mavjudlik, qidiruv) va saralash', () => {
+  assert.equal(queryLisList(SHORT, { weaponType: 'knife' }).total, 1);
+  assert.equal(queryLisList(SHORT, { wear: 'Factory New' }).total, 2);
+  assert.equal(queryLisList(SHORT, { priceFrom: 100, priceTo: 1000 }).total, 1);
+  assert.equal(queryLisList(SHORT, { availability: 'locked' }).items[0].name, 'AK-47 | Redline (Minimal Wear)');
+  assert.equal(queryLisList(SHORT, { availability: 'unlocked' }).total, 3);
+  assert.equal(queryLisList(SHORT, { query: 'howl' }).total, 1);
+  const asc = queryLisList(SHORT, { sort: 'price_asc' }).items.map((i) => i.price);
+  assert.deepEqual(asc, [...asc].sort((a, b) => a - b));
+  assert.equal(queryLisList(SHORT, { sort: 'count_desc' }).items[0].count, 10);
+});
+
+test('katalog: kategoriya sonlari qurol turi filtridan tashqari; rariteti filtri', () => {
+  const r = queryLisList(SHORT, { weaponType: 'knife' });
+  assert.equal(r.weaponCounts.rifle, 15); // tab sonlari o'zgarmaydi
+  assert.equal(r.matched, 5);
+  const rar = queryLisList(SHORT, { rarity: 'Covert' }, { rarityOf: (b) => (b.includes('Howl') ? 'Covert' : 'Classified') });
+  assert.equal(rar.total, 1);
+  assert.equal(queryLisList(SHORT, { rarity: 'Extraordinary' }).items[0].baseName, '★ Karambit | Doppler');
+});
+
+test('katalog: LIS bo\'lmagan havola (url) o\'tkazilmaydi; sahifalash', () => {
+  const k = queryLisList(SHORT, { weaponType: 'knife' }).items[0];
+  assert.equal(k.url, null);
+  const many = Array.from({ length: 130 }, (_, i) => ({ name: `AK-47 | Skin${i} (Field-Tested)`, price: i + 1, unlocked_price: i + 1, url: 'x', count: 1 }));
+  const p3 = queryLisList(many, { page: 3, sort: 'price_asc' });
+  assert.equal(p3.pages, 3);
+  assert.equal(p3.items.length, 130 - 96);
+  assert.equal(queryLisList(many, { page: 99 }).page, 3); // chegaraga qisiladi
+});

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from './StoreProvider';
 import { ProductMedia } from './ProductCard';
 import SkinCard from './SkinCard';
+import { cachedListings, fetchListings, prefetchSkin, prefetchListings } from '@/lib/skinClientCache';
 import { Eye, Zap, Clock, Copy, Check, ShoppingCart, ChevronLeft, ChevronRight } from './icons';
 import { formatPrice, weaponTypes } from '@/lib/products';
 import { rarityInfo, rarityRgb, WEAR_TIERS, WEAR_GRADIENT, wearInfo } from '@/lib/skinMeta';
@@ -68,7 +69,7 @@ function FloatBar({ value, className = '' }) {
 
 const fmtUsd = (n) => `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-export default function SkinDetail({ product, related = [], variants = [] }) {
+export default function SkinDetail({ product, related = [], variants = [], switching = false, onSelectVariant }) {
   const { lang, add, setCartOpen, favorites, toggleFavorite } = useStore();
   const D = DICT[lang] || DICT.uz;
 
@@ -78,15 +79,27 @@ export default function SkinDetail({ product, related = [], variants = [] }) {
   useEffect(() => {
     if (isListingPage) return undefined;
     let alive = true;
-    setLst({ loading: true, items: [], supported: true, error: false });
-    fetch(`/api/skins/${product.id}/listings`)
-      .then((r) => r.json())
-      .then((d) => alive && setLst({ loading: false, items: d.listings || [], supported: d.supported !== false, error: Boolean(d.error) }))
-      .catch(() => alive && setLst({ loading: false, items: [], supported: true, error: true }));
+    const done = (d) => alive && setLst({ loading: false, items: d.listings || [], supported: d.supported !== false, error: Boolean(d.error) });
+    const hit = cachedListings(product.id);
+    if (hit) {
+      done(hit); // keshda bor — jadval darhol
+    } else {
+      // faqat takliflar jadvali skeleton ko'rsatadi; sahifaning qolgan qismi joyida turadi
+      setLst((s) => ({ ...s, loading: true, items: [], error: false }));
+      fetchListings(product.id).then(done).catch(() => alive && setLst({ loading: false, items: [], supported: true, error: true }));
+    }
     return () => {
       alive = false;
     };
   }, [product.id, isListingPage]);
+
+  // boshqa variantlarning ma'lumotini bo'sh vaqtda oldindan yuklaymiz (almashish oniy bo'lsin)
+  useEffect(() => {
+    const ids = variants.map((v) => v.id).filter((id) => id !== product.id);
+    if (!ids.length) return undefined;
+    const timer = setTimeout(() => ids.forEach(prefetchSkin), 700);
+    return () => clearTimeout(timer);
+  }, [variants, product.id]);
 
   // cs2shop nusxa sahifasi: bitta nusxa
   const baseListings = useMemo(() => {
@@ -101,6 +114,18 @@ export default function SkinDetail({ product, related = [], variants = [] }) {
   const [f, setF] = useState({ delivery: 'all', floatFrom: '', floatTo: '', priceFrom: '', priceTo: '' });
   const [sort, setSort] = useState({ key: 'price', dir: 'asc' });
   const [selectedId, setSelectedId] = useState(null);
+  useEffect(() => setSelectedId(null), [product.id]);
+
+  // variant tablari: oddiy bosish — sahifa qayta yuklanmaydi; Ctrl/Cmd+bosish — yangi tabda
+  const pickVariant = (e, id) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0 || !onSelectVariant) return;
+    e.preventDefault();
+    onSelectVariant(id);
+  };
+  const hoverVariant = (id) => {
+    prefetchSkin(id);
+    prefetchListings(id);
+  };
 
   const shown = useMemo(() => {
     const ff = parseFloat(f.floatFrom), ft = parseFloat(f.floatTo), pf = parseFloat(f.priceFrom), pt = parseFloat(f.priceTo);
@@ -199,7 +224,7 @@ export default function SkinDetail({ product, related = [], variants = [] }) {
 
   return (
     <>
-      <section className="container-site py-8">
+      <section className={`container-site py-8 transition-opacity duration-200 ${switching ? 'opacity-60' : ''}`}>
         {/* sarlavha yo'li */}
         <nav className="flex flex-wrap items-center gap-1.5 text-xs text-muted" aria-label="breadcrumb">
           <Link href="/" className="hover:text-white">{D.home}</Link><span>›</span>
@@ -264,7 +289,7 @@ export default function SkinDetail({ product, related = [], variants = [] }) {
               <div className="flex w-fit gap-1 rounded-xl border border-line bg-panel p-1 text-sm">
                 {[[regularV, D.regular, !product.stattrak], [stV, D.stattrak, product.stattrak]].map(([v, label, active], i) => (
                   v && !active ? (
-                    <Link key={i} href={`/mahsulot/${v.id}`} className="rounded-lg px-4 py-1.5 text-muted transition hover:text-white">{label}</Link>
+                    <Link key={i} href={`/mahsulot/${v.id}`} onClick={(e) => pickVariant(e, v.id)} onMouseEnter={() => hoverVariant(v.id)} onFocus={() => hoverVariant(v.id)} className="rounded-lg px-4 py-1.5 text-muted transition hover:text-white">{label}</Link>
                   ) : (
                     <span key={i} className={`rounded-lg px-4 py-1.5 ${active ? 'bg-white/10 text-white' : 'cursor-not-allowed text-muted/40'}`}>{label}</span>
                   )
@@ -319,7 +344,7 @@ export default function SkinDetail({ product, related = [], variants = [] }) {
               const color = TIER_COLOR[key] || '#fff';
               const active = v.id === product.id;
               return (
-                <Link key={v.id} href={`/mahsulot/${v.id}`} className={`min-w-[170px] flex-1 px-5 py-4 transition ${active ? 'bg-white/[0.07]' : 'hover:bg-white/[0.04]'}`}>
+                <Link key={v.id} href={`/mahsulot/${v.id}`} onClick={(e) => pickVariant(e, v.id)} onMouseEnter={() => hoverVariant(v.id)} onFocus={() => hoverVariant(v.id)} className={`min-w-[170px] flex-1 px-5 py-4 transition ${active ? 'bg-white/[0.07]' : 'hover:bg-white/[0.04]'}`}>
                   <div className="text-sm font-medium" style={{ color }}>{v.wear}</div>
                   <div className="mt-1 text-xs text-muted">{v.count ? `${v.count} ${D.offers}` : D.offer1} · {formatPrice(v.price)}</div>
                 </Link>
@@ -333,7 +358,7 @@ export default function SkinDetail({ product, related = [], variants = [] }) {
       {showOffers && (
         <section className="container-site pb-8 pt-2">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-            {lst.loading ? D.loading : `${shown.length}${shown.length !== baseListings.length ? ` / ${baseListings.length}` : ''} ${D.offers}`}
+            {lst.loading || switching ? D.loading : `${shown.length}${shown.length !== baseListings.length ? ` / ${baseListings.length}` : ''} ${D.offers}`}
           </h2>
 
           {!isListingPage && (
@@ -366,7 +391,7 @@ export default function SkinDetail({ product, related = [], variants = [] }) {
               <span />
             </div>
 
-            {lst.loading ? (
+            {lst.loading || switching ? (
               <div className="space-y-px">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 animate-pulse bg-white/[0.04]" />)}</div>
             ) : lst.error && !baseListings.length ? (
               <div className="p-6 text-sm text-muted">{D.err}</div>
