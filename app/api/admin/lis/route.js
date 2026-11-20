@@ -27,6 +27,16 @@ export async function GET(req) {
     return NextResponse.json({ ref, ...(await status(ref)) });
   }
 
+  // Yengil so'rov: faqat balans (katalog sarlavhasi uchun)
+  if (sp.get('section') === 'balance') {
+    if (!configured()) return NextResponse.json({ configured: false });
+    try {
+      return NextResponse.json({ configured: true, ...(await balance()) });
+    } catch (e) {
+      return NextResponse.json({ configured: true, error: e.message }, { status: 502 });
+    }
+  }
+
   if (!configured()) return NextResponse.json({ configured: false });
   try {
     const [bal, hist] = await Promise.all([balance(), purchaseHistory({ page: 1 })]);

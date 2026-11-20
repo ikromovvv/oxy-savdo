@@ -26,7 +26,7 @@ const thumb = (u) => (u && STEAM_IMG.test(u) && !/\/\d+fx\d+f$/.test(u) ? `${u}/
 const DEFAULTS = { query: '', weaponType: 'all', wear: 'all', rarity: 'all', availability: 'all', priceFrom: '', priceTo: '', sort: 'price_desc' };
 
 // Trade-URL modali + xarid natijasi
-function BuyModal({ item, onClose }) {
+function BuyModal({ item, balance, onClose, onBought }) {
   const [url, setUrl] = useState('');
   const [busy, setBusy] = useState(false);
   const [res, setRes] = useState(null); // { ok, ref, item, priceUsd, float, state, notified, error }
@@ -44,6 +44,7 @@ function BuyModal({ item, onClose }) {
   }, [busy, onClose]);
 
   const valid = TRADE_RE.test(url.trim());
+  const short = balance != null && item.price > balance; // balans yetmaydi
 
   async function submit() {
     if (!valid || busy) return;
@@ -60,6 +61,7 @@ function BuyModal({ item, onClose }) {
       });
       const d = await r.json().catch(() => ({}));
       setRes(r.ok && d.ok ? d : { ok: false, error: d.error || `HTTP ${r.status}` });
+      if (r.ok && d.ok) onBought?.();
     } catch {
       setRes({ ok: false, error: 'aloqa xatosi' });
     } finally {
@@ -109,11 +111,12 @@ function BuyModal({ item, onClose }) {
               className={`${inputCls} mt-1.5`}
             />
             {url.trim() && !valid && <div className="mt-1.5 text-xs text-amber-300">Havola shaklda: …/tradeoffer/new/?partner=…&token=…</div>}
+            {short && <div className="mt-3 rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200">LIS balansi yetarli emas: {usd(balance)} &lt; {usd(item.price)}. Avval balansni to&apos;ldiring.</div>}
             {res && !res.ok && <div className="mt-3 rounded-xl border border-rose-400/30 bg-rose-400/10 p-3 text-sm text-rose-200">{res.error}</div>}
 
             <div className="mt-5 flex flex-wrap gap-3">
               <button onClick={onClose} disabled={busy} className="btn-ghost disabled:opacity-50">Bekor qilish</button>
-              <button onClick={submit} disabled={!valid || busy} className="btn-primary disabled:opacity-40">
+              <button onClick={submit} disabled={!valid || busy || short} className="btn-primary disabled:opacity-40">
                 {busy ? 'Sotib olinmoqda…' : 'Sotib olish va yuborish'}
               </button>
             </div>
@@ -146,7 +149,26 @@ export default function AdminLisCatalog({ onBack }) {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
   const [buying, setBuying] = useState(null);
+  const [bal, setBal] = useState({ loading: true, value: null, error: '' });
   const reqId = useRef(0);
+
+  const loadBalance = useCallback(async () => {
+    setBal((b) => ({ ...b, loading: true, error: '' }));
+    try {
+      const r = await fetch('/api/admin/lis?section=balance', { cache: 'no-store' });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || d.error || d.configured === false) {
+        setBal({ loading: false, value: null, error: d.configured === false ? 'kalit yoq' : d.error || `HTTP ${r.status}` });
+      } else {
+        setBal({ loading: false, value: Number(d.available ?? d.balance) || 0, error: '' });
+      }
+    } catch {
+      setBal({ loading: false, value: null, error: 'aloqa xatosi' });
+    }
+  }, []);
+  useEffect(() => {
+    loadBalance();
+  }, [loadBalance]);
   const scrollRef = useRef(null);
 
   const load = useCallback(async () => {
@@ -207,6 +229,16 @@ export default function AdminLisCatalog({ onBack }) {
         </button>
         <h3 className="text-base font-semibold tracking-tight">LIS-SKINS katalogi</h3>
         <div className="ml-auto flex items-center gap-6">
+          <button
+            onClick={loadBalance}
+            title={bal.error ? `Balansni o'qib bo'lmadi: ${bal.error}. Bosing — qayta urinish` : 'LIS balansi. Bosing — yangilash'}
+            className="rounded-xl border border-line px-3 py-1.5 text-right transition hover:border-white/40"
+          >
+            <div className="text-[10px] uppercase tracking-wider text-muted">LIS balansi</div>
+            <div className={`text-lg font-semibold leading-tight ${bal.error ? 'text-rose-400' : bal.value != null && bal.value < 20 ? 'text-amber-300' : 'text-emerald-300'}`}>
+              {bal.loading && bal.value == null ? '…' : bal.value != null ? usd(bal.value) : '—'}
+            </div>
+          </button>
           <div className="hidden text-right sm:block">
             <div className="text-[10px] uppercase tracking-wider text-muted">Topildi (nusxalar)</div>
             <div className="text-lg font-semibold leading-tight">{data ? int(data.matched) : '…'}</div>
@@ -280,6 +312,42 @@ export default function AdminLisCatalog({ onBack }) {
 
           {/* O'NG: kategoriyalar + kartalar */}
           <div className="min-w-0 flex-1">
+            {/* TEZ FILTRLAR: balansga mos eng yaxshi skinlar va tayyor narx oraliqlari */}
+            <div className="no-scrollbar mb-3 flex items-center gap-2 overflow-x-auto pb-1">
+              <span className="flex-none text-[11px] uppercase tracking-wider text-muted">Tez filtr:</span>
+              {(() => {
+                const budget = bal.value != null && bal.value >= 1 ? Math.floor(bal.value * 100) / 100 : null;
+                const isBudget = budget != null && String(f.priceTo) === String(budget) && f.priceFrom === '' && f.sort === 'price_desc' && f.availability === 'unlocked';
+                const base = { priceFrom: '', priceTo: '', availability: 'unlocked', sort: 'price_desc', weaponType: 'all', wear: 'all', rarity: 'all', query: '' };
+                const presets = [
+                  { key: 'b5', label: '≤ $5', patch: { ...base, priceTo: '5' } },
+                  { key: 'b20', label: '≤ $20', patch: { ...base, priceTo: '20' } },
+                  { key: 'b100', label: '≤ $100', patch: { ...base, priceTo: '100' } },
+                  { key: 'm', label: '$100–500', patch: { ...base, priceFrom: '100', priceTo: '500' } },
+                  { key: 'h', label: '$500+', patch: { ...base, priceFrom: '500' } },
+                  { key: 'pop', label: "Ko'p mavjud", patch: { ...base, sort: 'count_desc' } },
+                ];
+                const same = (p) => ['priceFrom', 'priceTo', 'sort', 'availability'].every((k) => String(f[k]) === String(p[k]));
+                return (
+                  <>
+                    <button
+                      disabled={budget == null}
+                      onClick={() => set({ ...base, priceTo: String(budget) })}
+                      title={budget == null ? "Balans noma'lum yoki $1 dan kam" : `Balansga mos: ${usd(budget)} gacha, qulfsiz, eng yaxshi (qimmat) skinlar oldinda`}
+                      className={`flex-none whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-semibold transition disabled:opacity-40 ${isBudget ? 'border-emerald-400 bg-emerald-400/15 text-emerald-300' : 'border-emerald-400/40 text-emerald-300 hover:bg-emerald-400/10'}`}
+                    >
+                      💰 Balansga mos{budget != null ? ` (${usd(budget)} gacha)` : ''}
+                    </button>
+                    {presets.map((p) => (
+                      <button key={p.key} onClick={() => set(p.patch)} className={`flex-none whitespace-nowrap ${chip(same(p.patch) && !isBudget)}`}>
+                        {p.label}
+                      </button>
+                    ))}
+                  </>
+                );
+              })()}
+            </div>
+
             <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto pb-1">
               <button onClick={() => set({ weaponType: 'all' })} className={tabCls(f.weaponType === 'all')}>
                 <div className="text-sm font-medium">Hammasi</div>
@@ -309,6 +377,7 @@ export default function AdminLisCatalog({ onBack }) {
                 <div className={`grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 ${loading ? 'opacity-60 transition-opacity' : ''}`}>
                   {data.items.map((it) => {
                     const wk = WEAR_KEY[it.wear];
+                    const afford = bal.value == null || it.price <= bal.value;
                     const canBuy = it.unlocked;
                     return (
                       <div
@@ -337,6 +406,7 @@ export default function AdminLisCatalog({ onBack }) {
                           </div>
                           <div className="-mt-5 mb-1 flex">
                             <span className="rounded-full bg-white px-3 py-1 text-sm font-bold text-ink shadow-lg">{usd(it.price)}</span>
+                            {!afford && <span className="ml-2 self-center text-[10px] font-semibold uppercase tracking-wide text-amber-300">Balans yetmaydi</span>}
                           </div>
                         </div>
                         <div className="flex flex-1 flex-col px-3 pb-3 pt-2">
@@ -368,7 +438,7 @@ export default function AdminLisCatalog({ onBack }) {
         </div>
       </div>
 
-      {buying && <BuyModal item={buying} onClose={() => setBuying(null)} />}
+      {buying && <BuyModal item={buying} balance={bal.value} onClose={() => setBuying(null)} onBought={loadBalance} />}
     </div>
   );
 }

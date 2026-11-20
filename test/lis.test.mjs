@@ -459,3 +459,10 @@ test('adminBuy: noto\'g\'ri trade URL, balans yetmasligi, chegaradan qimmat, qul
   });
   assert.match((await adminBuy({ name: NAME, tradeUrl: TRADE_URL, expectedUsd: 5 })).error, /qulfsiz holatda mavjud emas/);
 });
+
+test('nom tahlili: ★ StatTrak™ pichoq asosiy nomga ("★ Karambit | Doppler") va stattrak=true ga ajraladi', () => {
+  const r = queryLisList([{ name: '★ StatTrak™ Karambit | Doppler (Factory New)', price: 900, unlocked_price: 900, url: 'x', count: 1 }], {});
+  assert.equal(r.items[0].baseName, '★ Karambit | Doppler');
+  assert.equal(r.items[0].stattrak, true);
+  assert.equal(r.items[0].weaponType, 'knife');
+});
