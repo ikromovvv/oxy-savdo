@@ -8,6 +8,7 @@ import AdminOrders from '@/components/admin/AdminOrders';
 import AdminFailed from '@/components/admin/AdminFailed';
 import AdminCs2shop from '@/components/admin/AdminCs2shop';
 import AdminLis from '@/components/admin/AdminLis';
+import { ToastHost } from '@/components/admin/Toast';
 
 const NAV = [
   { key: 'dashboard', label: 'Panel', icon: Icon.grid },
@@ -208,6 +209,8 @@ export default function AdminPage() {
           </div>
         </main>
       </div>
+
+      <ToastHost />
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 z-[60] flex -translate-x-1/2 items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-ink shadow-[0_8px_30px_rgba(255,255,255,0.3)]">

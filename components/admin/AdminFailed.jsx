@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { formatPrice } from '@/lib/products';
 import { Icon, Svg } from './ui';
+import { toast } from './Toast';
 
 function fmtDate(ts) {
   try {
@@ -58,7 +59,7 @@ export default function AdminFailed({ onOpenOrders }) {
       // muvaffaqiyatli bo'lsa ro'yxatdan chiqadi, aks holda yangilanadi
       await load();
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message);
     } finally {
       setBusy(null);
     }

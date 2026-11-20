@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { formatPrice } from '@/lib/products';
 import { Icon, Svg } from './ui';
+import { toast } from './Toast';
 
 const STATUS = {
   new: { label: 'Yangi', cls: 'border-line text-white/80' },
@@ -130,7 +131,7 @@ export default function AdminOrders() {
       if (!r.ok) throw new Error(d.error || 'Xato');
       setItems((prev) => prev.map((o) => (o.id === id ? d.order : o)));
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message);
     } finally {
       setBusyId(null);
     }

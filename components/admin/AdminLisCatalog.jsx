@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { inputCls } from './ui';
+import { toast } from './Toast';
 
 // LIS-SKINS katalogi (admin, to'liq ekran): yetkazib beruvchida hozir bor skinlar.
 // Kartani bossangiz — trade-URL modali ochiladi; tasdiqlansa skin (qulfsiz eng arzon nusxa)
@@ -61,9 +62,13 @@ function BuyModal({ item, balance, onClose, onBought }) {
       });
       const d = await r.json().catch(() => ({}));
       setRes(r.ok && d.ok ? d : { ok: false, error: d.error || `HTTP ${r.status}` });
-      if (r.ok && d.ok) onBought?.();
+      if (r.ok && d.ok) {
+        onBought?.();
+        toast.success(`Buyurtma yuborildi: ${item.name}`);
+      } else toast.error(d.error || `HTTP ${r.status}`);
     } catch {
       setRes({ ok: false, error: 'aloqa xatosi' });
+      toast.error('Aloqa xatosi: server javob bermadi');
     } finally {
       setBusy(false);
     }
@@ -180,7 +185,11 @@ export default function AdminLisCatalog({ onBack }) {
       const r = await fetch(`/api/admin/lis/catalog?${qs}`, { cache: 'no-store' });
       const d = await r.json().catch(() => ({}));
       if (id !== reqId.current) return;
-      if (!r.ok || d.error) setErr([d.error || `HTTP ${r.status}`, d.detail].filter(Boolean).join(' — '));
+      if (!r.ok || d.error) {
+        const m = [d.error || `HTTP ${r.status}`, d.detail].filter(Boolean).join(' — ');
+        setErr(m);
+        toast.error(`Katalog yuklanmadi: ${m}`);
+      }
       else setData(d);
     } catch {
       if (id === reqId.current) setErr('aloqa xatosi');
