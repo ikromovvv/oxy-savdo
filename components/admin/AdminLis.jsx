@@ -232,6 +232,9 @@ export default function AdminLis() {
     load();
   }, [load]);
 
+  // Katalog — to'liq ekran (admin menyusi/sarlavhasi yo'qoladi)
+  if (tab === 'catalog') return <AdminLisCatalog onBack={() => setTab('overview')} />;
+
   return (
     <div className="flex min-h-0 flex-col lg:h-full">
       <div className="mb-5 flex-none">
@@ -253,7 +256,6 @@ export default function AdminLis() {
       </div>
       <div className={`min-h-0 flex-1 ${tab === 'overview' ? '' : 'admin-scroll lg:overflow-y-auto'}`}>
         {tab === 'overview' && <Overview data={data} loading={loading} err={err} reload={load} />}
-        {tab === 'catalog' && <AdminLisCatalog />}
         {tab === 'tools' && <Tools onChanged={load} />}
       </div>
     </div>

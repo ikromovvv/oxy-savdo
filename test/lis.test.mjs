@@ -404,3 +404,58 @@ test('katalog: LIS bo\'lmagan havola (url) o\'tkazilmaydi; sahifalash', () => {
   assert.equal(p3.items.length, 130 - 96);
   assert.equal(queryLisList(many, { page: 99 }).page, 3); // chegaraga qisiladi
 });
+
+// ---- admin: katalogdan qo'lda xarid (trade-linkka yuborish) ----
+
+const { adminBuy } = await imp('lib/lisAdminBuy.js');
+
+test('adminBuy: qulfsiz eng arzon nusxa, ko\'rsatilgan trade-linkka, max_price himoyasi bilan', async () => {
+  const calls = mock((c) => {
+    if (c.path === '/v1/user/balance') return json({ data: { balance: 100 } });
+    if (c.path === '/v1/market/info') return json({ data: [] });
+    if (c.path === '/v1/market/search') return json({ data: [skin(31, 10.4), skin(30, 10), skin(32, 9, { unlock_at: '2999-01-01T00:00:00Z' })] });
+    if (c.path === '/v1/market/buy') return json({ data: purchase(c.body.custom_id, 'wait_accept') });
+  });
+  const r = await adminBuy({ name: NAME, tradeUrl: TRADE_URL, expectedUsd: 10 });
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.match(r.ref, /^ADM-/);
+  assert.equal(r.priceUsd, 10);
+  const b = calls.find((c) => c.path === '/v1/market/buy');
+  assert.deepEqual(b.body.ids, [30]); // qulfli (32) emas, eng arzon qulfsiz
+  assert.equal(b.body.partner, '123456789');
+  assert.equal(b.body.token, 'AbCd1234');
+  assert.ok(b.body.max_price <= 10.5 + 1e-9 && b.body.max_price >= 10);
+});
+
+test('adminBuy: narx 5% dan ko\'p oshgan bo\'lsa sotib olmaydi', async () => {
+  const calls = mock((c) => {
+    if (c.path === '/v1/user/balance') return json({ data: { balance: 100 } });
+    if (c.path === '/v1/market/search') return json({ data: [skin(30, 12)] });
+  });
+  const r = await adminBuy({ name: NAME, tradeUrl: TRADE_URL, expectedUsd: 10 });
+  assert.equal(r.ok, false);
+  assert.match(r.error, /Narx oshib ketdi/);
+  assert.equal(calls.some((c) => c.path === '/v1/market/buy'), false);
+});
+
+test('adminBuy: noto\'g\'ri trade URL, balans yetmasligi, chegaradan qimmat, qulfsiz yo\'q', async () => {
+  assert.match((await adminBuy({ name: NAME, tradeUrl: 'nope', expectedUsd: 5 })).error, /Trade URL/);
+
+  mock((c) => {
+    if (c.path === '/v1/user/balance') return json({ data: { balance: 3 } });
+    if (c.path === '/v1/market/search') return json({ data: [skin(30, 5)] });
+  });
+  assert.match((await adminBuy({ name: NAME, tradeUrl: TRADE_URL, expectedUsd: 5 })).error, /balansi yetarli emas/);
+
+  process.env.LIS_ADMIN_BUY_MAX_USD = '100';
+  const big = await adminBuy({ name: NAME, tradeUrl: TRADE_URL, expectedUsd: 500 });
+  delete process.env.LIS_ADMIN_BUY_MAX_USD;
+  assert.equal(big.ok, false);
+  assert.match(big.error, /chegaradan oshdi/);
+
+  mock((c) => {
+    if (c.path === '/v1/user/balance') return json({ data: { balance: 100 } });
+    if (c.path === '/v1/market/search') return json({ data: [skin(30, 5, { unlock_at: '2999-01-01T00:00:00Z' })] });
+  });
+  assert.match((await adminBuy({ name: NAME, tradeUrl: TRADE_URL, expectedUsd: 5 })).error, /qulfsiz holatda mavjud emas/);
+});

@@ -4,6 +4,7 @@ import { activeProvider } from '@/lib/fulfillment';
 import { configured, balance, buy, status, purchaseHistory, cheapestUnlocked } from '@/lib/fulfill/lis';
 import { sendCs2shop, checkLowBalance, cs2shopChatId } from '@/lib/cs2shopAlerts';
 import { parseTradeUrl } from '@/lib/steamTrade';
+import { adminBuy } from '@/lib/lisAdminBuy';
 import { getSkinMeta } from '@/lib/skinImages';
 import { parseSkinName } from '@/lib/skinNames';
 
@@ -22,7 +23,7 @@ export async function GET(req) {
   const sp = new URL(req.url).searchParams;
   const ref = sp.get('ref');
   if (ref) {
-    if (!/^TEST-[A-Za-z0-9~-]{4,60}$/.test(ref)) return NextResponse.json({ error: 'bad_ref' }, { status: 400 });
+    if (!/^(TEST|ADM)-[A-Za-z0-9~-]{4,60}$/.test(ref)) return NextResponse.json({ error: 'bad_ref' }, { status: 400 });
     return NextResponse.json({ ref, ...(await status(ref)) });
   }
 
@@ -95,6 +96,20 @@ export async function POST(req) {
   if (body.action === 'check_balance') {
     try {
       return NextResponse.json({ ok: true, ...(await checkLowBalance({ force: true })) });
+    } catch (e) {
+      return NextResponse.json({ ok: false, error: e.message }, { status: 502 });
+    }
+  }
+
+  // Katalogdan qo'lda xarid: tanlangan skin (qulfsiz eng arzon nusxa) ko'rsatilgan trade-linkka sotib olinadi
+  if (body.action === 'catalog_buy') {
+    try {
+      const r = await adminBuy({ name: body.name, tradeUrl: body.tradeUrl, expectedUsd: body.expectedUsd });
+      if (!r.ok) return NextResponse.json({ ok: false, error: r.error }, { status: r.status || 400 });
+      const tg = await sendCs2shop(
+        `🧾 LIS admin xaridi ${r.ref}\n${r.item} · $${r.priceUsd}${r.float != null ? ` · float ${r.float.toFixed(4)}` : ''}\nQabul qiluvchi (partner): ${r.partner}\nHolat: ${r.state || 'processing'}`
+      );
+      return NextResponse.json({ ...r, notified: tg.ok, notifyError: tg.ok ? undefined : tg.error });
     } catch (e) {
       return NextResponse.json({ ok: false, error: e.message }, { status: 502 });
     }
