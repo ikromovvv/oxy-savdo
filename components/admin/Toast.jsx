@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { X, CircleAlert, CircleCheck, Info } from '@/components/icons';
 
 // Yengil toast tizimi (js alert o'rniga). Istalgan joydan:
 //   import { toast } from './Toast';  toast.error('...');  toast.success('...');  toast.info('...')
@@ -23,9 +24,9 @@ export const toast = {
 };
 
 const STYLE = {
-  error: { ring: 'border-rose-400/40', bar: 'bg-rose-400', icon: 'text-rose-300', title: 'Xatolik', glyph: '!' },
-  success: { ring: 'border-emerald-400/40', bar: 'bg-emerald-400', icon: 'text-emerald-300', title: 'Tayyor', glyph: '✓' },
-  info: { ring: 'border-sky-400/40', bar: 'bg-sky-400', icon: 'text-sky-300', title: "Ma'lumot", glyph: 'i' },
+  error: { ring: 'border-rose-400/40', bar: 'bg-rose-400', icon: 'text-rose-300', title: 'Xatolik', Icon: CircleAlert },
+  success: { ring: 'border-emerald-400/40', bar: 'bg-emerald-400', icon: 'text-emerald-300', title: 'Tayyor', Icon: CircleCheck },
+  info: { ring: 'border-sky-400/40', bar: 'bg-sky-400', icon: 'text-sky-300', title: "Ma'lumot", Icon: Info },
 };
 
 function Item({ t, onClose }) {
@@ -48,13 +49,13 @@ function Item({ t, onClose }) {
       }`}
     >
       <div className="flex items-start gap-3 p-4 pr-3">
-        <span className={`mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-full border border-current text-xs font-bold ${s.icon}`}>{s.glyph}</span>
+        <span className={`mt-0.5 flex h-6 w-6 flex-none items-center justify-center ${s.icon}`}><s.Icon className="h-5 w-5" strokeWidth={2} /></span>
         <div className="min-w-0 flex-1">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">{s.title}</div>
           <div className="mt-0.5 break-words text-sm leading-snug text-white">{t.message}</div>
         </div>
         <button onClick={onClose} aria-label="Yopish" className="flex-none rounded-lg px-2 py-1 text-muted transition hover:bg-white/10 hover:text-white">
-          ✕
+          <X className="h-4 w-4" />
         </button>
       </div>
       <div className={`h-0.5 ${s.bar} origin-left`} style={{ animation: `toast-bar ${t.ms}ms linear forwards` }} />

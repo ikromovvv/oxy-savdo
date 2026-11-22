@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Icon, Svg, inputCls } from './ui';
+import { X } from '@/components/icons';
 import AdminLisCatalog from './AdminLisCatalog';
 
 const usd = (n) => {
@@ -71,7 +72,7 @@ function PurchaseModal({ t, onClose }) {
             <div className="label">Xarid #{t.purchaseId}</div>
             <h3 className="mt-1 text-xl font-semibold leading-snug tracking-tight">{t.item}</h3>
           </div>
-          <button onClick={onClose} aria-label="Yopish" className="flex-none rounded-lg px-2 py-1 text-muted transition hover:bg-white/10 hover:text-white">✕</button>
+          <button onClick={onClose} aria-label="Yopish" className="flex-none rounded-lg px-2 py-1 text-muted transition hover:bg-white/10 hover:text-white"><X className="h-4 w-4" /></button>
         </div>
 
         {t.image && (

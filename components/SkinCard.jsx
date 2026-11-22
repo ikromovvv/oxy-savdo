@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useStore } from './StoreProvider';
 import { ProductMedia } from './ProductCard';
-import { ShoppingCart } from './icons';
+import { ShoppingCart, Heart } from './icons';
 import { weaponTypes, formatPrice } from '@/lib/products';
 import { wearInfo, rarityInfo, rarityRgb, WEAR_TIERS, unlockLabel } from '@/lib/skinMeta';
 
@@ -118,7 +118,7 @@ export default function SkinCard({ product: p }) {
         aria-label="favorite"
         className="absolute right-2.5 top-2.5 z-20 grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-black/45 text-base backdrop-blur-md transition hover:bg-black/70"
       >
-        <span className={fav ? 'text-accent' : 'text-white/70'}>{fav ? '♥' : '♡'}</span>
+        <Heart className={`h-4 w-4 ${fav ? 'fill-current text-accent' : 'text-white/70'}`} />
       </button>
 
       {/* StatTrak / Souvenir */}

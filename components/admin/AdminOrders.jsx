@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { formatPrice } from '@/lib/products';
 import { Icon, Svg } from './ui';
 import { toast } from './Toast';
+import { Gamepad2, StickyNote } from '@/components/icons';
 
 const STATUS = {
   new: { label: 'Yangi', cls: 'border-line text-white/80' },
@@ -362,8 +363,8 @@ export default function AdminOrders() {
                           <div className="text-muted">{o.customer?.phone}</div>
                           {o.customer?.tg && <div className="text-muted">{o.customer.tg}</div>}
                           {o.steam?.profileUrl && (
-                            <a href={o.steam.profileUrl} target="_blank" rel="noreferrer" className="block truncate text-accent hover:underline">
-                              🎮 {o.steam.name || 'Steam profil'}
+                            <a href={o.steam.profileUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 truncate text-accent hover:underline">
+                              <Gamepad2 className="h-3.5 w-3.5 flex-none" /> {o.steam.name || 'Steam profil'}
                             </a>
                           )}
                           {o.tradeUrl && (
@@ -376,7 +377,7 @@ export default function AdminOrders() {
                               {copied === o.id + 't' ? 'Nusxa olindi ✓' : o.tradeUrl}
                             </button>
                           )}
-                          {o.note && <div className="text-muted">📝 {o.note}</div>}
+                          {o.note && <div className="flex items-center gap-1.5 text-muted"><StickyNote className="h-3.5 w-3.5 flex-none" /> {o.note}</div>}
                         </div>
                       </div>
 

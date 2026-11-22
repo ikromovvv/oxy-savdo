@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { inputCls } from './ui';
 import { toast } from './Toast';
+import { Star, Gamepad2, Wallet } from '@/components/icons';
 
 // LIS-SKINS katalogi (admin, to'liq ekran): yetkazib beruvchida hozir bor skinlar.
 // Kartani bossangiz — trade-URL modali ochiladi; tasdiqlansa skin (qulfsiz eng arzon nusxa)
@@ -144,7 +145,8 @@ function BuyModal({ item, balance, onClose, onBought }) {
                     title="CS2 ochiladi va skin o'yin ichida ko'rsatiladi (Steam o'rnatilgan bo'lishi kerak)"
                     className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-white/40 hover:bg-white/10"
                   >
-                    🎮 CS orqali ko&apos;rish
+                    <Gamepad2 className="h-4 w-4" />
+                    CS orqali ko&apos;rish
                   </a>
                 ) : (
                   <span className="text-xs text-muted">{info.found === false ? 'Qulfsiz nusxa hozir yo\'q' : 'Inspect havolasi yo\'q'}</span>
@@ -420,9 +422,10 @@ export default function AdminLisCatalog({ onBack }) {
                       disabled={budget == null}
                       onClick={() => set({ ...base, priceTo: String(budget) })}
                       title={budget == null ? "Balans noma'lum yoki $1 dan kam" : `Balansga mos: ${usd(budget)} gacha, qulfsiz, eng yaxshi (qimmat) skinlar oldinda`}
-                      className={`flex-none whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-semibold transition disabled:opacity-40 ${isBudget ? 'border-emerald-400 bg-emerald-400/15 text-emerald-300' : 'border-emerald-400/40 text-emerald-300 hover:bg-emerald-400/10'}`}
+                      className={`inline-flex flex-none items-center gap-2 whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-semibold transition disabled:opacity-40 ${isBudget ? 'border-emerald-400 bg-emerald-400/15 text-emerald-300' : 'border-emerald-400/40 text-emerald-300 hover:bg-emerald-400/10'}`}
                     >
-                      💰 Balansga mos{budget != null ? ` (${usd(budget)} gacha)` : ''}
+                      <Wallet className="h-4 w-4" />
+                      Balansga mos{budget != null ? ` (${usd(budget)} gacha)` : ''}
                     </button>
                     {presets.map((p) => (
                       <button key={p.key} onClick={() => set(p.patch)} className={`flex-none whitespace-nowrap ${chip(same(p.patch) && !isBudget)}`}>
@@ -436,7 +439,7 @@ export default function AdminLisCatalog({ onBack }) {
 
             <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto pb-1">
               <button onClick={() => set({ fav: '1', weaponType: 'all' })} className={tabCls(f.fav === '1')}>
-                <div className="text-sm font-medium">⭐ Sevimlilar</div>
+                <div className="flex items-center gap-1.5 text-sm font-medium"><Star className="h-4 w-4" />Sevimlilar</div>
                 <div className={`text-[11px] ${f.fav === '1' ? 'text-ink/60' : 'text-muted'}`}>{int(favs.length)}</div>
               </button>
               <button onClick={() => set({ fav: '', weaponType: 'all' })} className={tabCls(f.fav !== '1' && f.weaponType === 'all')}>
@@ -461,7 +464,7 @@ export default function AdminLisCatalog({ onBack }) {
                 {Array.from({ length: 10 }).map((_, i) => <div key={i} className="card h-64 animate-pulse bg-white/[0.04]" />)}
               </div>
             ) : data.items.length === 0 ? (
-              <div className="card p-10 text-center text-sm text-muted">{f.fav === '1' ? "Hali sevimli skin yo'q. Kartadagi ☆ ni bosib qo'shing." : "Bu filtr bo'yicha skin topilmadi."}</div>
+              <div className="card p-10 text-center text-sm text-muted">{f.fav === '1' ? "Hali sevimli skin yo'q. Kartadagi yulduzcha tugmasini bosib qo'shing." : "Bu filtr bo'yicha skin topilmadi."}</div>
             ) : (
               <>
                 <div className={`grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 ${loading ? 'opacity-60 transition-opacity' : ''}`}>
@@ -509,7 +512,7 @@ export default function AdminLisCatalog({ onBack }) {
                                 favs.includes(it.name) ? 'border-amber-300/60 bg-amber-300/15 text-amber-300' : 'border-line bg-black/40 text-white/60 hover:border-white/50 hover:text-white'
                               }`}
                             >
-                              {favs.includes(it.name) ? '★' : '☆'}
+                              <Star className={`h-4 w-4 ${favs.includes(it.name) ? 'fill-current' : ''}`} />
                             </button>
                           </div>
                         </div>

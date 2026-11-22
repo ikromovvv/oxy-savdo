@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { formatPrice } from '@/lib/products';
+import { Check, Info } from '@/components/icons';
 
 // DEMO to'lov sahifasi — Payme/Click oynasi qanday ko'rinishini ko'rsatadi.
 // Kiritilgan karta/kod HECH QAYERGA yuborilmaydi va saqlanmaydi. Production'da
@@ -151,7 +152,7 @@ export default function DemoPaymentPage({ params }) {
             {step === 'done' && (
               <div className="mt-6 text-center">
                 <div className={`mx-auto grid h-14 w-14 place-items-center rounded-full text-2xl ${credited ? 'bg-accent text-ink' : 'bg-amber-500/20 text-amber-300'}`}>
-                  {credited ? '✓' : 'ℹ'}
+                  {credited ? <Check className="h-7 w-7" /> : <Info className="h-7 w-7" />}
                 </div>
                 <h2 className="mt-4 text-xl font-bold">{credited ? "To'lov o'tdi (demo)" : 'Demo yakunlandi'}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted">

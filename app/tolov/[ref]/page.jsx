@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import { formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
+import { Check, X, Hourglass } from '@/components/icons';
 
 export default function PaymentReturnPage({ params }) {
   const { t, refreshBalance } = useStore();
@@ -102,7 +103,7 @@ export default function PaymentReturnPage({ params }) {
                     : 'bg-white/10 text-white'
               }`}
             >
-              {paid || manual ? '✓' : failed ? '✕' : '⏳'}
+              {paid || manual ? <Check className="h-7 w-7" /> : failed ? <X className="h-7 w-7" /> : <Hourglass className="h-7 w-7" />}
             </div>
 
             <h1 className="mt-4 text-2xl font-bold tracking-tight">

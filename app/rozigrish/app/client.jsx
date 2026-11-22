@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Check, X } from '@/components/icons';
+import { Check, X, Gift, PartyPopper, Megaphone, Gamepad2, RefreshCw } from '@/components/icons';
 
 function Row({ ok, warn, children }) {
   return (
@@ -88,7 +88,7 @@ export default function MiniAppClient() {
 
   return (
     <section className="mx-auto w-full max-w-md px-4 py-8">
-      <h1 className="text-center text-2xl font-semibold tracking-tight">🎁 Rozigrish</h1>
+      <h1 className="flex items-center justify-center gap-2 text-center text-2xl font-semibold tracking-tight"><Gift className="h-6 w-6" /> Rozigrish</h1>
 
       {phase === 'loading' && <p className="mt-6 text-center text-sm text-muted">Tekshirilmoqda...</p>}
 
@@ -119,23 +119,23 @@ export default function MiniAppClient() {
 
           {st.eligible ? (
             <div className="rounded-xl border border-emerald-400/40 bg-emerald-400/10 p-4 text-center">
-              <div className="text-lg font-semibold text-emerald-200">Siz rozigrishda ishtirok etyapsiz! 🎉</div>
+              <div className="flex items-center justify-center gap-2 text-lg font-semibold text-emerald-200">Siz rozigrishda ishtirok etyapsiz! <PartyPopper className="h-5 w-5" /></div>
               <div className="mt-1 text-sm text-white/70">Ishtirokchilar: {st.count}. Omad!</div>
             </div>
           ) : (
             <div className="space-y-2 pt-2">
               {!st.subscribed && (
-                <button onClick={() => open(st.channelLink, true)} className="btn-primary w-full">
-                  📢 Kanalga o&apos;tish
+                <button onClick={() => open(st.channelLink, true)} className="btn-primary inline-flex w-full items-center justify-center gap-2">
+                  <Megaphone className="h-4 w-4" /> Kanalga o&apos;tish
                 </button>
               )}
               {!st.steam && st.steamUrl && (
-                <button onClick={() => { window.location.href = st.steamUrl; }} className="btn-primary w-full">
-                  🎮 Saytda Steam bilan kirish
+                <button onClick={() => { window.location.href = st.steamUrl; }} className="btn-primary inline-flex w-full items-center justify-center gap-2">
+                  <Gamepad2 className="h-4 w-4" /> Saytda Steam bilan kirish
                 </button>
               )}
-              <button onClick={check} disabled={busy} className="w-full rounded-xl border border-white/20 px-4 py-3 text-sm font-medium disabled:opacity-50">
-                {busy ? 'Tekshirilmoqda...' : '🔄 Qayta tekshirish'}
+              <button onClick={check} disabled={busy} className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 px-4 py-3 text-sm font-medium disabled:opacity-50">
+                {busy ? 'Tekshirilmoqda...' : (<><RefreshCw className="h-4 w-4" /> Qayta tekshirish</>)}
               </button>
               <p className="pt-1 text-center text-xs text-muted">Ikkala shart bajarilganda ishtirokchi bo&apos;lasiz.</p>
             </div>

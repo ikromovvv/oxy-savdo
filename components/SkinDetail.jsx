@@ -6,7 +6,7 @@ import { useStore } from './StoreProvider';
 import { ProductMedia } from './ProductCard';
 import SkinCard from './SkinCard';
 import { cachedListings, fetchListings, prefetchSkin, prefetchListings } from '@/lib/skinClientCache';
-import { Eye, Zap, Clock, Copy, Check, ShoppingCart, ChevronLeft, ChevronRight } from './icons';
+import { Eye, Zap, Clock, Copy, Check, ShoppingCart, ChevronLeft, ChevronRight, Heart } from './icons';
 import { formatPrice, weaponTypes } from '@/lib/products';
 import { rarityInfo, rarityRgb, WEAR_TIERS, WEAR_GRADIENT, wearInfo } from '@/lib/skinMeta';
 
@@ -260,7 +260,7 @@ export default function SkinDetail({ product, related = [], variants = [], switc
                 </span>
               ) : <span />}
               <button onClick={() => toggleFavorite(product)} aria-label={D.favorite} className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 bg-black/40 text-base transition hover:bg-black/60">
-                <span className={fav ? 'text-accent' : 'text-white/70'}>{fav ? '♥' : '♡'}</span>
+                <Heart className={`h-4 w-4 ${fav ? 'fill-current text-accent' : 'text-white/70'}`} />
               </button>
             </div>
 
