@@ -17,7 +17,7 @@ const NAV = [
   { key: 'lis', label: 'LIS-SKINS', icon: Icon.wallet, provider: 'lis' },
 ];
 
-function Sidebar({ view, setView, onLogout, onNav, nav = NAV }) {
+function Sidebar({ view, setView, onLogout, onNav, nav = NAV, adminName }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-14 items-center gap-2.5 border-b border-line px-5">
@@ -41,6 +41,7 @@ function Sidebar({ view, setView, onLogout, onNav, nav = NAV }) {
       </nav>
 
       <div className="border-t border-line p-3">
+        {adminName && <div className="px-3 pb-2 text-[11px] uppercase tracking-wider text-muted">Admin: <span className="text-white/80">{adminName}</span></div>}
         <button
           onClick={onLogout}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/70 transition hover:bg-white/5 hover:text-white"
@@ -58,6 +59,7 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [configured, setConfigured] = useState(true);
   const [provider, setProvider] = useState('');
+  const [adminName, setAdminName] = useState('');
 
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -79,6 +81,7 @@ export default function AdminPage() {
       .then((d) => {
         setAuthed(Boolean(d.admin));
         setProvider(d.provider || '');
+        setAdminName(d.name || '');
         setConfigured(d.configured !== false);
       })
       .catch(() => {})
@@ -97,6 +100,12 @@ export default function AdminPage() {
       });
       const d = await r.json();
       if (d.ok) {
+        setAdminName(d.name || '');
+        // provider (LIS menyusi) kirgandan keyin darhol chiqishi uchun
+        await fetch('/api/admin/me', { cache: 'no-store' })
+          .then((x) => x.json())
+          .then((m) => setProvider(m.provider || ''))
+          .catch(() => {});
         setAuthed(true);
         setPassword('');
       } else {
@@ -179,7 +188,7 @@ export default function AdminPage() {
     <div className={`min-h-screen bg-ink text-white ${view === 'cs2shop' || view === 'lis' ? 'lg:h-screen lg:overflow-hidden' : ''}`}>
       {/* desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 border-r border-line bg-panel/50 md:block">
-        <Sidebar view={view} setView={setView} onLogout={doLogout} nav={nav} />
+        <Sidebar view={view} setView={setView} onLogout={doLogout} nav={nav} adminName={adminName} />
       </aside>
 
       {/* mobile drawer — chapdan sirg'alib chiqadi */}
@@ -195,7 +204,7 @@ export default function AdminPage() {
             drawer ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <Sidebar view={view} setView={setView} onLogout={doLogout} onNav={() => setDrawer(false)} nav={nav} />
+          <Sidebar view={view} setView={setView} onLogout={doLogout} onNav={() => setDrawer(false)} nav={nav} adminName={adminName} />
         </aside>
       </div>
 

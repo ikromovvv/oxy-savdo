@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { isAdmin } from '@/lib/adminAuth';
+import { currentAdmin } from '@/lib/adminAuth';
+import { runWithLisKey } from '@/lib/lisContext';
 import { activeProvider } from '@/lib/fulfillment';
 import { configured, balance, buy, status, purchaseHistory, cheapestUnlocked } from '@/lib/fulfill/lis';
 import { sendCs2shop, checkLowBalance, cs2shopChatId } from '@/lib/cs2shopAlerts';
@@ -18,8 +19,7 @@ const TEST_MAX_USD = 2; // test savdo narxi yuqori chegarasi
 // POST { action: 'test_alert' }           — guruhga test xabar
 // POST { action: 'check_balance' }        — balansni hozir tekshiradi (kam bo'lsa guruhga yozadi)
 // POST { action: 'test_buy', tradeUrl }   — eng arzon QULFSIZ skinni (<= $2) adminning trade-linkiga REAL sotib oladi
-export async function GET(req) {
-  if (!isAdmin()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+async function handleGET(req, admin) {
 
   const sp = new URL(req.url).searchParams;
   const ref = sp.get('ref');
@@ -194,8 +194,7 @@ export async function GET(req) {
   }
 }
 
-export async function POST(req) {
-  if (!isAdmin()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+async function handlePOST(req, admin) {
   const body = await req.json().catch(() => ({}));
 
   if (body.action === 'test_alert') {
@@ -219,7 +218,7 @@ export async function POST(req) {
       const r = await adminBuy({ name: body.name, tradeUrl: body.tradeUrl, expectedUsd: body.expectedUsd });
       if (!r.ok) return NextResponse.json({ ok: false, error: r.error }, { status: r.status || 400 });
       const tg = await sendCs2shop(
-        `🧾 LIS admin xaridi ${r.ref}\n${r.item} · $${r.priceUsd}${r.float != null ? ` · float ${r.float.toFixed(4)}` : ''}\nQabul qiluvchi (partner): ${r.partner}\nHolat: ${r.state || 'processing'}`
+        `🧾 LIS admin xaridi ${r.ref} (${admin.name})\n${r.item} · $${r.priceUsd}${r.float != null ? ` · float ${r.float.toFixed(4)}` : ''}\nQabul qiluvchi (partner): ${r.partner}\nHolat: ${r.state || 'processing'}`
       );
       return NextResponse.json({ ...r, notified: tg.ok, notifyError: tg.ok ? undefined : tg.error });
     } catch (e) {
@@ -256,7 +255,7 @@ export async function POST(req) {
       if (!r.ok) return NextResponse.json({ ok: false, error: r.error }, { status: 502 });
 
       const tg = await sendCs2shop(
-        `🧪 LIS test savdo ${ref}\n${pick.name} · $${pick.price}\nHolat: ${r.state || 'processing'} (offer yuborildi, Steam'da qabul qiling)`
+        `🧪 LIS test savdo ${ref} (${admin.name})\n${pick.name} · $${pick.price}\nHolat: ${r.state || 'processing'} (offer yuborildi, Steam'da qabul qiling)`
       );
       return NextResponse.json({
         ok: true,
@@ -276,3 +275,14 @@ export async function POST(req) {
 
   return NextResponse.json({ error: 'unknown_action' }, { status: 400 });
 }
+
+// Har admin o'z LIS akkaunti (kaliti, balansi) bilan ishlaydi
+function withAdmin(handler) {
+  return async (req) => {
+    const admin = currentAdmin();
+    if (!admin) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+    return runWithLisKey(admin.lisKey, () => handler(req, admin));
+  };
+}
+export const GET = withAdmin(handleGET);
+export const POST = withAdmin(handlePOST);

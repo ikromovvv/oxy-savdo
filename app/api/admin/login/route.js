@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminPasswordConfigured, checkPassword, makeAdminCookie } from '@/lib/adminAuth';
+import { adminPasswordConfigured, findAdminByPassword, makeAdminCookie } from '@/lib/adminAuth';
 import { limitOr429 } from '@/lib/rateLimit';
 
 export async function POST(req) {
@@ -21,12 +21,13 @@ export async function POST(req) {
     return NextResponse.json({ ok: false, error: 'Noto\'g\'ri so\'rov' }, { status: 400 });
   }
 
-  if (!checkPassword(password)) {
+  const account = findAdminByPassword(password);
+  if (!account) {
     return NextResponse.json({ ok: false, error: 'Parol noto\'g\'ri' }, { status: 401 });
   }
 
-  const res = NextResponse.json({ ok: true });
-  const c = makeAdminCookie();
+  const res = NextResponse.json({ ok: true, name: account.name });
+  const c = makeAdminCookie(account);
   res.cookies.set(c.name, c.value, c.options);
   return res;
 }

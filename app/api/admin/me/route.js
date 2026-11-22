@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
-import { isAdmin, adminPasswordConfigured } from '@/lib/adminAuth';
+import { currentAdmin, adminPasswordConfigured } from '@/lib/adminAuth';
 import { activeProvider } from '@/lib/fulfillment';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const admin = isAdmin();
-  return NextResponse.json({ admin, configured: adminPasswordConfigured(), ...(admin ? { provider: activeProvider() } : {}) });
+  const a = currentAdmin();
+  return NextResponse.json({
+    admin: Boolean(a),
+    configured: adminPasswordConfigured(),
+    ...(a ? { provider: activeProvider(), name: a.name, lisKeyConfigured: Boolean(a.lisKey) } : {}),
+  });
 }

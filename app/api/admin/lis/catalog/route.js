@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { isAdmin } from '@/lib/adminAuth';
+import { currentAdmin } from '@/lib/adminAuth';
 import { fetchLisShortList } from '@/lib/lisCatalog';
 import { queryLisList } from '@/lib/lisAdminCatalog';
 import { getSkinMeta } from '@/lib/skinImages';
@@ -10,7 +10,8 @@ export const dynamic = 'force-dynamic';
 // GET /api/admin/lis/catalog — LIS-SKINS katalogi (admin uchun): filtr, saralash, sahifalash.
 // Query: query, weaponType, wear, rarity, availability, priceFrom, priceTo, sort, page
 export async function GET(req) {
-  if (!isAdmin()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  const admin = currentAdmin();
+  if (!admin) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
 
   const sp = new URL(req.url).searchParams;
   const filters = {
@@ -29,7 +30,7 @@ export async function GET(req) {
   try {
     let list = await fetchLisShortList();
     if (sp.get('fav') === '1') {
-      const favs = new Set(await getFavorites());
+      const favs = new Set(await getFavorites(admin.id));
       list = list.filter((e) => favs.has(e?.name));
     }
 
