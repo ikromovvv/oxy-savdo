@@ -236,7 +236,7 @@ export default function AdminDashboard({ onGo, provider }) {
           <>
             <Stat label="Bugungi tushum" value={formatPrice(rev.today || 0)} accent wide />
             <Stat label="Oylik tushum" value={formatPrice(rev.month || 0)} wide />
-            <Stat label="Umumiy tushum" value={formatPrice(rev.total || 0)} sub="Faqat haqiqiy to'langan" wide />
+            <Stat label="Umumiy tushum" value={formatPrice(rev.total || 0)} sub={`${rev.paidCount || 0} ta haqiqiy to'langan (demo/test hisobga olinmaydi)`} wide />
             <Stat label="Mahsulotlar" value={prodCount ?? '…'} sub="Kovrik + aksessuar" />
           </>
         )}

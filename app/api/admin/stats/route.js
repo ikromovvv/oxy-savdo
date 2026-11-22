@@ -10,7 +10,8 @@ function isPaid(o) {
   if (o.status === 'refunded' || o.status === 'cancelled') return false;
   // balansni to'ldirish — savdo tushumi emas (pul keyin balansdan sarflanganda hisoblanadi)
   if (o.items?.some((i) => i.kind === 'deposit')) return false;
-  if (o.payment?.provider === 'wallet-demo') return false; // demo pul
+  // sinov / demo to'lovlar haqiqiy pul emas
+  if (['wallet-demo', 'demo', 'test'].includes(o.payment?.provider)) return false;
   return o.payment?.status === 'paid' || PAID_STATUSES.includes(o.status);
 }
 
@@ -70,6 +71,7 @@ export async function GET() {
         nItems: (o.items || []).length,
       }));
 
+    revenue.paidCount = paid.length;
     return NextResponse.json({ counts, revenue, series, recent });
   } catch (e) {
     console.error('[api/admin/stats]', e?.message || e);
