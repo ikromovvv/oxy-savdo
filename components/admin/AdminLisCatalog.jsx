@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { inputCls } from './ui';
 import { toast } from './Toast';
-import { Star, Gamepad2, Wallet } from '@/components/icons';
+import { Star, Gamepad2, Wallet, Check } from '@/components/icons';
 
 // LIS-SKINS katalogi (admin, to'liq ekran): yetkazib beruvchida hozir bor skinlar.
 // Kartani bossangiz — trade-URL modali ochiladi; tasdiqlansa skin (qulfsiz eng arzon nusxa)
@@ -21,14 +21,28 @@ const STEAM_IMG = /steamstatic\.com\/economy\/image\//;
 const TRADE_KEY = 'oxy:adminTradeUrl';
 const TRADE_RE = /^https:\/\/steamcommunity\.com\/tradeoffer\/new\/\?partner=\d+&token=[A-Za-z0-9_-]+$/;
 
+const COLOR_OPTIONS = [
+  ['white', 'Oq', '#f5f5f5'],
+  ['black', 'Qora', '#111111'],
+  ['red', 'Qizil', '#ef4444'],
+  ['orange', "To'q sariq", '#f97316'],
+  ['yellow', 'Sariq', '#eab308'],
+  ['green', 'Yashil', '#22c55e'],
+  ['blue', 'Ko\'k', '#3b82f6'],
+  ['purple', 'Binafsha', '#a855f7'],
+  ['pink', 'Pushti', '#ec4899'],
+  ['brown', 'Jigarrang', '#92400e'],
+];
+const uzs = (usdVal, rate) => `≈ ${Math.round(Number(usdVal || 0) * (rate || 12700)).toLocaleString('ru-RU')} so'm`;
+
 const usd = (n) => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const int = (n) => Number(n || 0).toLocaleString('en-US');
 const thumb = (u) => (u && STEAM_IMG.test(u) && !/\/\d+fx\d+f$/.test(u) ? `${u}/256fx192f` : u);
 
-const DEFAULTS = { fav: '', query: '', weaponType: 'all', wear: 'all', rarity: 'all', availability: 'all', priceFrom: '', priceTo: '', sort: 'price_desc' };
+const DEFAULTS = { fav: '', color: '', query: '', weaponType: 'all', wear: 'all', rarity: 'all', availability: 'all', priceFrom: '', priceTo: '', sort: 'price_desc' };
 
 // Trade-URL modali + xarid natijasi
-function BuyModal({ item, balance, onClose, onBought }) {
+function BuyModal({ item, balance, rate, onClose, onBought }) {
   const [url, setUrl] = useState('');
   const [busy, setBusy] = useState(false);
   const [res, setRes] = useState(null); // { ok, ref, item, priceUsd, float, state, notified, error }
@@ -116,7 +130,7 @@ function BuyModal({ item, balance, onClose, onBought }) {
             <div className="mt-5 rounded-xl border border-line p-3 text-sm">
               <div>Skin: <b>{item.name}</b></div>
               <div className="mt-1 text-muted">
-                Katalog narxi <b className="text-white">{usd(item.price)}</b> · LIS balansidan yechiladi · qulfsiz eng arzon nusxa olinadi
+                Katalog narxi <b className="text-white">{usd(item.price)}</b> <span className="text-white/60">({uzs(item.price, rate)})</span> · LIS balansidan yechiladi · qulfsiz eng arzon nusxa olinadi
               </div>
               {info.found && (
                 <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
@@ -379,6 +393,36 @@ export default function AdminLisCatalog({ onBack }) {
               </div>
             </div>
             <div>
+              <div className="mb-2 flex items-center justify-between">
+                <div className="label">Rang</div>
+                {f.color && (
+                  <button onClick={() => set({ color: '' })} className="text-[11px] text-muted underline-offset-2 hover:text-white hover:underline">tozalash</button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {COLOR_OPTIONS.map(([key, label, hex]) => {
+                  const on = f.color.split(',').includes(key);
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      title={label}
+                      aria-label={label}
+                      aria-pressed={on}
+                      onClick={() => {
+                        const cur = f.color.split(',').filter(Boolean);
+                        set({ color: (on ? cur.filter((c) => c !== key) : [...cur, key]).join(',') });
+                      }}
+                      className={`grid h-8 w-8 place-items-center rounded-full border-2 transition ${on ? 'scale-110 border-white' : 'border-white/15 hover:border-white/50'}`}
+                      style={{ background: hex }}
+                    >
+                      {on && <Check className={`h-4 w-4 ${key === 'white' || key === 'yellow' ? 'text-black' : 'text-white'}`} strokeWidth={3} />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div>
               <div className="label mb-2">Rariteti</div>
               <select value={f.rarity} onChange={(e) => set({ rarity: e.target.value })} className={inputCls}>
                 <option value="all">Hammasi</option>
@@ -406,7 +450,7 @@ export default function AdminLisCatalog({ onBack }) {
               {(() => {
                 const budget = bal.value != null && bal.value >= 1 ? Math.floor(bal.value * 100) / 100 : null;
                 const isBudget = budget != null && String(f.priceTo) === String(budget) && f.priceFrom === '' && f.sort === 'price_desc' && f.availability === 'unlocked';
-                const base = { fav: '', priceFrom: '', priceTo: '', availability: 'unlocked', sort: 'price_desc', weaponType: 'all', wear: 'all', rarity: 'all', query: '' };
+                const base = { fav: '', color: '', priceFrom: '', priceTo: '', availability: 'unlocked', sort: 'price_desc', weaponType: 'all', wear: 'all', rarity: 'all', query: '' };
                 const presets = [
                   { key: 'b5', label: '≤ $5', patch: { ...base, priceTo: '5' } },
                   { key: 'b20', label: '≤ $20', patch: { ...base, priceTo: '20' } },
@@ -516,7 +560,8 @@ export default function AdminLisCatalog({ onBack }) {
                             </button>
                           </div>
                         </div>
-                        <div className="flex flex-1 flex-col px-3 pb-3 pt-2">
+                        <div className="flex flex-1 flex-col px-3 pb-3 pt-1">
+                          <div className="mb-1 text-[11px] font-medium text-white/60">{uzs(it.price, data.usdUzs)}</div>
                           <div className="text-sm font-semibold leading-snug">{it.baseName}</div>
                           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted">
                             <span>{int(it.count)} ta mavjud</span>
@@ -545,7 +590,7 @@ export default function AdminLisCatalog({ onBack }) {
         </div>
       </div>
 
-      {buying && <BuyModal item={buying} balance={bal.value} onClose={() => setBuying(null)} onBought={loadBalance} />}
+      {buying && <BuyModal item={buying} balance={bal.value} rate={data?.usdUzs} onClose={() => setBuying(null)} onBought={loadBalance} />}
     </div>
   );
 }

@@ -22,6 +22,7 @@ export async function GET(req) {
     priceFrom: sp.get('priceFrom') || '',
     priceTo: sp.get('priceTo') || '',
     sort: sp.get('sort') || 'price_desc',
+    color: sp.get('color') || '',
     page: sp.get('page') || 1,
   };
 
@@ -49,7 +50,8 @@ export async function GET(req) {
       return { ...i, image: m.image || null, rarity: m.rarity || null, rarityColor: m.rarityColor || null };
     });
 
-    return NextResponse.json({ ...res, items });
+    const usdUzs = Number(process.env.USD_UZS) || 12700;
+    return NextResponse.json({ ...res, items, usdUzs });
   } catch (e) {
     console.error('[api/admin/lis/catalog]', e?.code || e?.message || e);
     return NextResponse.json({ error: e?.code || 'fetch_failed', status: e?.status || null, detail: e?.detail || e?.message || null }, { status: 502 });

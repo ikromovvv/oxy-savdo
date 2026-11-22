@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "node db/migrate.mjs",
-    "test": "node --import ./test/_setup.mjs --test test/payments.test.mjs test/fulfillment.test.mjs test/wallet.test.mjs test/telegram.test.mjs test/giveaway.test.mjs test/tgwebapp.test.mjs test/pricing.test.mjs test/cs2shop.test.mjs test/listings.test.mjs test/alerts.test.mjs test/lis.test.mjs"
+    "test": "node --import ./test/_setup.mjs --test test/payments.test.mjs test/fulfillment.test.mjs test/wallet.test.mjs test/telegram.test.mjs test/giveaway.test.mjs test/tgwebapp.test.mjs test/pricing.test.mjs test/cs2shop.test.mjs test/listings.test.mjs test/alerts.test.mjs test/lis.test.mjs test/colors.test.mjs"
   },
   "dependencies": {
     "gsap": "^3.12.5",
@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "autoprefixer": "10.4.20",
+    "pngjs": "^7.0.0",
     "postcss": "8.4.41",
     "tailwindcss": "3.4.10"
   }
