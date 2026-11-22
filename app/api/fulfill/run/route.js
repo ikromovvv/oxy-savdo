@@ -3,6 +3,7 @@ import { isAdmin } from '@/lib/adminAuth';
 import { runFulfillmentTick, activeProvider } from '@/lib/fulfillment';
 import { recoverDeposits } from '@/lib/settle';
 import { checkLowBalance } from '@/lib/cs2shopAlerts';
+import { fetchLisAggregated } from '@/lib/lisCatalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,8 @@ export const dynamic = 'force-dynamic';
 async function run() {
   const deposits = await recoverDeposits().catch(() => ({ fixed: 0 }));
   const summary = await runFulfillmentTick();
+  // LIS ro'yxati keshini isitamiz (mijoz birinchi bo'lib sekin yuklamasin)
+  if ((process.env.SKINS_SOURCE || '').toLowerCase() === 'lis') await fetchLisAggregated().catch(() => {});
   const sp = activeProvider();
   const supplierBalance = sp === 'cs2shop' || sp === 'lis' ? await checkLowBalance().catch((e) => ({ error: e.message })) : undefined;
   return NextResponse.json({ ok: true, provider: sp, summary, deposits, supplierBalance });

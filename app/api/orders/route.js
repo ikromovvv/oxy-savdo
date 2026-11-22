@@ -7,6 +7,7 @@ import { verifySessionToken, SESSION_COOKIE } from '@/lib/session';
 import { payOrderWithWallet } from '@/lib/settle';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30; // yetkazish (waitUntil) javobdan keyin ham tugashi uchun
 
 // POST /api/orders — savatdan yangi buyurtma yaratadi (ochiq)
 export async function POST(req) {

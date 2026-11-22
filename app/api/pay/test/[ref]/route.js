@@ -5,6 +5,7 @@ import { settlePaidOrder } from '@/lib/settle';
 import { limitOr429 } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30; // yetkazish (waitUntil) javobdan keyin ham tugashi uchun
 
 // Sinov to'lovi: buyurtmani real to'lovsiz "to'landi" qiladi.
 //  - Lokal ishlab chiqishda (NODE_ENV != production): test provayderi yoki demo

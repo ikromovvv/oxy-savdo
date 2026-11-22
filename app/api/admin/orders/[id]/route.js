@@ -5,6 +5,7 @@ import { fulfillOrder, pollFulfillment } from '@/lib/fulfillment';
 import { settlePaidOrder, refundWalletOrder } from '@/lib/settle';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30; // yetkazish (waitUntil) javobdan keyin ham tugashi uchun
 
 // GET /api/admin/orders/[id]  — bitta buyurtma to'liq (faqat admin)
 export async function GET(_req, { params }) {
