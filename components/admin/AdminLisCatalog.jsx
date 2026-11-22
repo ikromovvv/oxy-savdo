@@ -85,6 +85,19 @@ function BuyModal({ item, balance, onClose, onBought }) {
     }
   }
 
+  // tanlangan skinning real nusxasi (float / inspect havola)
+  const [info, setInfo] = useState({ loading: true });
+  useEffect(() => {
+    let off = false;
+    fetch(`/api/admin/lis?section=listing&name=${encodeURIComponent(item.name)}`, { cache: 'no-store' })
+      .then((r) => r.json().catch(() => ({})))
+      .then((d) => !off && setInfo({ loading: false, ...d }))
+      .catch(() => !off && setInfo({ loading: false, ok: false }));
+    return () => {
+      off = true;
+    };
+  }, [item.name]);
+
   const done = res?.ok;
   return (
     <div className="fixed inset-0 z-[80] grid place-items-center p-4" role="dialog" aria-modal="true">
@@ -103,6 +116,39 @@ function BuyModal({ item, balance, onClose, onBought }) {
               <div>Skin: <b>{item.name}</b></div>
               <div className="mt-1 text-muted">
                 Katalog narxi <b className="text-white">{usd(item.price)}</b> · LIS balansidan yechiladi · qulfsiz eng arzon nusxa olinadi
+              </div>
+              {info.found && (
+                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
+                  {info.floatValue != null && <span>Float: <b className="text-white">{Number(info.floatValue).toFixed(5)}</b></span>}
+                  {info.paintSeed != null && <span>Pattern: <b className="text-white">{info.paintSeed}</b></span>}
+                  {info.priceUsd != null && <span>Nusxa narxi: <b className="text-white">{usd(info.priceUsd)}</b></span>}
+                  {info.instant === false && <span className="text-amber-300">sekin yetkazish</span>}
+                </div>
+              )}
+              {info.found && info.stickers?.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {info.stickers.map((s, i) =>
+                    s.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={i} src={s.image} alt={s.name} title={s.name} className="h-8 w-auto" />
+                    ) : null
+                  )}
+                </div>
+              )}
+              <div className="mt-3">
+                {info.loading ? (
+                  <span className="text-xs text-muted">Nusxa ma&apos;lumoti yuklanmoqda…</span>
+                ) : info.inspectLink ? (
+                  <a
+                    href={info.inspectLink}
+                    title="CS2 ochiladi va skin o'yin ichida ko'rsatiladi (Steam o'rnatilgan bo'lishi kerak)"
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-white/40 hover:bg-white/10"
+                  >
+                    🎮 CS orqali ko&apos;rish
+                  </a>
+                ) : (
+                  <span className="text-xs text-muted">{info.found === false ? 'Qulfsiz nusxa hozir yo\'q' : 'Inspect havolasi yo\'q'}</span>
+                )}
               </div>
             </div>
 

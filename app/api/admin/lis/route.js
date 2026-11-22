@@ -7,6 +7,7 @@ import { parseTradeUrl } from '@/lib/steamTrade';
 import { adminBuy } from '@/lib/lisAdminBuy';
 import { getSkinMeta } from '@/lib/skinImages';
 import { parseSkinName } from '@/lib/skinNames';
+import { getLisListings } from '@/lib/lisListings';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,6 +35,31 @@ export async function GET(req) {
       return NextResponse.json({ configured: true, ...(await balance()) });
     } catch (e) {
       return NextResponse.json({ configured: true, error: e.message }, { status: 502 });
+    }
+  }
+
+  // Katalog modali: tanlangan skinning eng arzon qulfsiz nusxasi (float, naqsh, stiker, inspect havola)
+  if (sp.get('section') === 'listing') {
+    const name = String(sp.get('name') || '').trim();
+    if (!name) return NextResponse.json({ error: 'name_required' }, { status: 400 });
+    if (!configured()) return NextResponse.json({ configured: false });
+    try {
+      const list = await getLisListings(name, { limit: 5 });
+      const f = list[0];
+      if (!f) return NextResponse.json({ ok: true, found: false });
+      return NextResponse.json({
+        ok: true,
+        found: true,
+        count: list.length,
+        priceUsd: f.costUsd,
+        floatValue: f.floatValue,
+        paintSeed: f.paintSeed,
+        inspectLink: f.inspectLink,
+        stickers: f.stickers,
+        instant: f.instant,
+      });
+    } catch (e) {
+      return NextResponse.json({ ok: false, error: e.message }, { status: 502 });
     }
   }
 

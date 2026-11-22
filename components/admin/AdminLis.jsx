@@ -45,7 +45,84 @@ function Stat({ label, value, sub, accent, danger }) {
   );
 }
 
+function Row({ label, children, mono }) {
+  return (
+    <div className="flex items-start justify-between gap-4 border-b border-line py-2.5 text-sm last:border-0">
+      <span className="flex-none text-muted">{label}</span>
+      <span className={`min-w-0 break-all text-right ${mono ? 'font-mono text-xs' : ''}`}>{children}</span>
+    </div>
+  );
+}
+
+const REASON = {
+  trade_canceled: 'Offer rad etildi yoki bekor qilindi',
+  trade_timeout: 'Offer vaqtida qabul qilinmadi (muddat tugadi)',
+};
+
+function PurchaseModal({ t, onClose }) {
+  const s = String(t.status || '').toLowerCase();
+  const refunded = s === 'return';
+  return (
+    <div className="fixed inset-0 z-[90] grid place-items-center p-4" role="dialog" aria-modal="true">
+      <div onClick={onClose} className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-line bg-panel p-6 shadow-[0_20px_80px_rgba(0,0,0,0.6)]">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="label">Xarid #{t.purchaseId}</div>
+            <h3 className="mt-1 text-xl font-semibold leading-snug tracking-tight">{t.item}</h3>
+          </div>
+          <button onClick={onClose} aria-label="Yopish" className="flex-none rounded-lg px-2 py-1 text-muted transition hover:bg-white/10 hover:text-white">✕</button>
+        </div>
+
+        {t.image && (
+          <div className="mt-4 grid place-items-center rounded-xl bg-white/[0.04] p-4" style={t.rarityColor ? { boxShadow: `inset 0 -3px 0 ${t.rarityColor}` } : undefined}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={t.image} alt={t.item} className="h-40 w-auto object-contain" />
+          </div>
+        )}
+
+        <div className="mt-4 flex items-center gap-3">
+          <Chip status={t.status} />
+          <span className="text-2xl font-bold">{usd(t.priceUsd)}</span>
+          {t.rarity && <span className="text-xs text-muted">{t.rarity}</span>}
+        </div>
+
+        {refunded && (
+          <div className="mt-4 rounded-xl border border-rose-400/30 bg-rose-400/10 p-3 text-sm text-rose-200">
+            {REASON[t.returnReason] || t.returnReason || 'Xarid qaytarildi'}. Pul ({usd(t.priceUsd)}) LIS balansiga qaytariladi.
+          </div>
+        )}
+        {!refunded && s === 'wait_accept' && (
+          <div className="mt-4 rounded-xl border border-sky-400/30 bg-sky-400/10 p-3 text-sm text-sky-200">
+            Offer yuborilgan, qabul qiluvchi Steam&apos;da tasdiqlashi kutilmoqda. Qabul qilinmasa, muddati tugagach pul qaytadi.
+          </div>
+        )}
+        {t.error && <div className="mt-3 rounded-xl border border-rose-400/30 bg-rose-400/10 p-3 text-sm text-rose-200">{t.error}</div>}
+
+        <div className="mt-4">
+          <Row label="Xarid ID" mono>{t.purchaseId}</Row>
+          {t.customId && <Row label="Buyurtma (custom_id)" mono>{t.customId}</Row>}
+          <Row label="Yaratilgan">{fmtDate(t.createdAt) || '—'}</Row>
+          <Row label="Offer ID" mono>{t.offerId || '—'}</Row>
+          {t.offerCreatedAt && <Row label="Offer yuborildi">{fmtDate(t.offerCreatedAt)}</Row>}
+          {t.offerFinishedAt && <Row label="Offer yakunlandi">{fmtDate(t.offerFinishedAt)}</Row>}
+          {t.steamId && <Row label="Qabul qiluvchi SteamID" mono>{t.steamId}</Row>}
+          {t.returnReason && <Row label="Qaytish sababi" mono>{t.returnReason}</Row>}
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+          {t.offerId && (
+            <a href={`https://steamcommunity.com/tradeoffer/${t.offerId}/`} target="_blank" rel="noreferrer" className="btn-ghost">Steam&apos;da offer</a>
+          )}
+          <button onClick={onClose} className="btn-primary">Yopish</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Overview({ data, loading, err, reload }) {
+  const [open, setOpen] = useState(null);
   if (loading && !data) {
     return (
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -106,7 +183,7 @@ function Overview({ data, loading, err, reload }) {
               </thead>
               <tbody className="divide-y divide-line">
                 {rows.map((t, i) => (
-                  <tr key={`${t.purchaseId}-${i}`} className="align-top">
+                  <tr key={`${t.purchaseId}-${i}`} onClick={() => setOpen(t)} className="cursor-pointer align-top transition hover:bg-white/[0.04]">
                     <td className="px-4 py-3">
                       <div className="font-mono text-[11px]">#{t.purchaseId}</div>
                       {t.customId && <div className="mt-0.5 break-all font-mono text-[10px] text-muted">{t.customId}</div>}
@@ -134,6 +211,7 @@ function Overview({ data, loading, err, reload }) {
           </div>
         )}
       </div>
+      {open && <PurchaseModal t={open} onClose={() => setOpen(null)} />}
     </div>
   );
 }

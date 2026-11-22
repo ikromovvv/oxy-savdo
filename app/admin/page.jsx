@@ -13,8 +13,6 @@ import { ToastHost } from '@/components/admin/Toast';
 const NAV = [
   { key: 'dashboard', label: 'Panel', icon: Icon.grid },
   { key: 'products', label: 'Mahsulotlar', icon: Icon.box },
-  { key: 'orders', label: 'Buyurtmalar', icon: Icon.cart },
-  { key: 'failed', label: 'Yetkazish xatolari', icon: Icon.warn },
   { key: 'cs2shop', label: 'cs2shop', icon: Icon.wallet, provider: 'cs2shop' },
   { key: 'lis', label: 'LIS-SKINS', icon: Icon.wallet, provider: 'lis' },
 ];
@@ -62,6 +60,7 @@ export default function AdminPage() {
   const [provider, setProvider] = useState('');
 
   const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const [loginErr, setLoginErr] = useState('');
   const [loggingIn, setLoggingIn] = useState(false);
 
@@ -150,7 +149,17 @@ export default function AdminPage() {
             </p>
           )}
 
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" autoFocus className={`${inputCls} mt-6`} />
+          <div className="relative mt-6">
+            <input type={showPw ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" autoFocus autoComplete="current-password" className={`${inputCls} pr-20`} />
+            <button
+              type="button"
+              onClick={() => setShowPw((v) => !v)}
+              aria-label={showPw ? 'Parolni yashirish' : "Parolni ko'rsatish"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-3 py-1.5 text-xs font-medium text-muted transition hover:bg-white/10 hover:text-white"
+            >
+              {showPw ? 'Yashirish' : "Ko'rsatish"}
+            </button>
+          </div>
           {loginErr && <p className="mt-2 text-xs text-rose-400">{loginErr}</p>}
 
           <button type="submit" disabled={loggingIn || !password} className="btn-primary mt-5 w-full disabled:opacity-50">
