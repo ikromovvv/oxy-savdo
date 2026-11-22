@@ -3,6 +3,7 @@ import { isAdmin } from '@/lib/adminAuth';
 import { fetchLisShortList } from '@/lib/lisCatalog';
 import { queryLisList } from '@/lib/lisAdminCatalog';
 import { getSkinMeta } from '@/lib/skinImages';
+import { getFavorites } from '@/lib/lisFavorites';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +26,11 @@ export async function GET(req) {
   };
 
   try {
-    const list = await fetchLisShortList();
+    let list = await fetchLisShortList();
+    if (sp.get('fav') === '1') {
+      const favs = new Set(await getFavorites());
+      list = list.filter((e) => favs.has(e?.name));
+    }
 
     // rariteti filtri uchun barcha nomlarning meta'si kerak (kod ichidagi ma'lumot — tez)
     let rarityOf;

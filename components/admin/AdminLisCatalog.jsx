@@ -24,7 +24,7 @@ const usd = (n) => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionD
 const int = (n) => Number(n || 0).toLocaleString('en-US');
 const thumb = (u) => (u && STEAM_IMG.test(u) && !/\/\d+fx\d+f$/.test(u) ? `${u}/256fx192f` : u);
 
-const DEFAULTS = { query: '', weaponType: 'all', wear: 'all', rarity: 'all', availability: 'all', priceFrom: '', priceTo: '', sort: 'price_desc' };
+const DEFAULTS = { fav: '', query: '', weaponType: 'all', wear: 'all', rarity: 'all', availability: 'all', priceFrom: '', priceTo: '', sort: 'price_desc' };
 
 // Trade-URL modali + xarid natijasi
 function BuyModal({ item, balance, onClose, onBought }) {
@@ -201,7 +201,38 @@ export default function AdminLisCatalog({ onBack }) {
   const [err, setErr] = useState('');
   const [buying, setBuying] = useState(null);
   const [bal, setBal] = useState({ loading: true, value: null, error: '' });
+  const [favs, setFavs] = useState([]);
   const reqId = useRef(0);
+
+  useEffect(() => {
+    fetch('/api/admin/lis/favorites', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => Array.isArray(d.names) && setFavs(d.names))
+      .catch(() => {});
+  }, []);
+
+  // sevimlilarga qo'shish / olib tashlash (darhol ko'rinadi, server orqada saqlaydi)
+  const toggleFav = useCallback(
+    async (name) => {
+      const on = !favs.includes(name);
+      setFavs((p) => (on ? [name, ...p] : p.filter((x) => x !== name)));
+      try {
+        const r = await fetch('/api/admin/lis/favorites', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ name, on }),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok || !d.ok) throw new Error(d.error || `HTTP ${r.status}`);
+        setFavs(d.names);
+        toast.success(on ? "Sevimlilarga qo'shildi" : 'Sevimlilardan olib tashlandi', 1800);
+      } catch (e) {
+        setFavs((p) => (on ? p.filter((x) => x !== name) : [name, ...p]));
+        toast.error(`Sevimlilarni saqlab bo'lmadi: ${e.message}`);
+      }
+    },
+    [favs]
+  );
 
   const loadBalance = useCallback(async () => {
     setBal((b) => ({ ...b, loading: true, error: '' }));
@@ -373,7 +404,7 @@ export default function AdminLisCatalog({ onBack }) {
               {(() => {
                 const budget = bal.value != null && bal.value >= 1 ? Math.floor(bal.value * 100) / 100 : null;
                 const isBudget = budget != null && String(f.priceTo) === String(budget) && f.priceFrom === '' && f.sort === 'price_desc' && f.availability === 'unlocked';
-                const base = { priceFrom: '', priceTo: '', availability: 'unlocked', sort: 'price_desc', weaponType: 'all', wear: 'all', rarity: 'all', query: '' };
+                const base = { fav: '', priceFrom: '', priceTo: '', availability: 'unlocked', sort: 'price_desc', weaponType: 'all', wear: 'all', rarity: 'all', query: '' };
                 const presets = [
                   { key: 'b5', label: '≤ $5', patch: { ...base, priceTo: '5' } },
                   { key: 'b20', label: '≤ $20', patch: { ...base, priceTo: '20' } },
@@ -404,14 +435,18 @@ export default function AdminLisCatalog({ onBack }) {
             </div>
 
             <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto pb-1">
-              <button onClick={() => set({ weaponType: 'all' })} className={tabCls(f.weaponType === 'all')}>
+              <button onClick={() => set({ fav: '1', weaponType: 'all' })} className={tabCls(f.fav === '1')}>
+                <div className="text-sm font-medium">⭐ Sevimlilar</div>
+                <div className={`text-[11px] ${f.fav === '1' ? 'text-ink/60' : 'text-muted'}`}>{int(favs.length)}</div>
+              </button>
+              <button onClick={() => set({ fav: '', weaponType: 'all' })} className={tabCls(f.fav !== '1' && f.weaponType === 'all')}>
                 <div className="text-sm font-medium">Hammasi</div>
-                <div className={`text-[11px] ${f.weaponType === 'all' ? 'text-ink/60' : 'text-muted'}`}>{data ? int(allCount) : '–'}</div>
+                <div className={`text-[11px] ${f.fav !== '1' && f.weaponType === 'all' ? 'text-ink/60' : 'text-muted'}`}>{data && f.fav !== '1' ? int(allCount) : '–'}</div>
               </button>
               {TYPES.map(([slug, label]) => (
                 <button key={slug} onClick={() => set({ weaponType: slug })} className={tabCls(f.weaponType === slug)}>
                   <div className="text-sm font-medium">{label}</div>
-                  <div className={`text-[11px] ${f.weaponType === slug ? 'text-ink/60' : 'text-muted'}`}>{data ? int(counts[slug] || 0) : '–'}</div>
+                  <div className={`text-[11px] ${f.weaponType === slug ? 'text-ink/60' : 'text-muted'}`}>{data && f.fav !== '1' ? int(counts[slug] || 0) : '–'}</div>
                 </button>
               ))}
             </div>
@@ -426,7 +461,7 @@ export default function AdminLisCatalog({ onBack }) {
                 {Array.from({ length: 10 }).map((_, i) => <div key={i} className="card h-64 animate-pulse bg-white/[0.04]" />)}
               </div>
             ) : data.items.length === 0 ? (
-              <div className="card p-10 text-center text-sm text-muted">Bu filtr bo&apos;yicha skin topilmadi.</div>
+              <div className="card p-10 text-center text-sm text-muted">{f.fav === '1' ? "Hali sevimli skin yo'q. Kartadagi ☆ ni bosib qo'shing." : "Bu filtr bo'yicha skin topilmadi."}</div>
             ) : (
               <>
                 <div className={`grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 ${loading ? 'opacity-60 transition-opacity' : ''}`}>
@@ -462,6 +497,20 @@ export default function AdminLisCatalog({ onBack }) {
                           <div className="-mt-5 mb-1 flex">
                             <span className="rounded-full bg-white px-3 py-1 text-sm font-bold text-ink shadow-lg">{usd(it.price)}</span>
                             {!afford && <span className="ml-2 self-center text-[10px] font-semibold uppercase tracking-wide text-amber-300">Balans yetmaydi</span>}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFav(it.name);
+                              }}
+                              aria-label={favs.includes(it.name) ? 'Sevimlilardan olib tashlash' : "Sevimlilarga qo'shish"}
+                              title={favs.includes(it.name) ? 'Sevimlilardan olib tashlash' : "Sevimlilarga qo'shish"}
+                              className={`ml-auto grid h-8 w-8 place-items-center rounded-full border text-base leading-none transition ${
+                                favs.includes(it.name) ? 'border-amber-300/60 bg-amber-300/15 text-amber-300' : 'border-line bg-black/40 text-white/60 hover:border-white/50 hover:text-white'
+                              }`}
+                            >
+                              {favs.includes(it.name) ? '★' : '☆'}
+                            </button>
                           </div>
                         </div>
                         <div className="flex flex-1 flex-col px-3 pb-3 pt-2">
