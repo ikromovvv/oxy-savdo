@@ -3,17 +3,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { playSfx } from '@/lib/sfx';
 
-// Brendlangan kirish animatsiyasi (faqat bir sessiyada bir marta, route almashganda qaytmaydi).
-// Qisqa va silliq: harflar pastdan "ko'tariladi", logotip joylashadi, ingichka chiziq yuklanishni ko'rsatadi,
-// sahifa tayyor bo'lishi bilan yuqoriga "parda" bo'lib ochiladi (~1.5 s, eng ko'pi 3.2 s).
-// Foiz haqiqiy yuklanish bosqichlariga (shrift + sahifa `load`) bog'langan.
-const KEY = 'oxy:intro';
-const MIN_MS = 1500; // harflar to'liq chiqib, bir lahza ko'rinib turishi uchun
-const MIN_MS_REDUCED = 500;
-const MAX_MS = 3200; // hech qachon qotib qolmasin
-const EXIT_MS = 850; // "parda" ochilish animatsiyasi (CSS bilan bir xil)
+// Brendlangan kirish animatsiyasi. Qaytgan mijozga (7 kun ichida) umuman ko'rsatilmaydi, bir sessiyada bir marta.
+// Logotip kontur bo'lib "chiziladi", so'ng to'ladi va yorug'lik chizig'i o'tadi; ingichka chiziq yuklanishni ko'rsatadi,
+// sahifa tayyor bo'lishi bilan yuqoriga "parda" bo'lib ochiladi (~1 s, eng ko'pi 2.6 s).
+// Intro davomida bosh sahifa skinlari oldindan so'raladi (CDN keshi isiydi) — parda ochilganda tayyor turadi.
+const KEY = 'oxy:intro'; // sessiya (sessionStorage)
+const KEY_SEEN = 'oxy:intro-seen'; // oxirgi ko'rsatilgan vaqt (localStorage) — layout.jsx dagi skript ham shuni o'qiydi
+const SEEN_MS = 7 * 24 * 60 * 60 * 1000;
+const MIN_MS = 1000; // logotip chizilib bo'lishi uchun
+const MIN_MS_REDUCED = 400;
+const MAX_MS = 2600; // hech qachon qotib qolmasin
+const EXIT_MS = 700; // "parda" ochilish animatsiyasi (CSS bilan bir xil)
 
-const LETTERS = ['O', 'X', 'Y'];
 const SAVDO = 'SAVDO'.split('');
 
 export default function IntroLoader() {
@@ -25,6 +26,10 @@ export default function IntroLoader() {
     let seen = false;
     try {
       seen = sessionStorage.getItem(KEY) === '1';
+      if (!seen) {
+        const t = Number(localStorage.getItem(KEY_SEEN));
+        seen = t > 0 && Date.now() - t < SEEN_MS;
+      }
     } catch {
       /* private rejim — har safar ko'rsatamiz */
     }
@@ -35,6 +40,9 @@ export default function IntroLoader() {
 
     const root = document.documentElement;
     root.classList.add('intro-lock');
+
+    // Intro paytida bosh sahifa skinlarini oldindan so'raymiz (Vercel CDN isiydi, keyin tez ochiladi)
+    if (location.pathname === '/') fetch('/api/skins?limit=120&sort=price_desc').catch(() => {});
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const minMs = reduce ? MIN_MS_REDUCED : MIN_MS;
@@ -62,6 +70,7 @@ export default function IntroLoader() {
       finished = true;
       try {
         sessionStorage.setItem(KEY, '1');
+        localStorage.setItem(KEY_SEEN, String(Date.now()));
       } catch {
         /* e'tiborsiz */
       }
@@ -116,18 +125,23 @@ export default function IntroLoader() {
       <div className="intro-glow" aria-hidden="true" />
 
       <div className="intro-stage">
-        <div className="intro-logo" aria-hidden="true">
-          {LETTERS.map((c, i) => (
-            <span key={c} className="intro-mask">
-              <span className="intro-letter" style={{ '--d': `${0.12 + i * 0.1}s` }}>{c}</span>
-            </span>
-          ))}
+        <div className="intro-mark" aria-hidden="true">
+          <svg viewBox="0 0 420 150" className="intro-svg">
+            <defs>
+              <linearGradient id="introGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ffffff" />
+                <stop offset="50%" stopColor="#e9ecf1" />
+                <stop offset="100%" stopColor="#a9afb9" />
+              </linearGradient>
+            </defs>
+            <text x="50%" y="118" textAnchor="middle" className="intro-glyphs">OXY</text>
+          </svg>
           <span className="intro-shine" />
         </div>
 
         <div className="intro-sub" aria-hidden="true">
           {SAVDO.map((c, i) => (
-            <span key={i} style={{ '--d': `${0.75 + i * 0.07}s` }}>{c}</span>
+            <span key={i} style={{ '--d': `${0.6 + i * 0.05}s` }}>{c}</span>
           ))}
         </div>
 

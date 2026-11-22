@@ -61,7 +61,7 @@ export default function RootLayout({ children }) {
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{if(location.pathname.indexOf('/rozigrish/app')===0)document.documentElement.classList.add('no-intro','tg-mini');else if(sessionStorage.getItem('oxy:intro')==='1')document.documentElement.classList.add('no-intro')}catch(e){}",
+              "try{if(location.pathname.indexOf('/rozigrish/app')===0)document.documentElement.classList.add('no-intro','tg-mini');else if(sessionStorage.getItem('oxy:intro')==='1'||Date.now()-Number(localStorage.getItem('oxy:intro-seen')||0)<6048e5)document.documentElement.classList.add('no-intro')}catch(e){}",
           }}
         />
         <IntroLoader />

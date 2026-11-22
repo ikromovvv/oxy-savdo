@@ -159,7 +159,7 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   background: radial-gradient(ellipse 85% 65% at 50% 44%, #10131a 0%, #070910 55%, #030409 100%);
   clip-path: inset(0 0 0 0);
   /* sahifa tayyor bo'lgach yuqoriga "parda" bo'lib ochiladi */
-  transition: clip-path 0.85s cubic-bezier(0.76, 0, 0.24, 1);
+  transition: clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1);
   /* JS ishlamasa ham 6 soniyadan keyin yopiladi */
   animation: introFailsafe 0.01s linear 6s forwards;
 }
@@ -184,9 +184,33 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   flex-direction: column;
   align-items: center;
   padding: 0 16px;
-  transition: transform 0.85s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.5s ease;
+  transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.45s ease;
 }
 .intro-root[data-phase='out'] .intro-stage { transform: translateY(-7vh) scale(0.97); opacity: 0; }
+
+/* Logotip: kontur "chiziladi", so'ng gradient bilan to'ladi */
+.intro-mark {
+  position: relative;
+  width: clamp(260px, 64vw, 540px);
+  overflow: hidden;
+}
+.intro-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.intro-glyphs {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 128px;
+  letter-spacing: 14px;
+  fill: url(#introGrad);
+  fill-opacity: 0;
+  stroke: #fff;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: introDraw 0.75s cubic-bezier(0.65, 0, 0.35, 1) 0.08s forwards, introFill 0.4s ease 0.62s forwards;
+}
+@keyframes introDraw { to { stroke-dashoffset: 0; } }
+@keyframes introFill { to { fill-opacity: 1; stroke-opacity: 0.2; } }
 
 .intro-logo {
   position: relative;
@@ -224,7 +248,7 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   transform: skewX(-18deg);
   mix-blend-mode: overlay;
   pointer-events: none;
-  animation: introShine 1.15s cubic-bezier(0.4, 0, 0.2, 1) 0.8s both;
+  animation: introShine 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.7s both;
 }
 
 .intro-sub {
@@ -248,7 +272,7 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   background: rgba(255, 255, 255, 0.1);
   overflow: hidden;
   border-radius: 2px;
-  animation: introFade 0.6s ease 0.5s both;
+  animation: introFade 0.5s ease 0.3s both;
 }
 .intro-bar-fill {
   position: absolute;
@@ -295,6 +319,7 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   .intro-letter { transform: none; }
   .intro-logo { letter-spacing: 0.06em; padding-left: 0.06em; }
   .intro-shine { display: none; }
+  .intro-glyphs { stroke-dashoffset: 0; fill-opacity: 1; stroke-opacity: 0.2; }
 }
 
 /* Telegram Mini App (/rozigrish/app): sayt sarlavhasi va pastki qismi kerak emas */
