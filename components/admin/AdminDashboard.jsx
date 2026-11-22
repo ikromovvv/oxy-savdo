@@ -65,7 +65,7 @@ function bucket(series, mode) {
   return [...map.values()];
 }
 
-function Chart({ series }) {
+function Chart({ series, fmt = formatPrice, title = 'Tushum grafigi' }) {
   const [mode, setMode] = useState('day');
   const data = useMemo(() => bucket(series, mode), [series, mode]);
   const max = Math.max(1, ...data.map((d) => d.revenue));
@@ -73,7 +73,7 @@ function Chart({ series }) {
   return (
     <div className="card p-4">
       <div className="flex items-center justify-between">
-        <div className="label">Tushum grafigi</div>
+        <div className="label">{title}</div>
         <div className="flex gap-1">
           {[
             ['day', 'Kunlik'],
@@ -105,7 +105,7 @@ function Chart({ series }) {
                   style={{ height: `${Math.round((d.revenue / max) * 100)}%` }}
                 />
                 <div className="pointer-events-none absolute -top-1 left-1/2 z-10 hidden -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg border border-line bg-ink px-2 py-1 text-[10px] text-white/90 group-hover:block">
-                  {formatPrice(d.revenue)} · {d.count} ta
+                  {fmt(d.revenue)} · {d.count} ta
                 </div>
               </div>
               <span className="w-full truncate text-center text-[9px] text-muted">{d.key}</span>
@@ -117,16 +117,28 @@ function Chart({ series }) {
   );
 }
 
+const usd = (n) => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const LIS_STATUS = {
+  processing: ['Jarayonda', 'border-sky-400/40 text-sky-300'],
+  wait_accept: ['Qabul kutilmoqda', 'border-sky-400/40 text-sky-300'],
+  wait_unlock: ['Qulf kutilmoqda', 'border-amber-400/40 text-amber-300'],
+  wait_withdraw: ['Qulf kutilmoqda', 'border-amber-400/40 text-amber-300'],
+  return: ['Qaytarilgan', 'border-rose-400/40 text-rose-300'],
+};
+
 export default function AdminDashboard({ onGo, provider }) {
-  const [data, setData] = useState(null);
-  const [err, setErr] = useState(false);
+  const [site, setSite] = useState(null);
+  const [lis, setLis] = useState(null);
+  const [lisErr, setLisErr] = useState('');
   const [prodCount, setProdCount] = useState(null);
+  const hasLis = provider === 'lis';
 
   useEffect(() => {
     fetch('/api/admin/stats', { cache: 'no-store' })
       .then((r) => r.json())
-      .then((d) => (d.error ? setErr(true) : setData(d)))
-      .catch(() => setErr(true));
+      .then((d) => !d.error && setSite(d))
+      .catch(() => {});
 
     Promise.all([
       fetch('/api/products?category=kovriklar').then((r) => r.json()),
@@ -136,87 +148,106 @@ export default function AdminDashboard({ onGo, provider }) {
       .catch(() => setProdCount(0));
   }, []);
 
-  const loading = !data && !err;
-  const c = data?.counts || {};
-  const rev = data?.revenue || {};
-  const recent = data?.recent || [];
+  useEffect(() => {
+    if (!hasLis) return;
+    fetch('/api/admin/lis?section=stats', { cache: 'no-store' })
+      .then((r) => r.json().then((d) => ({ ok: r.ok, d })))
+      .then(({ ok, d }) => (!ok || d.error ? setLisErr(d.error || 'xato') : d.configured === false ? setLisErr('LIS sozlanmagan') : setLis(d)))
+      .catch(() => setLisErr('aloqa xatosi'));
+  }, [hasLis]);
+
+  const rev = site?.revenue || {};
+  const siteSeries = site?.series || [];
+  const siteHasRevenue = (rev.total || 0) > 0;
 
   return (
     <div>
-      {err && (
-        <div className="card mb-4 p-4 text-sm text-rose-400">Ko&apos;rsatkichlarni yuklab bo&apos;lmadi.</div>
+      {hasLis && (
+        <>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">LIS-SKINS · haqiqiy ko&apos;rsatkichlar</h2>
+            <button onClick={() => onGo?.('lis')} className="py-1 text-xs text-accent hover:underline">Batafsil →</button>
+          </div>
+          {lisErr && <div className="card mb-4 p-4 text-sm text-rose-400">LIS statistikasini yuklab bo&apos;lmadi: {lisErr}</div>}
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {!lis && !lisErr ? (
+              Array.from({ length: 8 }).map((_, i) => <div key={i} className="card h-24 animate-pulse bg-white/[0.03]" />)
+            ) : lis ? (
+              <>
+                <Stat label="LIS balansi" value={usd(lis.balance)} sub="Xarid uchun mavjud" accent wide />
+                <Stat label="Bugun sarflandi" value={usd(lis.today.usd)} sub={`${lis.today.count} ta skin`} accent wide />
+                <Stat label="Shu oy sarflandi" value={usd(lis.month.usd)} sub={`${lis.month.count} ta skin`} wide />
+                <Stat label="Jami sotib olingan" value={usd(lis.accepted.usd)} sub={`${lis.accepted.count} ta qabul qilingan`} />
+                <Stat label="Jarayonda" value={lis.inflight.count} sub={lis.inflight.count ? `${usd(lis.inflight.usd)} band` : 'yo\'q'} accent={lis.inflight.count > 0} />
+                <Stat label="Qaytarilgan" value={lis.returned.count} sub={lis.returned.count ? `${usd(lis.returned.usd)} balansga qaytgan` : 'yo\'q'} danger={lis.returned.count > 0} />
+                <Stat label="Muvaffaqiyat" value={lis.successRate != null ? `${lis.successRate}%` : '—'} sub="qabul / (qabul + qaytgan)" />
+                <Stat label="Jami xarid" value={lis.total} sub="LIS tarixida" />
+              </>
+            ) : null}
+          </div>
+
+          {lis && (
+            <div className="mt-4">
+              <Chart series={lis.series} fmt={usd} title="Sarflangan summa (LIS, USD)" />
+            </div>
+          )}
+
+          <div className="mt-6 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">So&apos;nggi xaridlar</h2>
+            <button onClick={() => onGo?.('lis')} className="py-2 text-xs text-accent hover:underline">Hammasi →</button>
+          </div>
+          <div className="mt-3 overflow-hidden rounded-2xl border border-line">
+            {!lis ? (
+              <div className="divide-y divide-line">
+                {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-14 animate-pulse bg-white/[0.03]" />)}
+              </div>
+            ) : lis.recent.length === 0 ? (
+              <div className="p-10 text-center text-sm text-muted">Hali xarid yo&apos;q.</div>
+            ) : (
+              <div className="divide-y divide-line">
+                {lis.recent.map((o) => {
+                  const st = LIS_STATUS[o.status] || ['Qabul qilingan', 'border-emerald-400/40 text-emerald-300'];
+                  return (
+                    <button key={o.purchaseId + o.item} onClick={() => onGo?.('lis')} className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition hover:bg-white/[0.02]">
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-semibold">{o.item}</div>
+                        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
+                          <span className={`rounded-full border px-1.5 py-0.5 text-[9px] uppercase tracking-wider ${st[1]}`}>{st[0]}</span>
+                          <span>#{o.purchaseId} · {fmtDate(o.createdAt)}</span>
+                        </div>
+                      </div>
+                      <span className="flex-none whitespace-nowrap text-sm font-semibold">{usd(o.priceUsd)}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </>
       )}
 
+      <div className="mt-8 mb-3 flex items-center justify-between">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">Sayt savdosi (to&apos;langan buyurtmalar)</h2>
+      </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {loading ? (
-          Array.from({ length: 8 }).map((_, i) => <div key={i} className="card h-24 animate-pulse bg-white/[0.03]" />)
+        {!site ? (
+          Array.from({ length: 4 }).map((_, i) => <div key={i} className="card h-24 animate-pulse bg-white/[0.03]" />)
         ) : (
           <>
-            <Stat label="Bugungi tushum" value={formatPrice(rev.today || 0)} sub={`Buyurtma: ${c.today || 0}`} accent wide />
-            <Stat label="Oylik tushum" value={formatPrice(rev.month || 0)} sub="Joriy oy" accent wide />
-            <Stat label="Umumiy tushum" value={formatPrice(rev.total || 0)} sub="Barcha to'langan" wide />
+            <Stat label="Bugungi tushum" value={formatPrice(rev.today || 0)} accent wide />
+            <Stat label="Oylik tushum" value={formatPrice(rev.month || 0)} wide />
+            <Stat label="Umumiy tushum" value={formatPrice(rev.total || 0)} sub="Faqat haqiqiy to'langan" wide />
             <Stat label="Mahsulotlar" value={prodCount ?? '…'} sub="Kovrik + aksessuar" />
-            <Stat label="Jami buyurtma" value={c.total || 0} />
-            <Stat label="Yakunlangan" value={c.completed || 0} sub="done" />
-            <Stat label="To'lov kutilmoqda" value={c.pendingPayments || 0} accent={(c.pendingPayments || 0) > 0} />
-            <Stat
-              label="Yetkazish xatosi"
-              value={c.failed || 0}
-              sub={c.fulfilling ? `Jarayonda: ${c.fulfilling}` : undefined}
-              danger={(c.failed || 0) > 0}
-              wide
-            />
           </>
         )}
       </div>
-
-      {!loading && !err && (
+      {site && siteHasRevenue && (
         <div className="mt-4">
-          <Chart series={data.series} />
+          <Chart series={siteSeries} />
         </div>
       )}
 
-      <div className="mt-6 flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">So&apos;nggi buyurtmalar</h2>
-        <button onClick={() => onGo?.('orders')} className="py-2 text-xs text-accent hover:underline">
-          Hammasi →
-        </button>
-      </div>
-
-      <div className="mt-3 overflow-hidden rounded-2xl border border-line">
-        {loading ? (
-          <div className="divide-y divide-line">
-            {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-14 animate-pulse bg-white/[0.03]" />)}
-          </div>
-        ) : recent.length === 0 ? (
-          <div className="p-10 text-center text-sm text-muted">Hali buyurtma yo&apos;q.</div>
-        ) : (
-          <div className="divide-y divide-line">
-            {recent.map((o) => (
-              <button
-                key={o.id}
-                onClick={() => onGo?.('orders')}
-                className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition hover:bg-white/[0.02]"
-              >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="whitespace-nowrap font-mono text-sm font-semibold tracking-wider">{o.ref}</span>
-                    <span className="whitespace-nowrap rounded-full border border-line px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-muted">
-                      {STATUS_LABEL[o.status] || o.status}
-                    </span>
-                  </div>
-                  <div className="mt-0.5 truncate text-xs text-muted">
-                    {o.customerName} · {o.nItems} ta · {fmtDate(o.createdAt)}
-                  </div>
-                </div>
-                <span className="flex-none whitespace-nowrap text-sm font-semibold">{formatPrice(o.total || 0)}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <button onClick={() => onGo?.('products')} className="card card-hover flex items-center gap-3 p-4 text-left">
           <span className="grid h-10 w-10 place-items-center rounded-xl border border-line text-accent">
             <Svg d={Icon.box} className="h-5 w-5" />
@@ -226,24 +257,17 @@ export default function AdminDashboard({ onGo, provider }) {
             <div className="text-xs text-muted">Kovrik / aksessuar qo&apos;shish, tahrirlash</div>
           </div>
         </button>
-        <button onClick={() => onGo?.('orders')} className="card card-hover flex items-center gap-3 p-4 text-left">
-          <span className="grid h-10 w-10 place-items-center rounded-xl border border-line text-accent">
-            <Svg d={Icon.cart} className="h-5 w-5" />
-          </span>
-          <div>
-            <div className="text-sm font-semibold">Buyurtmalar</div>
-            <div className="text-xs text-muted">Holat, to&apos;lov, yetkazish</div>
-          </div>
-        </button>
-        {(provider === 'cs2shop' || provider === 'lis') && <button onClick={() => onGo?.(provider)} className="card card-hover flex items-center gap-3 p-4 text-left">
-          <span className="grid h-10 w-10 place-items-center rounded-xl border border-line text-accent">
-            <Svg d={Icon.wallet} className="h-5 w-5" />
-          </span>
-          <div>
-            <div className="text-sm font-semibold">{provider === 'lis' ? 'LIS-SKINS' : 'cs2shop'}</div>
-            <div className="text-xs text-muted">Balans, xaridlar, test savdo</div>
-          </div>
-        </button>}
+        {(provider === 'cs2shop' || provider === 'lis') && (
+          <button onClick={() => onGo?.(provider)} className="card card-hover flex items-center gap-3 p-4 text-left">
+            <span className="grid h-10 w-10 place-items-center rounded-xl border border-line text-accent">
+              <Svg d={Icon.wallet} className="h-5 w-5" />
+            </span>
+            <div>
+              <div className="text-sm font-semibold">{provider === 'lis' ? 'LIS-SKINS' : 'cs2shop'}</div>
+              <div className="text-xs text-muted">Balans, katalog, xaridlar</div>
+            </div>
+          </button>
+        )}
       </div>
     </div>
   );

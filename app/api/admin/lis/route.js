@@ -38,6 +38,82 @@ export async function GET(req) {
     }
   }
 
+  // Dashboard: butun xaridlar tarixidan haqiqiy statistika (Toshkent vaqti, UTC+5)
+  if (sp.get('section') === 'stats') {
+    if (!configured()) return NextResponse.json({ configured: false });
+    try {
+      const bal = await balance();
+      const first = await purchaseHistory({ page: 1 });
+      let purchases = [...first.purchases];
+      const lastPage = Math.min(first.lastPage || 1, 12);
+      for (let p = 2; p <= lastPage; p++) {
+        const h = await purchaseHistory({ page: p });
+        purchases = purchases.concat(h.purchases);
+      }
+      const TZ = 5 * 3600 * 1000;
+      const dayKey = (t) => new Date(t + TZ).toISOString().slice(0, 10);
+      const now = Date.now();
+      const today = dayKey(now);
+      const month = today.slice(0, 7);
+      const INFLIGHT = ['processing', 'wait_accept', 'wait_unlock', 'wait_withdraw'];
+      const z = () => ({ count: 0, usd: 0 });
+      const add = (o, usd) => {
+        o.count += 1;
+        o.usd += usd;
+      };
+      const tot = { accepted: z(), inflight: z(), returned: z(), todayAcc: z(), monthAcc: z() };
+      const byDay = {};
+      const rows = [];
+      for (const pu of purchases) {
+        const t = Date.parse(pu.created_at);
+        for (const s of pu.skins || []) {
+          const st = String(s.status || '').toLowerCase();
+          const usd = Number(s.price) || 0;
+          rows.push({ t, st, usd, s, pu });
+          if (st === 'return') add(tot.returned, usd);
+          else if (INFLIGHT.includes(st)) add(tot.inflight, usd);
+          else {
+            add(tot.accepted, usd);
+            if (Number.isFinite(t)) {
+              const k = dayKey(t);
+              if (k === today) add(tot.todayAcc, usd);
+              if (k.slice(0, 7) === month) add(tot.monthAcc, usd);
+              byDay[k] = byDay[k] || z();
+              add(byDay[k], usd);
+            }
+          }
+        }
+      }
+      const series = [];
+      for (let i = 29; i >= 0; i--) {
+        const k = dayKey(now - i * 86400000);
+        const v = byDay[k] || z();
+        series.push({ d: k, revenue: Math.round(v.usd * 100) / 100, count: v.count });
+      }
+      const r2 = (o) => ({ count: o.count, usd: Math.round(o.usd * 100) / 100 });
+      const finished = tot.accepted.count + tot.returned.count;
+      const recent = rows
+        .sort((a, b) => b.t - a.t)
+        .slice(0, 6)
+        .map(({ s, pu, st }) => ({ purchaseId: pu.purchase_id, item: s.name, priceUsd: Number(s.price) || 0, status: st, createdAt: pu.created_at }));
+      return NextResponse.json({
+        configured: true,
+        balance: bal.balance,
+        total: rows.length,
+        accepted: r2(tot.accepted),
+        inflight: r2(tot.inflight),
+        returned: r2(tot.returned),
+        today: r2(tot.todayAcc),
+        month: r2(tot.monthAcc),
+        successRate: finished ? Math.round((tot.accepted.count / finished) * 100) : null,
+        series,
+        recent,
+      });
+    } catch (e) {
+      return NextResponse.json({ configured: true, error: e.message }, { status: 502 });
+    }
+  }
+
   // Katalog modali: tanlangan skinning eng arzon qulfsiz nusxasi (float, naqsh, stiker, inspect havola)
   if (sp.get('section') === 'listing') {
     const name = String(sp.get('name') || '').trim();
