@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from './StoreProvider';
 import { formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
 import OxyLogo from './OxyLogo';
 import Select from './Select';
 import TopUpModal from './TopUpModal';
-import { ShoppingCart, Wallet, Plus, ChevronDown, SteamIcon } from './icons';
+import { ShoppingCart, Wallet, Plus, ChevronDown, SteamIcon, Search, Globe, Check } from './icons';
 
 
 // Foydalanuvchi menyusi (avatar + dropdown): buyurtmalar, saqlangan, balans, chiqish
@@ -93,6 +93,115 @@ function ProfileMenu({ onTopUp }) {
   );
 }
 
+// Header qidiruvi: /skinlar sahifasida yozganda katalog darhol filtrlanadi; boshqa sahifada Enter bosilganda katalogga o'tadi.
+function HeaderSearch({ placeholder, className = '', onDone }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [v, setV] = useState('');
+  const timer = useRef(null);
+  const onCatalog = pathname === '/skinlar';
+
+  useEffect(() => {
+    if (onCatalog) setV(new URLSearchParams(window.location.search).get('q') || '');
+  }, [onCatalog]);
+
+  // katalogdagi "Filtrlarni tozalash" qidiruvni ham tozalaydi
+  useEffect(() => {
+    const h = (e) => setV(String(e.detail ?? ''));
+    window.addEventListener('oxy:search', h);
+    return () => window.removeEventListener('oxy:search', h);
+  }, []);
+
+  const apply = (value, push) => {
+    const url = value ? `/skinlar?q=${encodeURIComponent(value)}` : '/skinlar';
+    if (onCatalog) {
+      window.history.replaceState(null, '', url);
+      window.dispatchEvent(new CustomEvent('oxy:search', { detail: value }));
+    } else if (push) {
+      router.push(url);
+    }
+  };
+
+  return (
+    <form
+      role="search"
+      onSubmit={(e) => {
+        e.preventDefault();
+        clearTimeout(timer.current);
+        apply(v.trim(), true);
+        onDone?.();
+      }}
+      className={`relative ${className}`}
+    >
+      <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50" />
+      <input
+        value={v}
+        onChange={(e) => {
+          const val = e.target.value;
+          setV(val);
+          clearTimeout(timer.current);
+          if (onCatalog) timer.current = setTimeout(() => apply(val.trim(), false), 250);
+        }}
+        placeholder={placeholder}
+        aria-label={placeholder}
+        className="w-full rounded-xl border border-line bg-panel/70 py-2.5 pl-10 pr-3 text-sm outline-none transition placeholder:text-muted/70 focus:border-white/40"
+      />
+    </form>
+  );
+}
+
+// Til menyusi: globus ikonkasi + to'liq nomlar, tanlangani belgilanadi
+function LangMenu({ lang, setLang }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDoc = (e) => ref.current && !ref.current.contains(e.target) && setOpen(false);
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const langs = [['uz', "O'zbekcha"], ['ru', 'Русский']];
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${open ? 'border-white/40 bg-white/5 text-white' : 'border-line text-white/80 hover:border-white/30 hover:text-white'}`}
+      >
+        <Globe className="h-4 w-4" strokeWidth={1.8} />
+        {lang.toUpperCase()}
+        <ChevronDown className={`h-3.5 w-3.5 text-white/50 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div role="listbox" className="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded-xl border border-line bg-panel/95 py-1 shadow-[0_16px_44px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+          {langs.map(([code, name]) => (
+            <button
+              key={code}
+              role="option"
+              aria-selected={lang === code}
+              onClick={() => {
+                setLang(code);
+                setOpen(false);
+              }}
+              className={`flex w-full items-center justify-between px-4 py-2.5 text-left text-sm transition hover:bg-white/5 ${lang === code ? 'text-white' : 'text-white/70'}`}
+            >
+              {name}
+              {lang === code && <Check className="h-4 w-4 text-accent" strokeWidth={2.5} />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Header() {
   const { t, lang, setLang, count, setCartOpen, user, userLoading, favoritesCount, balance, wallet } = useStore();
   const [open, setOpen] = useState(false);
@@ -169,18 +278,11 @@ export default function Header() {
             </nav>
           </div>
 
+          <HeaderSearch placeholder={t('catalog_search_ph')} className="mx-2 hidden max-w-md flex-1 lg:block" />
+
           <div className="flex flex-none items-center gap-2">
             <div className="hidden sm:block">
-              <Select
-                compact
-                align="right"
-                value={lang}
-                onChange={setLang}
-                options={[
-                  { value: 'uz', label: 'UZ' },
-                  { value: 'ru', label: 'RU' },
-                ]}
-              />
+              <LangMenu lang={lang} setLang={setLang} />
             </div>
 
             <button
@@ -285,6 +387,8 @@ export default function Header() {
                 </button>
               </div>
             )}
+
+            <HeaderSearch placeholder={t('catalog_search_ph')} className="mb-2 px-1" onDone={() => setOpen(false)} />
 
             {drawerLinks.map((l) => (
               <Link

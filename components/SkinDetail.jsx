@@ -440,14 +440,15 @@ export default function SkinDetail({ product, related = [], variants = [], switc
           )}
 
           <div className="mt-4 overflow-hidden rounded-2xl border border-line">
-            <div className="hidden grid-cols-[36px_minmax(170px,1.2fr)_minmax(0,1fr)_150px_210px] items-center gap-4 bg-panel/70 px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-muted md:grid">
+
+            <div className="admin-scroll max-h-[min(70vh,620px)] overflow-y-auto overscroll-contain">
+            <div className="sticky top-0 z-10 hidden grid-cols-[36px_minmax(170px,1.2fr)_minmax(0,1fr)_150px_210px] items-center gap-4 bg-panel px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-muted md:grid">
               <span />
               <button onClick={() => toggleSort('float')} className="text-left hover:text-white">{D.float}{sortMark('float')}</button>
               <span>{D.pattern}</span>
               <button onClick={() => toggleSort('price')} className="text-right hover:text-white">{D.price}{sortMark('price')}</button>
               <span />
             </div>
-
             {lst.loading || switching ? (
               <div className="space-y-px">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 animate-pulse bg-white/[0.04]" />)}</div>
             ) : lst.error && !baseListings.length ? (
@@ -506,6 +507,7 @@ export default function SkinDetail({ product, related = [], variants = [], switc
                 })}
               </ul>
             )}
+            </div>
           </div>
         </section>
       )}

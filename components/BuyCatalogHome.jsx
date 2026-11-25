@@ -1,6 +1,6 @@
 'use client';
 
-import { RotateCw, Search, SlidersHorizontal, ChevronDown, ChevronRight } from './icons';
+import { RotateCw, SlidersHorizontal, ChevronDown, ChevronRight } from './icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from './StoreProvider';
 import CatalogCard from './CatalogCard';
@@ -110,6 +110,14 @@ export default function BuyCatalogHome() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, weaponType, wear, rarity, availability, priceFrom, priceTo, sort]);
 
+  // qidiruv header'dagi maydondan keladi (URL ?q= yoki 'oxy:search' hodisasi)
+  useEffect(() => {
+    setQuery(new URLSearchParams(window.location.search).get('q') || '');
+    const h = (e) => setQuery(String(e.detail ?? ''));
+    window.addEventListener('oxy:search', h);
+    return () => window.removeEventListener('oxy:search', h);
+  }, []);
+
   // wear tugmalari o'zgarsa — float slayderi ham moslanadi
   useEffect(() => {
     setFl((prev) => (wearFromRange(prev[0], prev[1]) === wear ? prev : rangeFromWear(wear)));
@@ -129,6 +137,8 @@ export default function BuyCatalogHome() {
 
   function resetFilters() {
     setQuery('');
+    window.history.replaceState(null, '', '/skinlar');
+    window.dispatchEvent(new CustomEvent('oxy:search', { detail: '' }));
     setWeaponType('all');
     setWear('all');
     setRarity('all');
@@ -180,34 +190,9 @@ export default function BuyCatalogHome() {
   );
 
   return (
-    <section className="container-site py-8">
-      {/* sarlavha + qidiruv / saralash */}
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <span className="label">OXY</span>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{t('catalog_title')}</h1>
-        </div>
-        <div className="text-right">
-          <div className="text-xs text-muted">{L.found}</div>
-          <div className="text-2xl font-semibold tracking-tight">{loading && !total ? '…' : total.toLocaleString('ru-RU')}</div>
-        </div>
-      </div>
-
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <label className="relative min-w-[220px] flex-1">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t('catalog_search_ph')}
-            className="w-full rounded-2xl border border-line bg-panel py-3 pl-11 pr-4 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
-          />
-        </label>
-        <Select value={sort} onChange={setSort} options={sortOptions} />
-      </div>
-
+    <section className="container-site pb-8 pt-4">
       {/* kategoriyalar */}
-      <div className="no-scrollbar -mx-5 mt-4 flex gap-1.5 overflow-x-auto border-y border-line px-5 py-3 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:border-x-0 sm:px-0">
+      <div className="no-scrollbar -mx-5 flex gap-1.5 overflow-x-auto border-y border-line px-5 py-3 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:border-x-0 sm:px-0">
         {[{ slug: 'all', label: L.all }, ...tabs.map((w) => ({ slug: w.slug, label: w[lang] || w.uz }))].map((c) => {
           const active = weaponType === c.slug;
           return (
@@ -302,6 +287,10 @@ export default function BuyCatalogHome() {
 
         {/* O'NG: GRID */}
         <div className="min-w-0 flex-1">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <span className="text-sm text-muted">{loading && !total ? '…' : `${total.toLocaleString('ru-RU')} ${L.found.toLowerCase()}`}</span>
+            <Select value={sort} onChange={setSort} options={sortOptions} />
+          </div>
           {loading ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
