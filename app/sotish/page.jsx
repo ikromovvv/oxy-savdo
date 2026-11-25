@@ -144,15 +144,7 @@ export default function SotishPage() {
   }
 
   return (
-    <section className="container-site py-10">
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <span className="label">{t('nav_sell')}</span>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{t('sell_title')}</h1>
-          <p className="mt-2 max-w-lg text-sm text-muted">{t('sell_subtitle')}</p>
-        </div>
-      </div>
-
+    <section className="container-site pb-10 pt-4">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         {/* CHAP: TOOLBAR + GRID */}
         <div className="min-w-0 flex-1">
@@ -160,7 +152,7 @@ export default function SotishPage() {
             <button
               onClick={loadInventory}
               title={t('sell_refresh')}
-              className="grid h-10 w-10 place-items-center rounded-full border border-line transition hover:border-white/40"
+              className="grid h-11 w-11 place-items-center rounded-xl border border-line transition hover:border-white/40"
             >
               <RotateCw className="h-4 w-4" strokeWidth={2} />
             </button>
@@ -169,7 +161,7 @@ export default function SotishPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t('sell_search_ph')}
-              className="min-w-[180px] flex-1 rounded-full border border-line bg-panel px-4 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
+              className="min-w-[180px] flex-1 rounded-xl border border-line bg-panel px-4 py-3 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
             />
 
             <Select

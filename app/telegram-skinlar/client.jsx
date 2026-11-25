@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import Select from '@/components/Select';
 import TgSkinCard from '@/components/TgSkinCard';
-import { SortLabel } from '@/components/icons';
+import { SortLabel, Search } from '@/components/icons';
 
 const TIER_COLOR = { FN: '#22c55e', MW: '#a3e635', FT: '#eab308', WW: '#f97316', BS: '#ef4444' };
 
@@ -51,28 +51,43 @@ export default function TelegramSkinsClient() {
   }, [data, query, wear, sort, showSold]);
 
   return (
-    <section className="container-site py-10">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <span className="label">OXY</span>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{t('tg_title')}</h1>
-          <p className="mt-2 max-w-xl text-sm text-muted">{t('tg_sub')}</p>
+    <section className="container-site pb-10 pt-4">
+      {/* bitta ixcham toolbar: holat tugmalari | qidiruv, saralash, obuna, sotilganlar */}
+      <div className="mb-5 flex flex-wrap items-center gap-3 border-b border-line pb-4">
+        <div className="no-scrollbar -mx-5 flex flex-1 items-center gap-1.5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+          <button
+            onClick={() => setWear('all')}
+            className={`flex-none rounded-lg border px-4 py-2 text-sm font-medium transition ${
+              wear === 'all' ? 'border-white/20 bg-white/10 text-white' : 'border-transparent text-white/70 hover:bg-white/[0.05] hover:text-white'
+            }`}
+          >
+            {t('catalog_all')}
+          </button>
+          {Object.keys(TIER_COLOR).map((k) => {
+            const on = wear === k;
+            const c = TIER_COLOR[k];
+            return (
+              <button
+                key={k}
+                onClick={() => setWear(on ? 'all' : k)}
+                className="flex-none rounded-lg border px-4 py-2 text-sm font-semibold transition"
+                style={on ? { borderColor: `${c}99`, background: `${c}22`, color: c } : { borderColor: 'transparent', color: 'rgba(255,255,255,0.7)' }}
+              >
+                {k}
+              </button>
+            );
+          })}
         </div>
-        {data?.link && (
-          <a href={data.link} target="_blank" rel="noreferrer" className="btn-ghost flex-none">
-            {t('tg_follow')} ↗
-          </a>
-        )}
-      </div>
 
-      {/* filtrlar */}
-      <div className="mb-5 flex flex-wrap items-center gap-2">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t('catalog_search_ph')}
-          className="min-w-[180px] flex-1 rounded-full border border-line bg-panel px-4 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
-        />
+        <label className="relative w-full min-w-[200px] sm:w-64">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('catalog_search_ph')}
+            className="w-full rounded-xl border border-line bg-panel py-2.5 pl-10 pr-3 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
+          />
+        </label>
         <Select
           value={sort}
           onChange={setSort}
@@ -82,39 +97,19 @@ export default function TelegramSkinsClient() {
             { value: 'desc', label: <SortLabel text={t('tg_sort_desc').replace(/\s*[↑↓]/, '')} dir="desc" /> },
           ]}
         />
-      </div>
-
-      <div className="no-scrollbar -mx-5 mb-6 flex items-center gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
-        <button
-          onClick={() => setWear('all')}
-          className={`flex-none rounded-full border px-4 py-2 text-xs font-semibold transition-all ${
-            wear === 'all' ? 'border-accent/60 bg-accent/15 text-white shadow-[0_0_14px_rgba(255,255,255,0.25)]' : 'border-line text-white/75 hover:border-white/40'
-          }`}
-        >
-          {t('catalog_all')}
-        </button>
-        {Object.keys(TIER_COLOR).map((k) => {
-          const on = wear === k;
-          const c = TIER_COLOR[k];
-          return (
-            <button
-              key={k}
-              onClick={() => setWear(on ? 'all' : k)}
-              className="flex-none rounded-full border px-4 py-2 text-xs font-bold transition-all"
-              style={on ? { borderColor: `${c}99`, background: `${c}22`, color: c, boxShadow: `0 0 12px ${c}55` } : { borderColor: '#1E1E21', color: 'rgba(255,255,255,0.7)' }}
-            >
-              {k}
-            </button>
-          );
-        })}
         <button
           onClick={() => setShowSold((v) => !v)}
-          className={`ml-auto flex-none rounded-full border px-4 py-2 text-xs transition-all ${
-            showSold ? 'border-white/40 bg-white/10 text-white' : 'border-line text-white/60 hover:border-white/40'
+          className={`flex-none rounded-xl border px-4 py-2.5 text-sm transition ${
+            showSold ? 'border-white/40 bg-white/10 text-white' : 'border-line text-white/65 hover:border-white/40 hover:text-white'
           }`}
         >
           {t('tg_show_sold')}
         </button>
+        {data?.link && (
+          <a href={data.link} target="_blank" rel="noreferrer" className="flex-none rounded-xl border border-line px-4 py-2.5 text-sm font-medium text-white/85 transition hover:border-white/40 hover:text-white">
+            {t('tg_follow')} ↗
+          </a>
+        )}
       </div>
 
       {/* natija */}
@@ -124,7 +119,7 @@ export default function TelegramSkinsClient() {
           <button onClick={load} className="btn-ghost mt-4 inline-flex">{t('sell_refresh')}</button>
         </div>
       ) : data === null ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="card aspect-[3/4] animate-pulse bg-white/5" />
           ))}
@@ -132,7 +127,7 @@ export default function TelegramSkinsClient() {
       ) : items.length === 0 ? (
         <div className="card p-10 text-center text-sm text-muted">{t('tg_empty')}</div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {items.map((p) => (
             <TgSkinCard key={p.id} item={p} onOpen={setLightbox} />
           ))}
