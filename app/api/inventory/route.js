@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifySessionToken, SESSION_COOKIE } from '@/lib/session';
 import { getInventoryWithPrices } from '@/lib/steamInventory';
+import { payoutPercents } from '@/lib/sellPricing';
 
 export const maxDuration = 30; // Steam sekin/429 bersa ham funksiya o'rtada uzilib qolmasin
 
@@ -15,7 +16,7 @@ export async function GET() {
 
   try {
     const { items, stale } = await getInventoryWithPrices(session.steamid);
-    return NextResponse.json({ items, stale: Boolean(stale), rate: Number(process.env.USD_UZS) || 12700 });
+    return NextResponse.json({ items, stale: Boolean(stale), rate: Number(process.env.USD_UZS) || 12700, payoutPct: payoutPercents() });
   } catch (e) {
     console.error('[api/inventory] xato:', e?.code || e?.message || e, e?.detail || '');
     return NextResponse.json({

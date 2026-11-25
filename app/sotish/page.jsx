@@ -26,6 +26,7 @@ export default function SotishPage() {
   const [sort, setSort] = useState('price_desc');
   const [selected, setSelected] = useState(() => new Set());
   const [payout, setPayout] = useState('balance');
+  const [payoutPct, setPayoutPct] = useState({ balance: 85, crypto: 83, cards: 82 });
   const [contact, setContact] = useState({ phone: '', tg: '' });
   const [step, setStep] = useState('list'); // list | sending | ok | err
 
@@ -52,6 +53,7 @@ export default function SotishPage() {
         setItems(data.items || []);
         setStale(Boolean(data.stale));
         if (data.rate > 0) setRate(data.rate);
+        if (data.payoutPct) setPayoutPct(data.payoutPct);
       }
     } catch (e) {
       setError('fetch_failed');
@@ -75,7 +77,10 @@ export default function SotishPage() {
   }, [items, query, sort]);
 
   const selectedItems = useMemo(() => items.filter((i) => selected.has(i.assetid)), [items, selected]);
-  const total = selectedItems.reduce((s, i) => s + (i.price || 0), 0);
+  // sotuvchiga to'lanadigan narx = bozor narxi × to'lov usuli foizi
+  const pct = (payoutPct[payout] ?? 85) / 100;
+  const offer = (i) => Math.round((i.price || 0) * pct * 100) / 100;
+  const total = selectedItems.reduce((s, i) => s + offer(i), 0);
   const uzs = (usd) => Math.round(usd * rate).toLocaleString('ru-RU');
 
   function toggle(it) {
@@ -102,7 +107,7 @@ export default function SotishPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: selectedItems.map((i) => ({ name: i.name, exterior: i.exterior, price: i.price })),
+          items: selectedItems.map((i) => ({ name: i.name, exterior: i.exterior, price: offer(i), marketPrice: i.price })),
           total,
           payout,
           contact,
@@ -307,8 +312,8 @@ export default function SotishPage() {
                     <div className="mt-1">
                       {sellable ? (
                         <>
-                          <div className="text-sm font-semibold">{uzs(it.price)} so&apos;m</div>
-                          <div className="text-[11px] text-muted">${it.price.toFixed(2)}</div>
+                          <div className="text-sm font-semibold">{uzs(offer(it))} so&apos;m</div>
+                          <div className="text-[11px] text-muted">${offer(it).toFixed(2)}</div>
                         </>
                       ) : (
                         <div className="text-sm font-semibold">{t('sell_price_unknown')}</div>
@@ -336,6 +341,8 @@ export default function SotishPage() {
             </span>
           </div>
 
+          <p className="-mt-1 text-[11px] leading-relaxed text-muted">{t('sell_note').replace('{pct}', String(payoutPct[payout] ?? 85))}</p>
+
           <div>
             <div className="label mb-2">{t('sell_payout_method')}</div>
             <div className="grid grid-cols-3 gap-2">
@@ -348,7 +355,7 @@ export default function SotishPage() {
                     payout === p ? 'border-accent text-white' : 'border-line text-muted hover:text-white'
                   }`}
                 >
-                  {t(`sell_${p}`)}
+                  {t(`sell_${p}`)} <span className="opacity-60">{payoutPct[p] ?? ''}%</span>
                 </button>
               ))}
             </div>

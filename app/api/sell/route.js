@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifySessionToken, SESSION_COOKIE } from '@/lib/session';
+import { payoutPercents, payoutPrice } from '@/lib/sellPricing';
 
 // Skin sotish so'rovini Telegram'ga yuboradi (order/route.js bilan bir xil andoza).
 // .env.local: TELEGRAM_BOT_TOKEN va TELEGRAM_CHAT_ID to'ldirilmagan bo'lsa,
@@ -21,15 +22,20 @@ export async function POST(req) {
     }
 
     const data = await req.json();
-    const { items = [], total = 0, payout, contact = {} } = data;
+    const { items = [], payout, contact = {} } = data;
     const { phone = '', tg = '' } = contact;
 
     if (!Array.isArray(items) || items.length === 0 || (!phone && !tg)) {
       return NextResponse.json({ ok: false, error: 'invalid' }, { status: 400 });
     }
 
-    const lines = items
-      .map((i) => `• ${i.name}${i.exterior ? ` (${i.exterior})` : ''} — $${Number(i.price || 0).toFixed(2)}`)
+    // narx serverda qayta hisoblanadi: bozor narxi × to'lov usuli foizi
+    const pcts = payoutPercents();
+    const method = pcts[payout] != null ? payout : 'balance';
+    const priced = items.map((i) => ({ ...i, offer: payoutPrice(i.marketPrice ?? i.price, method, pcts), market: Number(i.marketPrice ?? i.price) || 0 }));
+    const sum = priced.reduce((s, i) => s + i.offer, 0);
+    const lines = priced
+      .map((i) => `• ${i.name}${i.exterior ? ` (${i.exterior})` : ''} — $${i.offer.toFixed(2)} (bozor $${i.market.toFixed(2)})`)
       .join('\n');
 
     const text =
@@ -39,7 +45,7 @@ export async function POST(req) {
       (tg ? `✈️ ${tg}\n` : '') +
       `💳 To'lov usuli: ${PAYOUT_LABEL[payout] || payout || '—'}\n\n` +
       `${lines}\n\n` +
-      `💵 Jami: $${Number(total).toFixed(2)}`;
+      `💵 Jami: $${sum.toFixed(2)} (${pcts[method]}%)`;
 
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chat = process.env.TELEGRAM_CHAT_ID;
