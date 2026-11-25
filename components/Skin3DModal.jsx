@@ -24,7 +24,7 @@ export default function Skin3DModal({ inspectLink, title, closeLabel = 'Yopish',
   const src = `${VIEWER}?inspectlink=${encodeURIComponent(inspectLink)}`;
 
   return (
-    <div className="fixed inset-0 z-[120] grid place-items-center p-0 sm:p-6" role="dialog" aria-modal="true" aria-label={title || '3D'}>
+    <div data-3d-open className="fixed inset-0 z-[120] grid place-items-center p-0 sm:p-6" role="dialog" aria-modal="true" aria-label={title || '3D'}>
       <div onClick={onClose} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
       <div className="relative flex h-full w-full max-w-6xl flex-col overflow-hidden border border-line bg-panel shadow-[0_20px_80px_rgba(0,0,0,0.7)] sm:h-[min(85vh,760px)] sm:rounded-2xl">
         <div className="flex flex-none items-center justify-between gap-3 border-b border-line px-4 py-3">

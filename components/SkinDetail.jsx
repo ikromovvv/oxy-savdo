@@ -7,7 +7,7 @@ import { ProductMedia } from './ProductCard';
 import SkinCard from './SkinCard';
 import Skin3DModal from './Skin3DModal';
 import { cachedListings, fetchListings, prefetchSkin, prefetchListings } from '@/lib/skinClientCache';
-import { Eye, Box, Zap, Clock, Copy, Check, ShoppingCart, ChevronLeft, ChevronRight, Heart } from './icons';
+import { Eye, Box, X, Zap, Clock, Copy, Check, ShoppingCart, ChevronLeft, ChevronRight, Heart } from './icons';
 import { formatPrice, weaponTypes } from '@/lib/products';
 import { rarityInfo, rarityRgb, WEAR_TIERS, WEAR_GRADIENT, wearInfo } from '@/lib/skinMeta';
 
@@ -24,7 +24,7 @@ const DICT = {
     float: 'Float', type: 'Turi', rarity: 'Rariteti', exterior: 'Holati', pattern: 'Naqsh (seed)', stock: 'Soni',
     inspect: "O'yin ichida ko'rish", inspectNone: "Inspect havolasi yo'q", view3d: "3D ko'rish", close: 'Yopish', loading3d: 'Yuklanmoqda…',
     inspectHint: "CS2 ochiladi va skin o'yin ichida ko'rsatiladi (Steam o'rnatilgan bo'lishi kerak)",
-    instant: 'Tezkor', slow: '12 soatgacha', slowFull: 'Sekin (12 soatgacha)',
+    stickers: 'Stikerlar', instant: 'Tezkor', slow: '12 soatgacha', slowFull: 'Sekin (12 soatgacha)',
     addToCart: 'Savatga', added: "Qo'shildi", buyNow: 'Sotib olish',
     offers: 'ta taklif', offersFrom: 'dan', offer1: 'taklif',
     delivery: 'Yetkazish', all: 'Hammasi', fast: 'Tezkor',
@@ -40,7 +40,7 @@ const DICT = {
     float: 'Float', type: 'Тип', rarity: 'Редкость', exterior: 'Состояние', pattern: 'Паттерн (seed)', stock: 'Количество',
     inspect: 'Осмотреть в игре', inspectNone: 'Нет inspect-ссылки', view3d: '3D просмотр', close: 'Закрыть', loading3d: 'Загрузка…',
     inspectHint: 'Откроется CS2 и покажет скин в игре (нужен установленный Steam)',
-    instant: 'Мгновенно', slow: 'до 12 часов', slowFull: 'Медленно (до 12 часов)',
+    stickers: 'Стикеры', instant: 'Мгновенно', slow: 'до 12 часов', slowFull: 'Медленно (до 12 часов)',
     addToCart: 'В корзину', added: 'Добавлено', buyNow: 'Купить',
     offers: 'предложений', offersFrom: 'от', offer1: 'предложение',
     delivery: 'Доставка', all: 'Все', fast: 'Мгновенная',
@@ -115,8 +115,12 @@ export default function SkinDetail({ product, related = [], variants = [], switc
   const [f, setF] = useState({ delivery: 'all', floatFrom: '', floatTo: '', priceFrom: '', priceTo: '' });
   const [sort, setSort] = useState({ key: 'price', dir: 'asc' });
   const [selectedId, setSelectedId] = useState(null);
-  const [show3d, setShow3d] = useState(false);
-  useEffect(() => setSelectedId(null), [product.id]);
+  const [show3d, setShow3d] = useState(null); // 3D ko'rgich uchun inspect havola
+  const [modalId, setModalId] = useState(null); // nusxa tafsilotlari oynasi
+  useEffect(() => {
+    setSelectedId(null);
+    setModalId(null);
+  }, [product.id]);
 
   // variant tablari: oddiy bosish — sahifa qayta yuklanmaydi; Ctrl/Cmd+bosish — yangi tabda
   const pickVariant = (e, id) => {
@@ -146,6 +150,8 @@ export default function SkinDetail({ product, related = [], variants = [], switc
   }, [baseListings, f, sort]);
 
   const selected = shown.find((l) => l.id === selectedId) || shown[0] || baseListings.find((l) => l.id === selectedId) || null;
+
+  const modalOffer = modalId != null ? baseListings.find((l) => l.id === modalId) || null : null;
 
   // ---- tanlangan nusxa / narx ----
   const price = selected?.price ?? product.price;
@@ -226,13 +232,32 @@ export default function SkinDetail({ product, related = [], variants = [], switc
 
   return (
     <>
-      {show3d && selected?.inspectLink && (
+      {modalOffer && (
+        <OfferModal
+          product={product}
+          offer={modalOffer}
+          rarity={rarity}
+          typeLabel={typeLabel}
+          D={D}
+          fav={fav}
+          onFav={() => toggleFavorite(product)}
+          onClose={() => setModalId(null)}
+          on3d={(link) => setShow3d(link)}
+          onAdd={() => add(toCartItem(modalOffer))}
+          onBuy={() => {
+            add(toCartItem(modalOffer));
+            setModalId(null);
+            setCartOpen(true);
+          }}
+        />
+      )}
+      {show3d && (
         <Skin3DModal
-          inspectLink={selected.inspectLink}
+          inspectLink={show3d}
           title={product.fullName || product.name}
           closeLabel={D.close}
           loadingLabel={D.loading3d}
-          onClose={() => setShow3d(false)}
+          onClose={() => setShow3d(null)}
         />
       )}
       <section className={`container-site py-8 transition-opacity duration-200 ${switching ? 'opacity-60' : ''}`}>
@@ -284,7 +309,7 @@ export default function SkinDetail({ product, related = [], variants = [], switc
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
-                    onClick={() => setShow3d(true)}
+                    onClick={() => setShow3d(selected.inspectLink)}
                     className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-3 text-sm font-semibold uppercase tracking-wide transition hover:border-white/40 hover:bg-white/10"
                   >
                     <Box className="h-4 w-4" strokeWidth={2} />
@@ -425,7 +450,10 @@ export default function SkinDetail({ product, related = [], variants = [], switc
                   return (
                     <li
                       key={l.id}
-                      onClick={() => setSelectedId(l.id)}
+                      onClick={() => {
+                        setSelectedId(l.id);
+                        setModalId(l.id);
+                      }}
                       className={`grid cursor-pointer items-center gap-x-4 gap-y-2 px-4 py-3 transition md:grid-cols-[36px_minmax(170px,1.2fr)_minmax(0,1fr)_150px_210px] ${active ? 'bg-white/[0.06]' : 'hover:bg-white/[0.03]'}`}
                     >
                       <span className={`hidden md:grid ${l.instant ? 'text-emerald-300' : 'text-sky-300'}`} title={l.instant ? D.instant : D.slowFull}>
@@ -501,5 +529,137 @@ export default function SkinDetail({ product, related = [], variants = [], switc
         </ul>
       </section>
     </>
+  );
+}
+
+// Nusxa tafsilotlari oynasi (LIS uslubida): rasm, yetkazish, float, naqsh, stikerlar, narx, sotib olish
+function OfferModal({ product, offer, rarity, typeLabel, D, fav, onFav, onClose, on3d, onAdd, onBuy }) {
+  const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape' && !document.querySelector('[data-3d-open]')) onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  const stickers = (offer.stickers || []).filter((s) => s.image);
+
+  return (
+    <div className="fixed inset-0 z-[110] grid place-items-center p-3 sm:p-6" role="dialog" aria-modal="true" aria-label={product.fullName || product.name}>
+      <div onClick={onClose} className="absolute inset-0 bg-black/75 backdrop-blur-sm" />
+      <div className="relative max-h-[94vh] w-full max-w-4xl overflow-y-auto rounded-2xl border border-line bg-panel p-4 shadow-[0_20px_80px_rgba(0,0,0,0.65)] sm:p-6">
+        <div className="grid gap-6 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+          {/* CHAP: rasm */}
+          <div className="flex flex-col">
+            <div className="relative rounded-xl border border-white/10 bg-black/30 p-3" style={{ boxShadow: `inset 0 2px 0 ${rarity.color}55` }}>
+              <div className={`absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold ${offer.instant ? 'border-emerald-400/40 bg-emerald-400/10 text-emerald-300' : 'border-sky-400/40 bg-sky-400/10 text-sky-300'}`}>
+                {offer.instant ? <Zap className="h-3.5 w-3.5" strokeWidth={2.5} /> : <Clock className="h-3.5 w-3.5" strokeWidth={2.5} />}
+                {offer.instant ? D.instant : D.slowFull}
+              </div>
+              <div className="absolute right-3 top-3 z-10 flex gap-2">
+                {offer.inspectLink && (
+                  <button onClick={() => on3d(offer.inspectLink)} aria-label={D.view3d} title={D.view3d} className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 bg-black/50 text-white/80 transition hover:bg-black/70 hover:text-white">
+                    <Box className="h-4 w-4" />
+                  </button>
+                )}
+                <button onClick={onFav} aria-label={D.favorite} className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 bg-black/50 transition hover:bg-black/70">
+                  <Heart className={`h-4 w-4 ${fav ? 'fill-current text-accent' : 'text-white/70'}`} />
+                </button>
+              </div>
+              <ProductMedia product={product} priority className="aspect-[4/3] w-full rounded-lg" />
+            </div>
+            {offer.inspectLink ? (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <a href={offer.inspectLink} title={D.inspectHint} className="flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-3 text-xs font-semibold uppercase tracking-wide transition hover:border-white/40 hover:bg-white/10 sm:text-sm">
+                  <Eye className="h-4 w-4" strokeWidth={2} />
+                  {D.inspect}
+                </a>
+                <button onClick={() => on3d(offer.inspectLink)} className="flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-3 text-xs font-semibold uppercase tracking-wide transition hover:border-white/40 hover:bg-white/10 sm:text-sm">
+                  <Box className="h-4 w-4" strokeWidth={2} />
+                  {D.view3d}
+                </button>
+              </div>
+            ) : (
+              <div className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-line py-3 text-sm text-muted">
+                <Eye className="h-4 w-4" strokeWidth={2} />
+                {D.inspectNone}
+              </div>
+            )}
+          </div>
+
+          {/* O'NG: tafsilotlar */}
+          <div className="flex min-w-0 flex-col">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-xl font-semibold leading-snug tracking-tight sm:text-2xl">{product.fullName || product.name}</h3>
+              <button onClick={onClose} aria-label={D.close} className="grid h-9 w-9 flex-none place-items-center rounded-lg text-muted transition hover:bg-white/10 hover:text-white">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <dl className="mt-4 divide-y divide-line text-sm">
+              <div className="flex items-center justify-between gap-4 py-3">
+                <dt className="text-muted">{D.float}</dt>
+                <dd className="flex min-w-0 items-center gap-3">
+                  <FloatBar value={offer.floatValue} className="hidden w-36 sm:block" />
+                  <span className="font-mono text-white/90">{offer.floatValue != null ? offer.floatValue.toFixed(12).replace(/0+$/, '') : '—'}</span>
+                </dd>
+              </div>
+              <div className="flex justify-between py-3"><dt className="text-muted">{D.type}</dt><dd>{typeLabel || '—'}</dd></div>
+              <div className="flex items-center justify-between py-3">
+                <dt className="text-muted">{D.rarity}</dt>
+                <dd className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full" style={{ background: rarity.color, boxShadow: `0 0 6px ${rarity.color}` }} />{rarity.label}</dd>
+              </div>
+              <div className="flex justify-between py-3"><dt className="text-muted">{D.exterior}</dt><dd>{product.wear || '—'}</dd></div>
+              {offer.paintSeed != null && (
+                <div className="flex justify-between py-3"><dt className="text-muted">{D.pattern}</dt><dd className="font-mono">{offer.paintSeed}</dd></div>
+              )}
+              {stickers.length > 0 && (
+                <div className="flex items-center justify-between gap-4 py-3">
+                  <dt className="text-muted">{D.stickers}</dt>
+                  <dd className="flex flex-wrap justify-end gap-1.5">
+                    {stickers.map((s, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={i} src={s.image} alt={s.name} title={s.name} loading="lazy" className="h-9 w-auto object-contain" />
+                    ))}
+                  </dd>
+                </div>
+              )}
+            </dl>
+
+            <div className="mt-auto pt-5">
+              <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 border-l-[3px] bg-white/[0.03] p-4" style={{ borderLeftColor: rarity.color }}>
+                <div className="mr-auto">
+                  <div className="text-2xl font-bold leading-tight tracking-tight sm:text-3xl">{formatPrice(offer.price)}</div>
+                  {offer.priceUsd != null && <div className="text-sm text-muted">{fmtUsd(offer.priceUsd)}</div>}
+                </div>
+                <button
+                  onClick={() => {
+                    onAdd();
+                    setAdded(true);
+                    setTimeout(() => setAdded(false), 1200);
+                  }}
+                  aria-label={D.addToCart}
+                  title={added ? D.added : D.addToCart}
+                  className="grid h-11 w-11 place-items-center rounded-xl border border-white/15 text-white/85 transition hover:border-white/40 hover:text-white"
+                >
+                  {added ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ShoppingCart className="h-4 w-4" strokeWidth={2} />}
+                </button>
+                <button onClick={onBuy} className="btn-primary inline-flex items-center gap-2">
+                  <Zap className="h-4 w-4" strokeWidth={2.5} />
+                  {D.buyNow}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
