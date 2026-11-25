@@ -23,7 +23,7 @@ const DICT = {
     home: 'Bosh sahifa', skins: 'Skinlar', copy: 'Nomini nusxalash', copied: 'Nusxalandi',
     regular: 'Oddiy', stattrak: 'StatTrak™', souvenir: 'Souvenir',
     float: 'Float', type: 'Turi', rarity: 'Rariteti', exterior: 'Holati', pattern: 'Naqsh (seed)', stock: 'Soni',
-    inspect: "O'yin ichida ko'rish", inspectNone: "Inspect havolasi yo'q", view3d: "3D ko'rish", close: 'Yopish', loading3d: 'Yuklanmoqda…',
+    inspect: "O'yin ichida ko'rish", inspectNone: "Inspect havolasi yo'q", view3d: "3D ko'rish", full3d: "To'liq ekran", exitFull3d: 'Kichraytirish', close: 'Yopish', loading3d: 'Yuklanmoqda…',
     inspectHint: "CS2 ochiladi va skin o'yin ichida ko'rsatiladi (Steam o'rnatilgan bo'lishi kerak)",
     stickers: 'Stikerlar', instant: 'Tezkor', slow: '12 soatgacha', slowFull: 'Sekin (12 soatgacha)',
     addToCart: 'Savatga', added: "Qo'shildi", buyNow: 'Sotib olish',
@@ -39,7 +39,7 @@ const DICT = {
     home: 'Главная', skins: 'Скины', copy: 'Копировать название', copied: 'Скопировано',
     regular: 'Обычный', stattrak: 'StatTrak™', souvenir: 'Сувенир',
     float: 'Float', type: 'Тип', rarity: 'Редкость', exterior: 'Состояние', pattern: 'Паттерн (seed)', stock: 'Количество',
-    inspect: 'Осмотреть в игре', inspectNone: 'Нет inspect-ссылки', view3d: '3D просмотр', close: 'Закрыть', loading3d: 'Загрузка…',
+    inspect: 'Осмотреть в игре', inspectNone: 'Нет inspect-ссылки', view3d: '3D просмотр', full3d: 'На весь экран', exitFull3d: 'Свернуть', close: 'Закрыть', loading3d: 'Загрузка…',
     inspectHint: 'Откроется CS2 и покажет скин в игре (нужен установленный Steam)',
     stickers: 'Стикеры', instant: 'Мгновенно', slow: 'до 12 часов', slowFull: 'Медленно (до 12 часов)',
     addToCart: 'В корзину', added: 'Добавлено', buyNow: 'Купить',
@@ -258,6 +258,8 @@ export default function SkinDetail({ product, related = [], variants = [], switc
           title={product.fullName || product.name}
           closeLabel={D.close}
           loadingLabel={D.loading3d}
+          fullLabel={D.full3d}
+          exitFullLabel={D.exitFull3d}
           onClose={() => setShow3d(null)}
         />
       )}
