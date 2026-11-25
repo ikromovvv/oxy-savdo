@@ -6,6 +6,7 @@ import { useStore } from './StoreProvider';
 import { ProductMedia } from './ProductCard';
 import SkinCard from './SkinCard';
 import Skin3DModal from './Skin3DModal';
+import Select from './Select';
 import { cachedListings, fetchListings, prefetchSkin, prefetchListings } from '@/lib/skinClientCache';
 import { Eye, Box, X, Zap, Clock, Copy, Check, ShoppingCart, ChevronLeft, ChevronRight, Heart } from './icons';
 import { formatPrice, weaponTypes } from '@/lib/products';
@@ -28,7 +29,7 @@ const DICT = {
     addToCart: 'Savatga', added: "Qo'shildi", buyNow: 'Sotib olish',
     offers: 'ta taklif', offersFrom: 'dan', offer1: 'taklif',
     delivery: 'Yetkazish', all: 'Hammasi', fast: 'Tezkor',
-    floatFrom: 'Float dan', floatTo: 'Float gacha', priceFrom: 'Narx dan', priceTo: 'Narx gacha',
+    from: 'dan', to: 'gacha', floatFrom: 'Float dan', floatTo: 'Float gacha', priceFrom: 'Narx dan', priceTo: 'Narx gacha',
     price: 'Narx', actions: '', noOffers: "Bu filtr bo'yicha taklif topilmadi.", loading: 'Yuklanmoqda...',
     err: "Takliflar ro'yxatini yuklab bo'lmadi.", reset: 'Tozalash',
     also: 'Sizga yoqishi mumkin', description: 'Tavsif', whatToCheck: 'Sotib olishdan oldin tekshiring',
@@ -44,7 +45,7 @@ const DICT = {
     addToCart: 'В корзину', added: 'Добавлено', buyNow: 'Купить',
     offers: 'предложений', offersFrom: 'от', offer1: 'предложение',
     delivery: 'Доставка', all: 'Все', fast: 'Мгновенная',
-    floatFrom: 'Float от', floatTo: 'Float до', priceFrom: 'Цена от', priceTo: 'Цена до',
+    from: 'от', to: 'до', floatFrom: 'Float от', floatTo: 'Float до', priceFrom: 'Цена от', priceTo: 'Цена до',
     price: 'Цена', actions: '', noOffers: 'По этому фильтру предложений нет.', loading: 'Загрузка...',
     err: 'Не удалось загрузить предложения.', reset: 'Сбросить',
     also: 'Вам может понравиться', description: 'Описание', whatToCheck: 'Проверьте перед покупкой',
@@ -408,22 +409,32 @@ export default function SkinDetail({ product, related = [], variants = [], switc
           </h2>
 
           {!isListingPage && (
-            <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
-              <select value={f.delivery} onChange={(e) => setF({ ...f, delivery: e.target.value })} className={inputCls} aria-label={D.delivery}>
-                <option value="all">{D.delivery}: {D.all}</option>
-                <option value="instant">{D.delivery}: {D.fast}</option>
-                <option value="slow">{D.delivery}: {D.slow}</option>
-              </select>
-              <div className="grid grid-cols-2 gap-2">
-                <input type="number" step="0.001" inputMode="decimal" placeholder={D.floatFrom} value={f.floatFrom} onChange={(e) => setF({ ...f, floatFrom: e.target.value })} className={inputCls} />
-                <input type="number" step="0.001" inputMode="decimal" placeholder={D.floatTo} value={f.floatTo} onChange={(e) => setF({ ...f, floatTo: e.target.value })} className={inputCls} />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <input type="number" inputMode="numeric" placeholder={D.priceFrom} value={f.priceFrom} onChange={(e) => setF({ ...f, priceFrom: e.target.value })} className={inputCls} />
-                <input type="number" inputMode="numeric" placeholder={D.priceTo} value={f.priceTo} onChange={(e) => setF({ ...f, priceTo: e.target.value })} className={inputCls} />
-              </div>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <Select
+                value={f.delivery}
+                onChange={(v) => setF({ ...f, delivery: v })}
+                options={[
+                  { value: 'all', label: `${D.delivery}: ${D.all}` },
+                  { value: 'instant', label: `${D.delivery}: ${D.fast}` },
+                  { value: 'slow', label: `${D.delivery}: ${D.slow}` },
+                ]}
+              />
+              {[
+                ['float', D.float, 'floatFrom', 'floatTo', '0.001', 'decimal'],
+                ['price', D.price, 'priceFrom', 'priceTo', '1', 'numeric'],
+              ].map(([key, label, kFrom, kTo, step, mode]) => (
+                <div key={key} className="flex min-w-0 flex-1 items-center rounded-xl border border-line bg-panel transition focus-within:border-white/40 sm:flex-none">
+                  <span className="flex-none border-r border-line px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted">{label}</span>
+                  <input type="number" step={step} inputMode={mode} placeholder={D.from} aria-label={`${label} ${D.from}`} value={f[kFrom]} onChange={(e) => setF({ ...f, [kFrom]: e.target.value })} className="w-full min-w-0 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-muted/60 sm:w-24" />
+                  <span className="text-muted/50">—</span>
+                  <input type="number" step={step} inputMode={mode} placeholder={D.to} aria-label={`${label} ${D.to}`} value={f[kTo]} onChange={(e) => setF({ ...f, [kTo]: e.target.value })} className="w-full min-w-0 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-muted/60 sm:w-24" />
+                </div>
+              ))}
               {filtersActive && (
-                <button onClick={() => setF({ delivery: 'all', floatFrom: '', floatTo: '', priceFrom: '', priceTo: '' })} className="rounded-xl border border-line px-4 py-2.5 text-sm transition hover:border-white/40">{D.reset}</button>
+                <button onClick={() => setF({ delivery: 'all', floatFrom: '', floatTo: '', priceFrom: '', priceTo: '' })} className="inline-flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm text-white/80 transition hover:border-white/40 hover:text-white">
+                  <X className="h-3.5 w-3.5" />
+                  {D.reset}
+                </button>
               )}
             </div>
           )}

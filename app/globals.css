@@ -292,6 +292,11 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   .filters-aside { position: sticky; top: 5rem; }
 }
 
+/* number inputlardagi o'sha kichik tepa/past strelkalar (spinner) ko'rinmasin */
+input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
 /* Katalog float slayderi: ikkita ustma-ust range input */
 .catalog-range-input {
   position: absolute; inset: 0; width: 100%; height: 100%; margin: 0;
