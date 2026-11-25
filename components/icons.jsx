@@ -27,7 +27,7 @@ export {
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
 export { ArrowDown, ArrowUp };
-export { Maximize2, Minimize2, Globe, Search, SlidersHorizontal, Star, Gamepad2, Gift, PartyPopper, Megaphone, RefreshCw, StickyNote, Heart, Info, CircleAlert, CircleCheck, Hourglass } from 'lucide-react';
+export { ArrowRight, ChevronUp, Maximize2, Minimize2, Globe, Search, SlidersHorizontal, Star, Gamepad2, Gift, PartyPopper, Megaphone, RefreshCw, StickyNote, Heart, Info, CircleAlert, CircleCheck, Hourglass } from 'lucide-react';
 
 // Saralash yorlig'i: matn + yo'nalish strelkasi (dropdown va tanlangan qiymatda)
 export function SortLabel({ text, dir }) {

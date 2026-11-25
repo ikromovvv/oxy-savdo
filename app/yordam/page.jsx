@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useStore } from '@/components/StoreProvider';
 import Reveal from '@/components/Reveal';
 import { site } from '@/lib/site';
+import { ArrowRight } from '@/components/icons';
 
 // Huquqiy hujjatlarning to'liq matni alohida sahifalarda (/oferta, /maxfiylik, /qaytarish).
 const content = {
@@ -53,7 +54,7 @@ export default function SupportPage() {
           <Link key={d.href} href={d.href} className="card card-hover group flex flex-col p-6">
             <span className="flex items-center justify-between text-base font-medium">
               {d.title}
-              <span className="text-muted transition-all duration-300 group-hover:translate-x-1 group-hover:text-accent">→</span>
+              <span className="text-muted transition-all duration-300 group-hover:translate-x-1 group-hover:text-accent"><ArrowRight className="h-4 w-4" /></span>
             </span>
             <span className="mt-2 text-sm leading-relaxed text-muted">{d.text}</span>
           </Link>

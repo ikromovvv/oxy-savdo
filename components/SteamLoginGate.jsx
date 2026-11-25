@@ -1,6 +1,6 @@
 'use client';
 
-import { SteamIcon } from './icons';
+import { SteamIcon, Check } from './icons';
 import { useStore } from './StoreProvider';
 
 // Skinlar ko'rsatiladigan har qanday sahifada Steam orqali kirilmagan
@@ -44,7 +44,7 @@ export default function SteamLoginGate({ title, subtitle, skeletonCount = 10 }) 
           <ul className="relative mt-2 w-full space-y-2 text-left text-xs text-white/75">
             {['gate_b1', 'gate_b2', 'gate_b3'].map((k) => (
               <li key={k} className="flex items-start gap-2">
-                <span className="mt-0.5 grid h-4 w-4 flex-none place-items-center rounded-full bg-accent/15 text-[10px] text-accent">✓</span>
+                <span className="mt-0.5 grid h-4 w-4 flex-none place-items-center rounded-full bg-accent/15 text-accent"><Check className="h-2.5 w-2.5" strokeWidth={3} /></span>
                 {t(k)}
               </li>
             ))}

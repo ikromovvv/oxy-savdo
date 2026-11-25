@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from './StoreProvider';
 import { formatPrice } from '@/lib/products';
 import { rarityRgb } from '@/lib/skinMeta';
+import { ArrowRight } from './icons';
 
 // Bosh sahifadagi qisqa lenta: Telegram kanaldagi eng yangi mavjud skinlar.
 // E'lon bo'lmasa yoki yuklanmasa — umuman ko'rinmaydi.
@@ -30,7 +31,7 @@ export default function TgStrip() {
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="text-base font-semibold tracking-tight sm:text-lg">{t('tg_latest')}</h2>
         <Link href="/telegram-skinlar" className="flex-none py-2 text-xs text-accent hover:underline">
-          {t('tg_all')} →
+          {t('tg_all')} <ArrowRight className="ml-1 inline h-3.5 w-3.5" />
         </Link>
       </div>
 

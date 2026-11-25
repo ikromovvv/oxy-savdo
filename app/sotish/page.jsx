@@ -1,6 +1,6 @@
 'use client';
 
-import { RotateCw, SortLabel } from '@/components/icons';
+import { RotateCw, SortLabel, Check } from '@/components/icons';
 import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import SteamLoginGate from '@/components/SteamLoginGate';
@@ -23,6 +23,14 @@ export default function SotishPage() {
   const [stale, setStale] = useState(false);
   const [rate, setRate] = useState(12700); // 1 USD = ? so'm
   const [query, setQuery] = useState('');
+
+  // qidiruv header'dagi maydondan keladi (URL ?q= yoki 'oxy:search' hodisasi)
+  useEffect(() => {
+    setQuery(new URLSearchParams(window.location.search).get('q') || '');
+    const h = (e) => setQuery(String(e.detail ?? ''));
+    window.addEventListener('oxy:search', h);
+    return () => window.removeEventListener('oxy:search', h);
+  }, []);
   const [sort, setSort] = useState('price_desc');
   const [selected, setSelected] = useState(() => new Set());
   const [payout, setPayout] = useState('balance');
@@ -157,12 +165,7 @@ export default function SotishPage() {
               <RotateCw className="h-4 w-4" strokeWidth={2} />
             </button>
 
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('sell_search_ph')}
-              className="min-w-[180px] flex-1 rounded-xl border border-line bg-panel px-4 py-3 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
-            />
+            <div className="flex-1" />
 
             <Select
               value={sort}
@@ -290,7 +293,7 @@ export default function SotishPage() {
                         isSelected ? 'border-accent bg-accent text-ink' : 'border-line text-transparent'
                       }`}
                     >
-                      ✓
+                      <Check className="h-3 w-3" strokeWidth={3} />
                     </span>
                     <div className="mt-4 flex aspect-square items-center justify-center">
                       {it.icon ? (

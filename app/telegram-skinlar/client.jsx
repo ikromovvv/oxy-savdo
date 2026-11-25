@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import Select from '@/components/Select';
 import TgSkinCard from '@/components/TgSkinCard';
-import { SortLabel, Search } from '@/components/icons';
+import { SortLabel, ArrowUpRight, X } from '@/components/icons';
 
 const TIER_COLOR = { FN: '#22c55e', MW: '#a3e635', FT: '#eab308', WW: '#f97316', BS: '#ef4444' };
 
@@ -28,6 +28,14 @@ export default function TelegramSkinsClient() {
   }, []);
 
   useEffect(load, [load]);
+
+  // qidiruv header'dagi maydondan keladi (URL ?q= yoki 'oxy:search' hodisasi)
+  useEffect(() => {
+    setQuery(new URLSearchParams(window.location.search).get('q') || '');
+    const h = (e) => setQuery(String(e.detail ?? ''));
+    window.addEventListener('oxy:search', h);
+    return () => window.removeEventListener('oxy:search', h);
+  }, []);
 
   useEffect(() => {
     if (!lightbox) return;
@@ -79,15 +87,6 @@ export default function TelegramSkinsClient() {
           })}
         </div>
 
-        <label className="relative w-full min-w-[200px] sm:w-64">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t('catalog_search_ph')}
-            className="w-full rounded-xl border border-line bg-panel py-2.5 pl-10 pr-3 text-sm outline-none placeholder:text-muted/60 focus:border-white/40"
-          />
-        </label>
         <Select
           value={sort}
           onChange={setSort}
@@ -107,7 +106,7 @@ export default function TelegramSkinsClient() {
         </button>
         {data?.link && (
           <a href={data.link} target="_blank" rel="noreferrer" className="flex-none rounded-xl border border-line px-4 py-2.5 text-sm font-medium text-white/85 transition hover:border-white/40 hover:text-white">
-            {t('tg_follow')} ↗
+            {t('tg_follow')} <ArrowUpRight className="ml-1 inline h-3.5 w-3.5" />
           </a>
         )}
       </div>
@@ -137,7 +136,7 @@ export default function TelegramSkinsClient() {
       {/* katta rasm */}
       {lightbox && (
         <div className="fixed inset-0 z-[80] grid place-items-center bg-black/85 p-4 backdrop-blur-sm" onClick={() => setLightbox(null)}>
-          <button aria-label="close" className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-2xl text-white hover:bg-white/20">✕</button>
+          <button aria-label="close" className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20"><X className="h-5 w-5" /></button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={lightbox.image}

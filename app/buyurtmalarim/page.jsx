@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import SteamLoginGate from '@/components/SteamLoginGate';
 import { formatPrice } from '@/lib/products';
+import { Check, X, ChevronUp, ChevronDown } from '@/components/icons';
 
 const STAGE_INDEX = { new: 0, pending: 0, paid: 1, fulfilling: 2, sent: 3, done: 4 };
 
@@ -79,7 +80,7 @@ function Timeline({ order, t }) {
                   : 'border-line text-muted'
               }`}
             >
-              {reached ? '✓' : ''}
+              {reached ? <Check className="h-3 w-3" strokeWidth={3} /> : null}
             </span>
             <div className="min-w-0">
               <div className={`text-sm ${reached ? 'text-white/90' : 'text-muted'}`}>{s.label}</div>
@@ -91,7 +92,7 @@ function Timeline({ order, t }) {
       {cancelled && (
         <li className="flex items-center gap-3">
           <span className="grid h-5 w-5 flex-none place-items-center rounded-full border border-rose-500/40 bg-rose-500/15 text-[11px] text-rose-300">
-            ✕
+            <X className="h-3 w-3" strokeWidth={3} />
           </span>
           <div className="text-sm text-rose-300">{t('myorders_step_cancelled')}</div>
         </li>
@@ -185,7 +186,7 @@ export default function BuyurtmalarimPage() {
                   </div>
                   <div className="flex-none text-right">
                     <div className="text-sm font-semibold">{formatPrice(o.total)}</div>
-                    <div className="text-[11px] text-muted">{isOpen ? '▲' : '▼'}</div>
+                    <div className="text-[11px] text-muted">{isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</div>
                   </div>
                 </button>
 

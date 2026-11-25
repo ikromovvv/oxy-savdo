@@ -1,6 +1,6 @@
 'use client';
 
-import { SteamIcon } from '@/components/icons';
+import { SteamIcon, ArrowRight } from '@/components/icons';
 import Link from 'next/link';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
@@ -154,7 +154,7 @@ export default function Home() {
               >
                 <span className="text-lg font-medium">{c[lang]}</span>
                 <span className="text-muted transition-all duration-300 group-hover:translate-x-1.5 group-hover:text-accent">
-                  →
+                  <ArrowRight className="h-5 w-5" />
                 </span>
               </Link>
             </Magnetic>
@@ -229,7 +229,7 @@ function Section({ title, href, cta, children }) {
     <section className="container-site py-10">
       <Reveal className="mb-6 flex items-end justify-between">
         <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
-        <Link href={href} className="text-sm text-muted hover:text-white">{cta} →</Link>
+        <Link href={href} className="text-sm text-muted hover:text-white">{cta} <ArrowRight className="ml-1 inline h-3.5 w-3.5" /></Link>
       </Reveal>
       {children}
     </section>

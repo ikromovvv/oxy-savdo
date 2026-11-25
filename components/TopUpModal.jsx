@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from './StoreProvider';
 import { formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
+import { X, Hourglass } from './icons';
 
 const PRESETS = [50000, 100000, 250000, 500000, 1000000];
 const METHOD_LABEL = { payme: 'Payme', click: 'Click', test: 'Test', demo: 'Demo' };
@@ -82,7 +83,7 @@ export default function TopUpModal({ open, onClose }) {
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-accent/25 bg-panel/90 p-6 shadow-[0_0_50px_rgba(255,255,255,0.1),0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl">
         <span aria-hidden="true" className="pointer-events-none absolute -top-16 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-accent/15 blur-3xl" />
-        <button aria-label="close" onClick={onClose} className="absolute right-3 top-3 grid h-9 w-9 place-items-center text-muted hover:text-white">✕</button>
+        <button aria-label="close" onClick={onClose} className="absolute right-3 top-3 grid h-9 w-9 place-items-center text-muted hover:text-white"><X className="h-5 w-5" /></button>
 
         {methods === null ? (
           <div className="relative space-y-3 py-2">
@@ -91,7 +92,7 @@ export default function TopUpModal({ open, onClose }) {
           </div>
         ) : unavailable ? (
           <div className="relative text-center">
-            <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl border border-line text-xl text-muted">⏳</div>
+            <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl border border-line text-muted"><Hourglass className="h-6 w-6" /></div>
             <h2 className="mt-4 text-xl font-semibold">{t('topup_unavailable_title')}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted">{t('topup_unavailable_text')}</p>
             <a href={site.telegram} className="btn-primary mt-5 w-full">{t('topup_contact')}</a>

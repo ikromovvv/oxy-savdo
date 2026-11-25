@@ -13,6 +13,7 @@ import SteamLoginGate from '@/components/SteamLoginGate';
 import { formatPrice, weaponTypes } from '@/lib/products';
 import { rarityInfo, unlockLabel } from '@/lib/skinMeta';
 import { cachedSkin, fetchSkin } from '@/lib/skinClientCache';
+import { ArrowLeft, Check } from '@/components/icons';
 
 // Kovrik/aksessuar bo'lsa /api/products/[id] dan (admin panel boshqaradi),
 // skin bo'lsa /api/skins/[id] dan (LIS-SKINS'dan real vaqtda) olamiz.
@@ -196,7 +197,7 @@ export default function ProductPage({ params }) {
           href={isSkin ? '/skinlar' : `/katalog/${product.category}`}
           className="inline-block py-2 text-sm text-muted hover:text-white"
         >
-          ← {t('all_products')}
+          <ArrowLeft className="mr-1.5 inline h-4 w-4" />{t('all_products')}
         </Link>
 
         <div className="mt-6 grid gap-8 lg:grid-cols-2">
@@ -276,13 +277,13 @@ export default function ProductPage({ params }) {
                     {product.stattrak && (
                       <div className="flex justify-between py-2.5 text-sm">
                         <dt className="text-muted">StatTrak™</dt>
-                        <dd>✓</dd>
+                        <dd><Check className="h-4 w-4 text-emerald-300" strokeWidth={2.5} /></dd>
                       </div>
                     )}
                     {product.souvenir && (
                       <div className="flex justify-between py-2.5 text-sm">
                         <dt className="text-muted">Souvenir</dt>
-                        <dd>✓</dd>
+                        <dd><Check className="h-4 w-4 text-emerald-300" strokeWidth={2.5} /></dd>
                       </div>
                     )}
                   </>

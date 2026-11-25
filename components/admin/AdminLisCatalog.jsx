@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { inputCls } from './ui';
 import { toast } from './Toast';
-import { Star, Gamepad2, Wallet, Check } from '@/components/icons';
+import { Star, Gamepad2, Wallet, Check, ArrowLeft, ArrowRight, ArrowUpRight } from '@/components/icons';
 
 // LIS-SKINS katalogi (admin, to'liq ekran): yetkazib beruvchida hozir bor skinlar.
 // Kartani bossangiz — trade-URL modali ochiladi; tasdiqlansa skin (qulfsiz eng arzon nusxa)
@@ -327,7 +327,7 @@ export default function AdminLisCatalog({ onBack }) {
     <div className="fixed inset-0 z-[60] flex flex-col bg-ink text-white">
       <header className="flex h-14 flex-none items-center gap-3 border-b border-line px-4 md:px-6">
         <button onClick={onBack} className="inline-flex items-center gap-2 rounded-lg border border-line px-3 py-1.5 text-sm transition hover:border-white/40">
-          ← Orqaga
+          <ArrowLeft className="h-4 w-4" /> Orqaga
         </button>
         <h3 className="text-base font-semibold tracking-tight">LIS-SKINS katalogi</h3>
         <div className="ml-auto flex items-center gap-6">
@@ -570,7 +570,7 @@ export default function AdminLisCatalog({ onBack }) {
                           </div>
                           {it.url && (
                             <a href={it.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="mt-2 w-fit text-[11px] text-muted underline-offset-2 hover:text-white hover:underline">
-                              LIS&apos;da ochish ↗
+                              LIS&apos;da ochish <ArrowUpRight className="ml-0.5 inline h-3 w-3" />
                             </a>
                           )}
                         </div>
@@ -580,9 +580,9 @@ export default function AdminLisCatalog({ onBack }) {
                 </div>
 
                 <div className="mt-5 flex items-center justify-between text-xs text-muted">
-                  <button disabled={data.page <= 1} onClick={() => goPage(data.page - 1)} className="btn-ghost disabled:opacity-40">← Oldingi</button>
+                  <button disabled={data.page <= 1} onClick={() => goPage(data.page - 1)} className="btn-ghost disabled:opacity-40"><ArrowLeft className="mr-1 inline h-4 w-4" />Oldingi</button>
                   <span>Sahifa {int(data.page)} / {int(data.pages)} · {int(data.total)} ta skin nomi</span>
-                  <button disabled={data.page >= data.pages} onClick={() => goPage(data.page + 1)} className="btn-ghost disabled:opacity-40">Keyingi →</button>
+                  <button disabled={data.page >= data.pages} onClick={() => goPage(data.page + 1)} className="btn-ghost disabled:opacity-40">Keyingi<ArrowRight className="ml-1 inline h-4 w-4" /></button>
                 </div>
               </>
             )}

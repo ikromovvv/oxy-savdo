@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { formatPrice } from '@/lib/products';
 import { Icon, Svg } from './ui';
 import { toast } from './Toast';
-import { Gamepad2, StickyNote } from '@/components/icons';
+import { Gamepad2, StickyNote, ArrowRight, Check } from '@/components/icons';
 
 const STATUS = {
   new: { label: 'Yangi', cls: 'border-line text-white/80' },
@@ -374,7 +374,7 @@ export default function AdminOrders() {
                               title={o.tradeUrl}
                             >
                               <Svg d={Icon.copy} className="h-3.5 w-3.5 flex-none" />
-                              {copied === o.id + 't' ? 'Nusxa olindi ✓' : o.tradeUrl}
+                              {copied === o.id + 't' ? (<span className="inline-flex items-center gap-1">Nusxa olindi <Check className="h-3.5 w-3.5" /></span>) : o.tradeUrl}
                             </button>
                           )}
                           {o.note && <div className="flex items-center gap-1.5 text-muted"><StickyNote className="h-3.5 w-3.5 flex-none" /> {o.note}</div>}
@@ -455,7 +455,7 @@ export default function AdminOrders() {
                                   : 'border border-line text-white/85 hover:border-white/40'
                             }`}
                           >
-                            → {STATUS[next]?.label || next}
+                            <ArrowRight className="mr-1 inline h-3.5 w-3.5" />{STATUS[next]?.label || next}
                           </button>
                         ))}
                         {(NEXT[o.status] || []).length === 0 && (

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { formatPrice } from '@/lib/products';
-import { Check, Info } from '@/components/icons';
+import { Check, Info, ArrowLeft } from '@/components/icons';
 
 // DEMO to'lov sahifasi — Payme/Click oynasi qanday ko'rinishini ko'rsatadi.
 // Kiritilgan karta/kod HECH QAYERGA yuborilmaydi va saqlanmaydi. Production'da
@@ -144,7 +144,7 @@ export default function DemoPaymentPage({ params }) {
                   {busy ? 'Tekshirilmoqda…' : `To'lash · ${formatPrice(order.total)}`}
                 </button>
                 <button type="button" onClick={() => setStep('card')} className="w-full py-2 text-xs text-muted underline">
-                  ← Kartani o&apos;zgartirish
+                  <ArrowLeft className="mr-1.5 inline h-4 w-4" />Kartani o&apos;zgartirish
                 </button>
               </form>
             )}

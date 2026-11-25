@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import SkinCard from '@/components/SkinCard';
 import SteamLoginGate from '@/components/SteamLoginGate';
+import { ArrowLeft } from '@/components/icons';
 
 export default function SaqlanganPage() {
   const { t, favorites, user, userLoading } = useStore();
@@ -29,7 +30,7 @@ export default function SaqlanganPage() {
         <div className="card p-10 text-center">
           <p className="text-sm text-muted">{t('saved_empty')}</p>
           <Link href="/" className="btn-ghost mt-5 inline-flex">
-            ← {t('saved_back')}
+            <ArrowLeft className="mr-1.5 inline h-4 w-4" />{t('saved_back')}
           </Link>
         </div>
       ) : (

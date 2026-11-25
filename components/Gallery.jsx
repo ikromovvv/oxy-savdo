@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ProductMedia } from './ProductCard';
+import { ChevronLeft, ChevronRight } from './icons';
 
 /**
  * Mahsulot rasm galereyasi.
@@ -109,14 +110,14 @@ export default function Gallery({ product }) {
               onClick={() => setI((v) => (v - 1 + list.length) % list.length)}
               className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-line bg-ink/70 backdrop-blur transition hover:border-white/40"
             >
-              ‹
+              <ChevronLeft className="h-5 w-5" />
             </button>
             <button
               aria-label="keyingi"
               onClick={() => setI((v) => (v + 1) % list.length)}
               className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-line bg-ink/70 backdrop-blur transition hover:border-white/40"
             >
-              ›
+              <ChevronRight className="h-5 w-5" />
             </button>
             <span className="absolute bottom-3 right-3 rounded-full border border-line bg-ink/70 px-3 py-1 text-[11px] text-muted backdrop-blur">
               {i + 1} / {list.length}

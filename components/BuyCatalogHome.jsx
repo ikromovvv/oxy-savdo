@@ -1,6 +1,6 @@
 'use client';
 
-import { RotateCw, SlidersHorizontal, ChevronDown, ChevronRight } from './icons';
+import { RotateCw, SlidersHorizontal, ChevronDown, ChevronRight, SortLabel } from './icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from './StoreProvider';
 import CatalogCard from './CatalogCard';
@@ -156,8 +156,8 @@ export default function BuyCatalogHome() {
 
   const sortOptions = [
     { value: 'count_desc', label: `${L.sort}: ${L.popular}` },
-    { value: 'price_desc', label: `${L.sort}: ${t('catalog_sort_price')} ↓` },
-    { value: 'price_asc', label: `${L.sort}: ${t('catalog_sort_price')} ↑` },
+    { value: 'price_desc', label: <SortLabel text={`${L.sort}: ${t('catalog_sort_price')}`} dir="desc" /> },
+    { value: 'price_asc', label: <SortLabel text={`${L.sort}: ${t('catalog_sort_price')}`} dir="asc" /> },
   ];
   const rarityList = ['Consumer Grade', 'Industrial Grade', 'Mil-Spec Grade', 'Restricted', 'Classified', 'Covert', 'Extraordinary', 'Contraband'];
   const availOptions = [

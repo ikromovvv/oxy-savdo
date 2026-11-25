@@ -9,7 +9,7 @@ import { site } from '@/lib/site';
 import OxyLogo from './OxyLogo';
 import Select from './Select';
 import TopUpModal from './TopUpModal';
-import { ShoppingCart, Wallet, Plus, ChevronDown, SteamIcon, Search, Globe, Check } from './icons';
+import { ShoppingCart, Wallet, Plus, ChevronDown, SteamIcon, Search, Globe, Check, X } from './icons';
 
 
 // Foydalanuvchi menyusi (avatar + dropdown): buyurtmalar, saqlangan, balans, chiqish
@@ -99,11 +99,12 @@ function HeaderSearch({ placeholder, className = '', onDone }) {
   const pathname = usePathname();
   const [v, setV] = useState('');
   const timer = useRef(null);
-  const onCatalog = pathname === '/skinlar';
+  // shu sahifalarda yozganda ro'yxat o'sha zahoti filtrlanadi; qolgan sahifalarda Enter bosilsa katalogga o'tadi
+  const onCatalog = ['/skinlar', '/telegram-skinlar', '/sotish'].includes(pathname);
 
   useEffect(() => {
-    if (onCatalog) setV(new URLSearchParams(window.location.search).get('q') || '');
-  }, [onCatalog]);
+    setV(onCatalog ? new URLSearchParams(window.location.search).get('q') || '' : '');
+  }, [pathname, onCatalog]);
 
   // katalogdagi "Filtrlarni tozalash" qidiruvni ham tozalaydi
   useEffect(() => {
@@ -113,7 +114,8 @@ function HeaderSearch({ placeholder, className = '', onDone }) {
   }, []);
 
   const apply = (value, push) => {
-    const url = value ? `/skinlar?q=${encodeURIComponent(value)}` : '/skinlar';
+    const base = onCatalog ? pathname : '/skinlar';
+    const url = value ? `${base}?q=${encodeURIComponent(value)}` : base;
     if (onCatalog) {
       window.history.replaceState(null, '', url);
       window.dispatchEvent(new CustomEvent('oxy:search', { detail: value }));
@@ -365,7 +367,7 @@ export default function Header() {
               aria-label="Yopish"
               className="grid h-9 w-9 place-items-center rounded-full border border-line text-muted transition hover:text-white"
             >
-              ✕
+              <X className="h-4 w-4" />
             </button>
           </div>
 

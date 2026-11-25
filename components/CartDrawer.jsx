@@ -8,7 +8,7 @@ import { ProductMedia } from './ProductCard';
 import { formatPrice } from '@/lib/products';
 import { isValidTradeUrl, parseTradeUrl } from '@/lib/steamTrade';
 import { site } from '@/lib/site';
-import { ShoppingCart, Trash2 } from './icons';
+import { ShoppingCart, Trash2, X, ArrowLeft, ArrowUpRight } from './icons';
 
 // Savat qatoridagi kichik rasm (rasm bo'lmasa — bosh harfli gradient)
 function Thumb({ it }) {
@@ -140,7 +140,7 @@ export default function CartDrawer() {
       <aside ref={panelRef} className="relative flex max-h-[92vh] min-h-[320px] w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-line bg-ink shadow-[0_24px_80px_rgba(0,0,0,0.65),0_0_40px_rgba(255,255,255,0.06)]">
         <div className="flex flex-none items-center justify-between px-6 pb-3 pt-5">
           <span className="text-2xl font-bold tracking-tight">{t('cart')}</span>
-          <button aria-label="close" onClick={close} className="grid h-10 w-10 place-items-center rounded-full text-2xl text-muted transition hover:bg-white/5 hover:text-white">✕</button>
+          <button aria-label="close" onClick={close} className="grid h-10 w-10 place-items-center rounded-full text-muted transition hover:bg-white/5 hover:text-white"><X className="h-5 w-5" /></button>
         </div>
 
         {step === 'ok' && (
@@ -164,7 +164,7 @@ export default function CartDrawer() {
             {errMsg && <p className="text-sm text-white/85">{errMsg}</p>}
             <p className="text-sm text-muted">{t('err_text')}</p>
             <a href={site.telegram} className="btn-primary">Telegram</a>
-            <button onClick={() => setStep('cart')} className="text-xs text-muted underline">←</button>
+            <button onClick={() => setStep('cart')} aria-label="back" className="text-muted transition hover:text-white"><ArrowLeft className="h-4 w-4" /></button>
           </div>
         )}
 
@@ -267,7 +267,7 @@ export default function CartDrawer() {
                         rel="noreferrer"
                         className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent transition hover:bg-accent/20"
                       >
-                        {t('trade_url_get')} ↗
+                        {t('trade_url_get')} <ArrowUpRight className="ml-0.5 inline h-3.5 w-3.5" />
                       </a>
                     </label>
                   )}
@@ -376,7 +376,7 @@ export default function CartDrawer() {
                   rel="noreferrer"
                   className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent transition hover:bg-accent/20"
                 >
-                  {t('trade_url_get')} ↗
+                  {t('trade_url_get')} <ArrowUpRight className="ml-0.5 inline h-3.5 w-3.5" />
                 </a>
               </label>
             )}
@@ -399,7 +399,7 @@ export default function CartDrawer() {
                 {sending ? t('sending') : t('submit')}
               </button>
               <button type="button" onClick={() => setStep('cart')} className="mt-1 w-full py-3 text-xs text-muted underline">
-                ← {t('cart')}
+                <ArrowLeft className="mr-1.5 inline h-4 w-4" />{t('cart')}
               </button>
             </div>
           </form>

@@ -8,7 +8,7 @@ import SkinCard from './SkinCard';
 import Skin3DModal from './Skin3DModal';
 import Select from './Select';
 import { cachedListings, fetchListings, prefetchSkin, prefetchListings } from '@/lib/skinClientCache';
-import { Eye, Box, X, Zap, Clock, Copy, Check, ShoppingCart, ChevronLeft, ChevronRight, Heart } from './icons';
+import { Eye, Box, X, Zap, Clock, Copy, Check, ShoppingCart, ChevronLeft, ChevronRight, Heart, ArrowUp, ArrowDown } from './icons';
 import { formatPrice, weaponTypes } from '@/lib/products';
 import { rarityInfo, rarityRgb, WEAR_TIERS, WEAR_GRADIENT, wearInfo } from '@/lib/skinMeta';
 
@@ -226,7 +226,7 @@ export default function SkinDetail({ product, related = [], variants = [], switc
   const scrollRail = (dir) => railRef.current?.scrollBy({ left: dir * 560, behavior: 'smooth' });
 
   const toggleSort = (key) => setSort((s) => (s.key === key ? { key, dir: s.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }));
-  const sortMark = (key) => (sort.key === key ? (sort.dir === 'asc' ? ' ↑' : ' ↓') : '');
+  const sortMark = (key) => (sort.key === key ? (sort.dir === 'asc' ? <ArrowUp className="ml-1 inline h-3 w-3" /> : <ArrowDown className="ml-1 inline h-3 w-3" />) : null);
   const inputCls = 'w-full rounded-xl border border-line bg-panel px-3 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40';
   const showOffers = lst.supported || isListingPage;
   const filtersActive = f.delivery !== 'all' || f.floatFrom || f.floatTo || f.priceFrom || f.priceTo;
@@ -266,10 +266,10 @@ export default function SkinDetail({ product, related = [], variants = [], switc
       <section className={`container-site py-8 transition-opacity duration-200 ${switching ? 'opacity-60' : ''}`}>
         {/* sarlavha yo'li */}
         <nav className="flex flex-wrap items-center gap-1.5 text-xs text-muted" aria-label="breadcrumb">
-          <Link href="/" className="hover:text-white">{D.home}</Link><span>›</span>
-          <Link href="/skinlar" className="hover:text-white">{D.skins}</Link><span>›</span>
-          {typeLabel && <><span>{typeLabel}</span><span>›</span></>}
-          <span>{weapon}</span><span>›</span>
+          <Link href="/" className="hover:text-white">{D.home}</Link><ChevronRight className="h-3 w-3 text-muted/60" />
+          <Link href="/skinlar" className="hover:text-white">{D.skins}</Link><ChevronRight className="h-3 w-3 text-muted/60" />
+          {typeLabel && <><span>{typeLabel}</span><ChevronRight className="h-3 w-3 text-muted/60" /></>}
+          <span>{weapon}</span><ChevronRight className="h-3 w-3 text-muted/60" />
           <span className="text-white/80">{product.fullName || product.name}</span>
         </nav>
 

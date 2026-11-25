@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Icon, Svg, inputCls } from './ui';
+import { ArrowLeft, ArrowRight } from '@/components/icons';
 
 const usd = (n) => {
   const v = Number(n || 0);
@@ -333,7 +334,7 @@ function WalletTab() {
     <div className="card overflow-hidden p-0">
       <div className="border-b border-line px-5 py-4">
         <div className="label">Hamyon va yozuvlar</div>
-        <div className="mt-1 text-sm text-muted">Balansdan oldin → o&apos;zgarish → keyin (USD) · jami {data.total}</div>
+        <div className="mt-1 text-sm text-muted">Balansdan oldin · o&apos;zgarish · keyin (USD) · jami {data.total}</div>
       </div>
       {data.transactions.length === 0 ? (
         <div className="p-10 text-center text-sm text-muted">Yozuv yo&apos;q.</div>
@@ -368,9 +369,9 @@ function WalletTab() {
         </div>
       )}
       <div className="flex items-center justify-between border-t border-line px-5 py-3 text-xs text-muted">
-        <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="btn-ghost disabled:opacity-40">← Oldingi</button>
+        <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="btn-ghost disabled:opacity-40"><ArrowLeft className="mr-1 inline h-4 w-4" />Oldingi</button>
         <span>{page} / {pages}</span>
-        <button disabled={page >= pages} onClick={() => setPage((p) => p + 1)} className="btn-ghost disabled:opacity-40">Keyingi →</button>
+        <button disabled={page >= pages} onClick={() => setPage((p) => p + 1)} className="btn-ghost disabled:opacity-40">Keyingi<ArrowRight className="ml-1 inline h-4 w-4" /></button>
       </div>
     </div>
   );
@@ -397,13 +398,13 @@ function Tools({ onChanged }) {
       });
       const d = await r.json().catch(() => ({}));
       if (action === 'test_alert') {
-        setTgMsg(d.ok ? `Yuborildi ✓ ${d.dedicated ? '(cs2shop guruhiga)' : '(TELEGRAM_CS2SHOP_CHAT_ID yo\'q — umumiy chatga)'}` : `Xato: ${d.error || r.status}`);
+        setTgMsg(d.ok ? `Yuborildi ${d.dedicated ? '(cs2shop guruhiga)' : '(TELEGRAM_CS2SHOP_CHAT_ID yo\'q — umumiy chatga)'}` : `Xato: ${d.error || r.status}`);
       } else if (d.ok === false) {
         setTgMsg(`Xato: ${d.error || r.status}`);
       } else if (!d.low) {
         setTgMsg(`Balans yetarli: $${Number(d.available).toFixed(2)} (chegara $${d.limit}). Ogohlantirish kerak emas.`);
       } else {
-        setTgMsg(`Balans kam: $${Number(d.available).toFixed(2)} (chegara $${d.limit}). ${d.notified ? 'Guruhga ogohlantirish yuborildi ✓' : `Yuborilmadi: ${d.error || 'noma\'lum'}`}`);
+        setTgMsg(`Balans kam: $${Number(d.available).toFixed(2)} (chegara $${d.limit}). ${d.notified ? 'Guruhga ogohlantirish yuborildi' : `Yuborilmadi: ${d.error || 'noma\'lum'}`}`);
       }
     } catch {
       setTgMsg('Xato: aloqa');

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { formatPrice } from '@/lib/products';
 import { Icon, Svg } from './ui';
+import { ArrowRight } from '@/components/icons';
 
 const STATUS_LABEL = {
   new: 'Yangi', pending: "To'lov kutilmoqda", paid: "To'landi", fulfilling: 'Yuborilmoqda',
@@ -166,7 +167,7 @@ export default function AdminDashboard({ onGo, provider }) {
         <>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">LIS-SKINS · haqiqiy ko&apos;rsatkichlar</h2>
-            <button onClick={() => onGo?.('lis')} className="py-1 text-xs text-accent hover:underline">Batafsil →</button>
+            <button onClick={() => onGo?.('lis')} className="py-1 text-xs text-accent hover:underline">Batafsil <ArrowRight className="ml-1 inline h-3.5 w-3.5" /></button>
           </div>
           {lisErr && <div className="card mb-4 p-4 text-sm text-rose-400">LIS statistikasini yuklab bo&apos;lmadi: {lisErr}</div>}
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -194,7 +195,7 @@ export default function AdminDashboard({ onGo, provider }) {
 
           <div className="mt-6 flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">So&apos;nggi xaridlar</h2>
-            <button onClick={() => onGo?.('lis')} className="py-2 text-xs text-accent hover:underline">Hammasi →</button>
+            <button onClick={() => onGo?.('lis')} className="py-2 text-xs text-accent hover:underline">Hammasi <ArrowRight className="ml-1 inline h-3.5 w-3.5" /></button>
           </div>
           <div className="mt-3 overflow-hidden rounded-2xl border border-line">
             {!lis ? (
