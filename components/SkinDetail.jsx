@@ -5,8 +5,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from './StoreProvider';
 import { ProductMedia } from './ProductCard';
 import SkinCard from './SkinCard';
+import Skin3DModal from './Skin3DModal';
 import { cachedListings, fetchListings, prefetchSkin, prefetchListings } from '@/lib/skinClientCache';
-import { Eye, Zap, Clock, Copy, Check, ShoppingCart, ChevronLeft, ChevronRight, Heart } from './icons';
+import { Eye, Box, Zap, Clock, Copy, Check, ShoppingCart, ChevronLeft, ChevronRight, Heart } from './icons';
 import { formatPrice, weaponTypes } from '@/lib/products';
 import { rarityInfo, rarityRgb, WEAR_TIERS, WEAR_GRADIENT, wearInfo } from '@/lib/skinMeta';
 
@@ -21,7 +22,7 @@ const DICT = {
     home: 'Bosh sahifa', skins: 'Skinlar', copy: 'Nomini nusxalash', copied: 'Nusxalandi',
     regular: 'Oddiy', stattrak: 'StatTrak™', souvenir: 'Souvenir',
     float: 'Float', type: 'Turi', rarity: 'Rariteti', exterior: 'Holati', pattern: 'Naqsh (seed)', stock: 'Soni',
-    inspect: "O'yin ichida ko'rish", inspectNone: "Inspect havolasi yo'q",
+    inspect: "O'yin ichida ko'rish", inspectNone: "Inspect havolasi yo'q", view3d: "3D ko'rish", close: 'Yopish', loading3d: 'Yuklanmoqda…',
     inspectHint: "CS2 ochiladi va skin o'yin ichida ko'rsatiladi (Steam o'rnatilgan bo'lishi kerak)",
     instant: 'Tezkor', slow: '12 soatgacha', slowFull: 'Sekin (12 soatgacha)',
     addToCart: 'Savatga', added: "Qo'shildi", buyNow: 'Sotib olish',
@@ -37,7 +38,7 @@ const DICT = {
     home: 'Главная', skins: 'Скины', copy: 'Копировать название', copied: 'Скопировано',
     regular: 'Обычный', stattrak: 'StatTrak™', souvenir: 'Сувенир',
     float: 'Float', type: 'Тип', rarity: 'Редкость', exterior: 'Состояние', pattern: 'Паттерн (seed)', stock: 'Количество',
-    inspect: 'Осмотреть в игре', inspectNone: 'Нет inspect-ссылки',
+    inspect: 'Осмотреть в игре', inspectNone: 'Нет inspect-ссылки', view3d: '3D просмотр', close: 'Закрыть', loading3d: 'Загрузка…',
     inspectHint: 'Откроется CS2 и покажет скин в игре (нужен установленный Steam)',
     instant: 'Мгновенно', slow: 'до 12 часов', slowFull: 'Медленно (до 12 часов)',
     addToCart: 'В корзину', added: 'Добавлено', buyNow: 'Купить',
@@ -114,6 +115,7 @@ export default function SkinDetail({ product, related = [], variants = [], switc
   const [f, setF] = useState({ delivery: 'all', floatFrom: '', floatTo: '', priceFrom: '', priceTo: '' });
   const [sort, setSort] = useState({ key: 'price', dir: 'asc' });
   const [selectedId, setSelectedId] = useState(null);
+  const [show3d, setShow3d] = useState(false);
   useEffect(() => setSelectedId(null), [product.id]);
 
   // variant tablari: oddiy bosish — sahifa qayta yuklanmaydi; Ctrl/Cmd+bosish — yangi tabda
@@ -224,6 +226,15 @@ export default function SkinDetail({ product, related = [], variants = [], switc
 
   return (
     <>
+      {show3d && selected?.inspectLink && (
+        <Skin3DModal
+          inspectLink={selected.inspectLink}
+          title={product.fullName || product.name}
+          closeLabel={D.close}
+          loadingLabel={D.loading3d}
+          onClose={() => setShow3d(false)}
+        />
+      )}
       <section className={`container-site py-8 transition-opacity duration-200 ${switching ? 'opacity-60' : ''}`}>
         {/* sarlavha yo'li */}
         <nav className="flex flex-wrap items-center gap-1.5 text-xs text-muted" aria-label="breadcrumb">
@@ -270,10 +281,20 @@ export default function SkinDetail({ product, related = [], variants = [], switc
 
             <div className="relative mt-3">
               {selected?.inspectLink ? (
-                <a href={selected.inspectLink} title={D.inspectHint} className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-3 text-sm font-semibold uppercase tracking-wide transition hover:border-white/40 hover:bg-white/10">
-                  <Eye className="h-4 w-4" strokeWidth={2} />
-                  {D.inspect}
-                </a>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShow3d(true)}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-3 text-sm font-semibold uppercase tracking-wide transition hover:border-white/40 hover:bg-white/10"
+                  >
+                    <Box className="h-4 w-4" strokeWidth={2} />
+                    {D.view3d}
+                  </button>
+                  <a href={selected.inspectLink} title={D.inspectHint} className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-3 text-sm font-semibold uppercase tracking-wide transition hover:border-white/40 hover:bg-white/10">
+                    <Eye className="h-4 w-4" strokeWidth={2} />
+                    {D.inspect}
+                  </a>
+                </div>
               ) : (
                 <div className="flex w-full items-center justify-center gap-2 rounded-xl border border-line py-3 text-sm text-muted">
                   <Eye className="h-4 w-4" strokeWidth={2} />
