@@ -15,12 +15,13 @@ const SITE_URL = (
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'OXY SAVDO — CS2 skinlar va gaming kovriklar',
+    default: 'OXY SAVDO (OXY SHOP) — CS2 skinlar va gaming kovriklar',
     template: '%s · OXY SAVDO',
   },
   description:
-    "CS2 skinlarini sotib oling va soting, professional gaming kovriklar. UZS'da to'lov (Payme, Click), avtomatik yetkazish.",
+    "OXY SAVDO (OXY SHOP): CS2 skinlarini sotib oling va soting, professional gaming kovriklar. UZS'da to'lov (Payme, Click), avtomatik yetkazish.",
   keywords: [
+    'oxy', 'oxyshop', 'oxy shop', 'oxysavdo', 'oxy savdo', 'oxystore', 'oxyship', 'oxy skin', 'oxy skinlar',
     'CS2 skin', 'CS2 skin sotib olish', 'CS2 skinlar narxi', 'skin savdo', 'skin sotish',
     'CS2 skin Uzbekistan', 'CS2 skin O\'zbekiston', 'CS2 скины Узбекистан', 'купить скины CS2',
     'gaming kovrik', 'mousepad', 'Payme', 'Click', 'OXY SAVDO', 'skin marketplace',

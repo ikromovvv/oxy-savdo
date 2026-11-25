@@ -56,7 +56,7 @@ export default function Footer() {
 
       <div className="border-t border-line">
         <div className="container-site flex flex-col justify-between gap-2 py-6 text-xs text-muted sm:flex-row">
-          <span>© {new Date().getFullYear()} {site.full}. {t('rights')}</span>
+          <span>© {new Date().getFullYear()} {site.full} (OXY SHOP). {t('rights')}</span>
           <span className="flex items-center gap-3">
             <Link href="/admin" className="inline-block py-1 hover:text-white">Admin</Link>
             <span>Toshkent, O&apos;zbekiston</span>
