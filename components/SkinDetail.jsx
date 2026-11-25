@@ -425,7 +425,7 @@ export default function SkinDetail({ product, related = [], variants = [], switc
                 ['float', D.float, 'floatFrom', 'floatTo', '0.001', 'decimal'],
                 ['price', D.price, 'priceFrom', 'priceTo', '1', 'numeric'],
               ].map(([key, label, kFrom, kTo, step, mode]) => (
-                <div key={key} className="flex min-w-0 flex-1 items-center rounded-xl border border-line bg-panel transition focus-within:border-white/40 sm:flex-none">
+                <div key={key} className="flex w-full min-w-0 items-center rounded-xl border border-line bg-panel transition focus-within:border-white/40 sm:w-auto sm:flex-none">
                   <span className="flex-none border-r border-line px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted">{label}</span>
                   <input type="number" step={step} inputMode={mode} placeholder={D.from} aria-label={`${label} ${D.from}`} value={f[kFrom]} onChange={(e) => setF({ ...f, [kFrom]: e.target.value })} className="w-full min-w-0 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-muted/60 sm:w-24" />
                   <span className="text-muted/50">—</span>

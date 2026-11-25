@@ -62,7 +62,7 @@ export default function TelegramSkinsClient() {
     <section className="container-site pb-10 pt-4">
       {/* bitta ixcham toolbar: holat tugmalari | qidiruv, saralash, obuna, sotilganlar */}
       <div className="mb-5 flex flex-wrap items-center gap-3 border-b border-line pb-4">
-        <div className="no-scrollbar -mx-5 flex flex-1 items-center gap-1.5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+        <div className="no-scrollbar -mx-5 flex basis-full items-center gap-1.5 overflow-x-auto px-5 sm:mx-0 sm:flex-1 sm:basis-0 sm:px-0">
           <button
             onClick={() => setWear('all')}
             className={`flex-none rounded-lg border px-4 py-2 text-sm font-medium transition ${
