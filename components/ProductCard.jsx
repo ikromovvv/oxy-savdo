@@ -15,7 +15,9 @@ export function ProductMedia({ product, className = '', innerRef, src, priority 
   // o'lchamda so'raymiz va kartada TO'LIQ ko'rsatamiz (object-contain).
   const isSteamImage = STEAM_IMAGE_RE.test(rawImage) && !/\/\d+fx\d+f$/.test(rawImage);
   // kartada 384x288 yetarli (512x384 ga nisbatan ~45% yengil); katta rasm (priority) — 512x384
-  const image = isSteamImage ? `${rawImage}/${priority ? '512fx384f' : '384fx288f'}` : rawImage;
+  // Steam rasmlari o'zimizning keshlovchi proksi orqali (O'zbekistondan Steam CDN sekin) — /api/simg
+  const steamHash = isSteamImage ? rawImage.split('/economy/image/')[1] : null;
+  const image = steamHash ? `/api/simg/${steamHash}?s=${priority ? 512 : 384}` : rawImage;
 
   return (
     <div className={`product-media relative overflow-hidden ${className}`}>
