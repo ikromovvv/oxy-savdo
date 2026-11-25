@@ -48,6 +48,7 @@ export default function Footer() {
             <li><a href={site.telegram} className="inline-block py-1 hover:text-white">Telegram {site.telegramName}</a></li>
             <li><a href={site.instagram} className="inline-block py-1 hover:text-white">Instagram</a></li>
             <li><a href={`tel:${site.phone.replace(/\s/g, '')}`} className="inline-block py-1 hover:text-white">{site.phone}</a></li>
+            {site.phone2 && <li><a href={`tel:${site.phone2.replace(/\s/g, '')}`} className="inline-block py-1 hover:text-white">{site.phone2}</a></li>}
             <li><a href={`mailto:${site.email}`} className="inline-block py-1 hover:text-white">{site.email}</a></li>
           </ul>
         </div>

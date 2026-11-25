@@ -131,7 +131,7 @@ export default function BuyCatalogHome() {
     { value: 'later', label: t('avail_later') },
   ];
   const inputCls =
-    'w-full rounded-xl border border-line bg-panel px-3 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40';
+    'w-full rounded-xl border border-line bg-panel px-3 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40 lg:py-2';
   const tabCls = (active) =>
     `cat-tab group flex flex-none items-center gap-2.5 whitespace-nowrap rounded-full border py-2 pl-4 pr-2 text-sm font-medium transition-all duration-300 ease-out active:scale-[0.97] ${
       active
@@ -180,24 +180,24 @@ export default function BuyCatalogHome() {
 
         {/* CHAP: FILTRLAR — sahifa aylantirilganda birga yuradi (sticky) */}
         <aside
-          className={`card w-full flex-none p-5 lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:w-[260px] lg:overflow-y-auto ${
+          className={`card w-full flex-none p-5 lg:p-4 lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:w-[260px] lg:overflow-y-auto ${
             filtersOpen ? 'block' : 'hidden'
           }`}
         >
           <div className="hidden lg:block">
-            <div className="label mb-3">{t('catalog_search')}</div>
+            <div className="label mb-3 lg:mb-2">{t('catalog_search')}</div>
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t('catalog_search_ph')}
               className={inputCls}
             />
-            <div className="label mb-3 mt-6">{t('catalog_sort')}</div>
+            <div className="label mb-3 mt-6 lg:mb-2 lg:mt-4">{t('catalog_sort')}</div>
             <Select value={sort} onChange={setSort} options={sortOptions} />
           </div>
 
-          <div className="label mb-3 lg:mt-6">{t('catalog_sort_price')}</div>
-          <div className="flex flex-col gap-2">
+          <div className="label mb-3 lg:mb-2 lg:mt-4">{t('catalog_sort_price')}</div>
+          <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2">
             <input
               type="number"
               inputMode="numeric"
@@ -216,11 +216,11 @@ export default function BuyCatalogHome() {
             />
           </div>
 
-          <div className="label mb-3 mt-6">{t('catalog_wear')}</div>
+          <div className="label mb-3 mt-6 lg:mb-2 lg:mt-4">{t('catalog_wear')}</div>
           <div className="flex flex-wrap gap-1.5">
             <button
               onClick={() => setWear('all')}
-              className={`rounded-full border px-3.5 py-2 text-xs font-medium transition-all duration-300 ${
+              className={`rounded-full border px-3.5 py-2 text-xs font-medium transition-all duration-300 lg:px-3 lg:py-1.5 ${
                 wear === 'all'
                   ? 'border-white/50 bg-white/10 text-white'
                   : 'border-line text-white/70 hover:border-white/40'
@@ -230,14 +230,19 @@ export default function BuyCatalogHome() {
             </button>
             {wearOptions.map((w) => {
               const tier = wearInfo(w);
-              const active = wear === w;
+              const selected = wear === 'all' ? [] : wear.split(',');
+              const active = selected.includes(w);
               const color = tier ? TIER_COLOR[tier.key] : '#fff';
               return (
                 <button
                   key={w}
-                  onClick={() => setWear(w)}
+                  onClick={() => {
+                    const next = active ? selected.filter((x) => x !== w) : [...selected, w];
+                    setWear(next.length ? next.join(',') : 'all');
+                  }}
+                  aria-pressed={active}
                   title={w}
-                  className="rounded-full border px-3.5 py-2 text-xs font-semibold transition-all duration-300"
+                  className="rounded-full border px-3.5 py-2 text-xs font-semibold transition-all duration-300 lg:px-3 lg:py-1.5"
                   style={
                     active
                       ? { borderColor: `${color}99`, background: `${color}22`, color, boxShadow: `0 0 12px ${color}55` }
@@ -250,29 +255,15 @@ export default function BuyCatalogHome() {
             })}
           </div>
 
-          <div className="label mb-3 mt-6">{t('catalog_rarity')}</div>
+          <div className="label mb-3 mt-6 lg:mb-2 lg:mt-4">{t('catalog_rarity')}</div>
           <Select value={rarity} onChange={setRarity} options={rarityOptions} />
 
-          <div className="label mb-3 mt-6">{t('catalog_avail')}</div>
-          <div className="flex flex-wrap gap-1.5">
-            {availOptions.map((o) => (
-              <button
-                key={o.value}
-                onClick={() => setAvailability(o.value)}
-                className={`rounded-full border px-3.5 py-2 text-xs font-medium transition-all duration-300 ${
-                  availability === o.value
-                    ? 'border-white/50 bg-white/10 text-white'
-                    : 'border-line text-white/70 hover:border-white/40'
-                }`}
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
+          <div className="label mb-3 mt-6 lg:mb-2 lg:mt-4">{t('catalog_avail')}</div>
+          <Select value={availability} onChange={setAvailability} options={availOptions} />
 
           <button
             onClick={resetFilters}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-line py-2.5 text-sm transition hover:border-white/40"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-line py-2.5 text-sm transition hover:border-white/40 lg:mt-4 lg:py-2"
           >
             <RotateCw className="h-4 w-4" strokeWidth={2} />
             {t('catalog_reset')}

@@ -128,7 +128,7 @@ export default function OfertaPage() {
           <li>STIR: <Fill v={legal.inn} /></li>
           <li>Manzil: <Fill v={legal.address} /></li>
           <li>Bank: <Fill v={legal.bank} /></li>
-          <li>Telefon: {site.phone}</li>
+          <li>Telefon: {site.phone}{site.phone2 ? `, ${site.phone2}` : ''}</li>
           <li>E-pochta: {site.email}</li>
           <li>Telegram: {site.telegramName}</li>
         </ul>

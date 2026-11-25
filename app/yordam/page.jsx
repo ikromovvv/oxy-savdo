@@ -42,6 +42,7 @@ export default function SupportPage() {
       <Reveal stagger className="mt-8 flex flex-wrap gap-3">
         <a href={site.telegram} className="btn-primary">Telegram {site.telegramName}</a>
         <a href={`tel:${site.phone.replace(/\s/g, '')}`} className="btn-ghost">{site.phone}</a>
+        {site.phone2 && <a href={`tel:${site.phone2.replace(/\s/g, '')}`} className="btn-ghost">{site.phone2}</a>}
       </Reveal>
 
       <Reveal className="mt-12">

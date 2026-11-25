@@ -74,7 +74,7 @@ export default function ReturnsPage() {
         <ul className="space-y-1">
           <li>Telegram: {site.telegramName}</li>
           <li>E-pochta: {site.email}</li>
-          <li>Telefon: {site.phone}</li>
+          <li>Telefon: {site.phone}{site.phone2 ? `, ${site.phone2}` : ''}</li>
         </ul>
         <p>Murojaatlar odatda 1–2 ish kuni ichida ko&apos;rib chiqiladi.</p>
       </Sec>
