@@ -7,7 +7,7 @@ export default function robots() {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin', '/api/', '/buyurtmalarim', '/tolov/', '/demo-tolov/'],
+      disallow: ['/admin', '/api/', '/buyurtmalarim', '/tolov/', '/demo-tolov/', '/saqlangan', '/rozigrish/app'],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

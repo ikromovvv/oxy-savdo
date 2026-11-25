@@ -283,6 +283,15 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   transition: transform 0.18s linear;
 }
 
+/* Katalog filtr paneli (lg+): ichki scroll yo'q — ochiladigan menyular (Select) kesilmaydi.
+   Ekran balandligi yetarli bo'lsagina sahifa bilan birga "yopishib" yuradi. */
+@media (min-width: 1024px) {
+  .filters-aside { overflow: visible; }
+}
+@media (min-width: 1024px) and (min-height: 720px) {
+  .filters-aside { position: sticky; top: 5rem; }
+}
+
 /* Admin: ichki scroll konteynerlari uchun ingichka qora scrollbar */
 .admin-scroll { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.22) transparent; }
 .admin-scroll::-webkit-scrollbar { width: 8px; height: 8px; }

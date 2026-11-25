@@ -180,7 +180,7 @@ export default function BuyCatalogHome() {
 
         {/* CHAP: FILTRLAR — sahifa aylantirilganda birga yuradi (sticky) */}
         <aside
-          className={`card w-full flex-none p-5 lg:p-4 lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:w-[260px] lg:overflow-y-auto ${
+          className={`card filters-aside w-full flex-none p-5 lg:block lg:w-[290px] lg:p-4 ${
             filtersOpen ? 'block' : 'hidden'
           }`}
         >

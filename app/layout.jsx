@@ -6,6 +6,7 @@ import CartDrawer from '@/components/CartDrawer';
 import ScrollToTop from '@/components/ScrollToTop';
 import TgWebApp from '@/components/TgWebApp';
 import IntroLoader from '@/components/IntroLoader';
+import { organizationLd, websiteLd } from '@/lib/seo';
 
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || 'https://oxy-savdo.vercel.app'
@@ -20,11 +21,14 @@ export const metadata = {
   description:
     "CS2 skinlarini sotib oling va soting, professional gaming kovriklar. UZS'da to'lov (Payme, Click), avtomatik yetkazish.",
   keywords: [
-    'CS2 skin', 'CS2 skin sotib olish', 'skin savdo', 'gaming kovrik',
-    'mousepad', 'Payme', 'Click', 'OXY SAVDO', 'skin marketplace',
+    'CS2 skin', 'CS2 skin sotib olish', 'CS2 skinlar narxi', 'skin savdo', 'skin sotish',
+    'CS2 skin Uzbekistan', 'CS2 skin O\'zbekiston', 'CS2 скины Узбекистан', 'купить скины CS2',
+    'gaming kovrik', 'mousepad', 'Payme', 'Click', 'OXY SAVDO', 'skin marketplace',
   ],
+  category: 'games',
+  formatDetection: { telephone: true, email: true, address: false },
   applicationName: 'OXY SAVDO',
-  alternates: { canonical: '/' },
+  alternates: { canonical: './' }, // har sahifa o'z (query'siz) URL'ini canonical qiladi
   openGraph: {
     type: 'website',
     siteName: 'OXY SAVDO',
@@ -58,6 +62,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="min-h-screen font-sans antialiased">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationLd(), websiteLd()]) }} />
         <script
           dangerouslySetInnerHTML={{
             __html:
