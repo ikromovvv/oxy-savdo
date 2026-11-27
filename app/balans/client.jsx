@@ -1,97 +1,25 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
 import CatalogCard from '@/components/CatalogCard';
 import { ProductMedia } from '@/components/ProductCard';
 import { ShoppingCart, Check } from '@/components/icons';
 import { buildSets, popularWithin } from '@/lib/balanceSets';
+import { TXT, fmt, useBalancePool } from './shared';
 
 const QUICK = [200000, 500000, 1000000, 3000000];
-const fmt = (n) => Number(n).toLocaleString('ru-RU');
-
-const TXT = {
-  uz: {
-    title: 'Balansga qarab skin tanlash',
-    sub: "Balansingizni kiriting — biz sig'adigan eng yaxshi to'plamlar va eng ommabop skinlarni ko'rsatamiz.",
-    budget: "Balans, so'm",
-    mine: 'Mening balansim',
-    sets: "Tayyor to'plamlar",
-    popular: 'Eng ommabop skinlar',
-    total: 'Jami',
-    left: 'Qoladi',
-    addAll: 'Hammasini savatga',
-    added: "Savatga qo'shildi",
-    open: 'Ichini ko‘rish',
-    close: 'Yopish',
-    items: 'ta skin',
-    loading: 'Tanlanmoqda…',
-    empty: "Bu balansga mos skin topilmadi. Balansni oshirib ko'ring.",
-    error: "Skinlarni yuklab bo'lmadi. Birozdan keyin qayta urinib ko'ring.",
-    names: {
-      duo: ['Ikkita kuchli skin', 'Balans teng ikkiga bo‘lingan'],
-      lead: ['Asosiy + yordamchi', 'Bitta kuchli qurol va unga juft skin'],
-      kit: ["Qurol to'plami", 'Avtomat + snayper + pistolet'],
-      premium: ['Premium', 'Pichoq yoki qo‘lqop + qurol'],
-      trio: ['Uchta skin', 'Teng taqsimlangan 3 ta skin'],
-      mix: ['Arzon-mazali', '4–5 ta ommabop skin, har xil turdan'],
-      duo2: ['Ikkita skin (variant)', 'Boshqa ommabop juftlik'],
-      kit2: ["Qurol to'plami (variant)", 'Boshqa avtomat + snayper + pistolet'],
-      trio2: ['Uchta skin (variant)', 'Boshqa ommabop uchlik'],
-      lead2: ['Asosiy + yordamchi (variant)', 'Boshqa kuchli juftlik'],
-    },
-  },
-  ru: {
-    title: 'Подбор скинов по балансу',
-    sub: 'Введите баланс — покажем лучшие наборы и самые популярные скины, которые на него хватит.',
-    budget: 'Баланс, сум',
-    mine: 'Мой баланс',
-    sets: 'Готовые наборы',
-    popular: 'Самые популярные скины',
-    total: 'Итого',
-    left: 'Останется',
-    addAll: 'Всё в корзину',
-    added: 'Добавлено в корзину',
-    open: 'Посмотреть состав',
-    close: 'Закрыть',
-    items: 'скина',
-    loading: 'Подбираем…',
-    empty: 'Под этот баланс скинов не нашлось. Попробуйте увеличить сумму.',
-    error: 'Не удалось загрузить скины. Попробуйте позже.',
-    names: {
-      duo: ['Два сильных скина', 'Баланс поровну на два'],
-      lead: ['Основной + дополнительный', 'Одно сильное оружие и пара к нему'],
-      kit: ['Набор оружия', 'Винтовка + снайперка + пистолет'],
-      premium: ['Премиум', 'Нож или перчатки + оружие'],
-      trio: ['Три скина', 'Поровну на три скина'],
-      mix: ['Дёшево и интересно', '4–5 популярных скинов разных типов'],
-      duo2: ['Два скина (вариант)', 'Другая популярная пара'],
-      kit2: ['Набор оружия (вариант)', 'Другая винтовка + снайперка + пистолет'],
-      trio2: ['Три скина (вариант)', 'Другая популярная тройка'],
-      lead2: ['Основной + дополнительный (вариант)', 'Другая сильная пара'],
-    },
-  },
-};
-
-async function getJson(params) {
-  const r = await fetch('/api/skins?' + new URLSearchParams(params).toString());
-  if (!r.ok) throw new Error('http_' + r.status);
-  const d = await r.json();
-  if (d.error && !d.items?.length) throw new Error(d.error);
-  return d.items || [];
-}
 
 export default function BalansClient() {
+  const router = useRouter();
   const { lang, balance, add } = useStore();
   const L = TXT[lang] || TXT.uz;
 
   const [input, setInput] = useState('');
   const [budget, setBudget] = useState(500000);
-  const [pool, setPool] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ok | error
   const [addedKey, setAddedKey] = useState(null);
-  const [openSet, setOpenSet] = useState(null);
+  const { pool, status } = useBalancePool(budget);
 
   // kirgan foydalanuvchi balansi bo'lsa — boshlang'ich qiymat sifatida
   useEffect(() => {
@@ -109,49 +37,8 @@ export default function BalansClient() {
     return () => clearTimeout(id);
   }, [input]);
 
-  useEffect(() => {
-    let dead = false;
-    setStatus('loading');
-    const base = { priceTo: String(budget), wear: 'Factory New,Minimal Wear,Field-Tested', offset: '0', sort: 'count_desc' };
-    const from = (k) => String(Math.round(budget * k));
-    const reqs = [
-      { ...base, priceFrom: from(0.08), limit: '120' },
-      { ...base, sort: 'price_desc', limit: '60' },
-      { ...base, priceFrom: from(0.1), weaponType: 'rifle', limit: '60' },
-      { ...base, priceFrom: from(0.08), weaponType: 'sniper', limit: '60' },
-      { ...base, priceFrom: from(0.05), weaponType: 'pistol', limit: '60' },
-      { ...base, priceFrom: from(0.05), weaponType: 'smg', limit: '40' },
-      { ...base, priceFrom: from(0.05), weaponType: 'heavy', limit: '40' },
-      { ...base, priceFrom: from(0.2), weaponType: 'knife', limit: '40' },
-      { ...base, priceFrom: from(0.2), weaponType: 'gloves', limit: '40' },
-    ];
-    Promise.all(reqs.map(getJson))
-      .then((lists) => {
-        if (dead) return;
-        setPool(lists.flat());
-        setStatus('ok');
-      })
-      .catch(() => !dead && setStatus('error'));
-    return () => {
-      dead = true;
-    };
-  }, [budget]);
-
   const sets = useMemo(() => buildSets(pool, budget), [pool, budget]);
   const popular = useMemo(() => popularWithin(pool, budget, 20), [pool, budget]);
-
-  // modalni Esc bilan yopish + orqa fon aylanmasin
-  useEffect(() => {
-    if (!openSet) return;
-    const onKey = (e) => e.key === 'Escape' && setOpenSet(null);
-    window.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [openSet]);
 
   function addAll(set) {
     set.items.forEach((p) => add(p));
@@ -160,7 +47,7 @@ export default function BalansClient() {
   }
 
   const chip = 'rounded-lg border px-3 py-2 text-sm transition';
-  const current = openSet ? sets.find((s) => s.key === openSet) : null;
+  const openSet = (key) => router.push(`/balans/${key}?budget=${budget}`);
 
   return (
     <section className="container-wide pb-12 pt-6">
@@ -221,10 +108,10 @@ export default function BalansClient() {
               return (
                 <div
                   key={s.key}
-                  role="button"
+                  role="link"
                   tabIndex={0}
-                  onClick={() => setOpenSet(s.key)}
-                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setOpenSet(s.key))}
+                  onClick={() => openSet(s.key)}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), openSet(s.key))}
                   className="card card-hover flex h-[440px] cursor-pointer flex-col p-3 text-left outline-none focus-visible:border-white/50"
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -277,67 +164,12 @@ export default function BalansClient() {
       {status === 'ok' && popular.length > 0 && (
         <>
           <h2 className="mt-10 text-lg font-semibold">{L.popular}</h2>
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[1700px]:grid-cols-5">
+          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 min-[1700px]:grid-cols-5">
             {popular.map((p) => (
               <CatalogCard key={p.id} product={p} />
             ))}
           </div>
         </>
-      )}
-
-      {current && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm" onClick={() => setOpenSet(null)}>
-          <div className="card flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden p-0" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-            <div className="flex items-start justify-between gap-3 border-b border-line px-5 py-4">
-              <div>
-                <div className="text-lg font-semibold">{(L.names[current.key] || [current.key])[0]}</div>
-                <div className="text-xs text-muted">{(L.names[current.key] || [])[1]}</div>
-              </div>
-              <button onClick={() => setOpenSet(null)} className="rounded-lg border border-line px-3 py-1.5 text-xs text-white/70 hover:text-white">
-                {L.close}
-              </button>
-            </div>
-            <ul className="admin-scroll flex-1 space-y-3 overflow-y-auto px-5 py-4">
-              {current.items.map((p) => (
-                <li key={p.id} className="flex items-center gap-4 rounded-xl border border-line bg-ink/40 p-3">
-                  <Link href={`/mahsulot/${p.id}`} className="block w-28 flex-none">
-                    <ProductMedia product={{ ...p, tone: 'from-transparent to-transparent' }} className="relative aspect-[4/3]" />
-                  </Link>
-                  <div className="min-w-0 flex-1">
-                    <Link href={`/mahsulot/${p.id}`} className="block truncate text-sm font-semibold hover:text-accent">
-                      {p.name}
-                    </Link>
-                    <div className="mt-0.5 text-xs text-white/50">
-                      {p.wear || ''} {p.stattrak ? '· StatTrak' : ''}
-                    </div>
-                    <div className="mt-1 text-sm font-bold">{fmt(p.price)} so&apos;m</div>
-                  </div>
-                  <button
-                    onClick={() => add(p)}
-                    aria-label="add"
-                    className="grid h-10 w-10 flex-none place-items-center rounded-xl border border-white/15 bg-white/[0.04] text-white/85 transition hover:border-white/40 hover:bg-white/10"
-                  >
-                    <ShoppingCart className="h-4 w-4" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <div className="border-t border-line px-5 py-4">
-              <div className="flex items-baseline justify-between">
-                <span className="text-sm text-muted">{L.total}</span>
-                <span className="text-xl font-bold">{fmt(current.total)} so&apos;m</span>
-              </div>
-              <div className="flex items-baseline justify-between text-xs text-white/45">
-                <span>{L.left}</span>
-                <span>{fmt(Math.max(0, budget - current.total))} so&apos;m</span>
-              </div>
-              <button onClick={() => addAll(current)} className="btn-primary mt-3 w-full">
-                {addedKey === current.key ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ShoppingCart className="h-4 w-4" />}
-                {addedKey === current.key ? L.added : L.addAll}
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </section>
   );
