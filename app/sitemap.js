@@ -15,7 +15,7 @@ export default async function sitemap() {
       url: `${SITE_URL}${p || '/'}`,
       lastModified: now,
       changeFrequency: p === '' ? 'daily' : 'weekly',
-      priority: p === '' ? 1 : 0.6,
+      priority: p === '' ? 1 : p === '/skinlar' ? 0.9 : p === '/balans' || p === '/telegram-skinlar' || p === '/sotish' ? 0.7 : 0.6,
     })
   );
 

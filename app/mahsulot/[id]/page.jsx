@@ -63,11 +63,19 @@ export async function generateMetadata({ params }) {
         (price ? ` Narx: ${price}.` : '') +
         " UZS'da to'lov (Payme, Click), avtomatik yetkazish."
     );
+    let image = skin.image;
+    if (!image) {
+      try {
+        image = (await getSkinMeta([skin.name]))[skin.name]?.image;
+      } catch {
+        /* rasmsiz ham ishlaydi */
+      }
+    }
     return {
       title,
       description: desc,
       alternates: { canonical },
-      openGraph: { type: 'website', url: canonical, title, description: desc },
+      openGraph: { type: 'website', url: canonical, title, description: desc, images: image ? [absUrl(image)] : undefined },
     };
   }
 

@@ -9,5 +9,10 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <TelegramSkinsClient />;
+  return (
+    <>
+      <h1 className="sr-only">Telegram kanaldagi CS2 skinlar: float, narx va unban sanasi</h1>
+      <TelegramSkinsClient />
+    </>
+  );
 }

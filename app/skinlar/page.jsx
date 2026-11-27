@@ -9,5 +9,10 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <BuyCatalogHome />;
+  return (
+    <>
+      <h1 className="sr-only">CS2 skinlar — so&apos;mda sotib oling</h1>
+      <BuyCatalogHome />
+    </>
+  );
 }
