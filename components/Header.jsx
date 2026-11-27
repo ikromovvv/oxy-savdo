@@ -259,7 +259,7 @@ export default function Header() {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-line/80 bg-ink/80 backdrop-blur-xl">
-        <div className="container-site flex h-14 items-center justify-between gap-3">
+        <div className={`${['/skinlar', '/telegram-skinlar', '/sotish'].includes(pathname) ? 'container-wide' : 'container-site'} flex h-14 items-center justify-between gap-3`}>
           <div className="flex min-w-0 items-center gap-6">
             <Link href="/" className="flex flex-none items-center py-2" aria-label={site.name}>
               <OxyLogo size={22} />

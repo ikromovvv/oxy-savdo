@@ -1,6 +1,6 @@
 'use client';
 
-import { RotateCw, SlidersHorizontal, ChevronDown, ChevronRight, SortLabel } from './icons';
+import { RotateCw, SlidersHorizontal, ChevronDown, SortLabel } from './icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from './StoreProvider';
 import CatalogCard from './CatalogCard';
@@ -15,29 +15,6 @@ const RARITY_DOT = {
 };
 const PAGE_SIZE = 60;
 
-// ---- float oralig'i <-> wear ro'yxati (katalog nom darajasida: float oralig'i mos holatlarga aylantiriladi) ----
-const wearFromRange = (lo, hi) => {
-  const ts = WEAR_TIERS.filter((t) => t.max > lo && t.min < hi);
-  return ts.length === 0 || ts.length === WEAR_TIERS.length ? 'all' : ts.map((t) => t.name).join(',');
-};
-const rangeFromWear = (wear) => {
-  if (!wear || wear === 'all') return [0, 1];
-  const ts = WEAR_TIERS.filter((t) => wear.split(',').includes(t.name));
-  return ts.length ? [Math.min(...ts.map((t) => t.min)), Math.max(...ts.map((t) => t.max))] : [0, 1];
-};
-
-function Acc({ title, open, onToggle, children }) {
-  return (
-    <div className="border-t border-line first:border-t-0">
-      <button onClick={onToggle} aria-expanded={open} className="flex w-full items-center justify-between px-5 py-4 text-left text-[15px] font-semibold transition hover:bg-white/[0.03]">
-        {title}
-        {open ? <ChevronDown className="h-4 w-4 text-white/60" /> : <ChevronRight className="h-4 w-4 text-white/60" />}
-      </button>
-      {open && <div className="px-5 pb-5">{children}</div>}
-    </div>
-  );
-}
-
 export default function BuyCatalogHome() {
   const { t, lang } = useStore();
 
@@ -46,13 +23,10 @@ export default function BuyCatalogHome() {
   const [wear, setWear] = useState('all');
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
-  const [sort, setSort] = useState('count_desc');
+  const [sort, setSort] = useState('price_desc');
   const [rarity, setRarity] = useState('all');
   const [availability, setAvailability] = useState('all');
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [fl, setFl] = useState([0, 1]);
-  const [open, setOpen] = useState({ price: false, wear: false, rarity: false, float: true, more: false });
-  const tog = (k) => setOpen((o) => ({ ...o, [k]: !o[k] }));
 
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
@@ -118,17 +92,6 @@ export default function BuyCatalogHome() {
     return () => window.removeEventListener('oxy:search', h);
   }, []);
 
-  // wear tugmalari o'zgarsa — float slayderi ham moslanadi
-  useEffect(() => {
-    setFl((prev) => (wearFromRange(prev[0], prev[1]) === wear ? prev : rangeFromWear(wear)));
-  }, [wear]);
-
-  function setRange(lo, hi) {
-    const a = Math.max(0, Math.min(lo, hi - 0.01));
-    const b = Math.min(1, Math.max(hi, lo + 0.01));
-    setFl([a, b]);
-    setWear(wearFromRange(a, b));
-  }
   function toggleWear(name) {
     const cur = wear === 'all' ? [] : wear.split(',');
     const next = cur.includes(name) ? cur.filter((x) => x !== name) : [...cur, name];
@@ -155,9 +118,9 @@ export default function BuyCatalogHome() {
       : { filters: 'Filtrlar', price: "Narx, so'm", wear: 'Holati (wear)', rarity: 'Nodirligi', float: 'Float', more: "Qo'shimcha", sort: 'Saralash', found: 'Topildi', popular: 'Ommabop', all: 'Hammasi' };
 
   const sortOptions = [
-    { value: 'count_desc', label: `${L.sort}: ${L.popular}` },
     { value: 'price_desc', label: <SortLabel text={`${L.sort}: ${t('catalog_sort_price')}`} dir="desc" /> },
     { value: 'price_asc', label: <SortLabel text={`${L.sort}: ${t('catalog_sort_price')}`} dir="asc" /> },
+    { value: 'count_desc', label: `${L.sort}: ${L.popular}` },
   ];
   const rarityList = ['Consumer Grade', 'Industrial Grade', 'Mil-Spec Grade', 'Restricted', 'Classified', 'Covert', 'Extraordinary', 'Contraband'];
   const availOptions = [
@@ -167,6 +130,8 @@ export default function BuyCatalogHome() {
   ];
   const inputCls = 'w-full rounded-xl border border-line bg-ink/40 px-3 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40';
   const selectedWears = wear === 'all' ? [] : wear.split(',');
+  const activeCount = (priceFrom || priceTo ? 1 : 0) + (wear !== 'all' ? 1 : 0) + (rarity !== 'all' ? 1 : 0) + (availability !== 'all' ? 1 : 0);
+  const RARITY_SHORT = { 'Consumer Grade': 'Consumer', 'Industrial Grade': 'Industrial', 'Mil-Spec Grade': 'Mil-Spec', Restricted: 'Restricted', Classified: 'Classified', Covert: 'Covert', Extraordinary: 'Extraordinary', Contraband: 'Contraband' };
 
   const wearChips = (
     <div className="flex flex-wrap gap-1.5">
@@ -190,7 +155,7 @@ export default function BuyCatalogHome() {
   );
 
   return (
-    <section className="container-site pb-8 pt-4">
+    <section className="container-wide pb-8 pt-4">
       {/* kategoriyalar */}
       <div className="no-scrollbar -mx-5 flex gap-1.5 overflow-x-auto border-y border-line px-5 py-3 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:border-x-0 sm:px-0">
         {[{ slug: 'all', label: L.all }, ...tabs.map((w) => ({ slug: w.slug, label: w[lang] || w.uz }))].map((c) => {
@@ -220,68 +185,77 @@ export default function BuyCatalogHome() {
           <ChevronDown className={`h-4 w-4 text-muted transition-transform ${filtersOpen ? 'rotate-180' : ''}`} />
         </button>
 
-        {/* CHAP: FILTRLAR (akkordeon) */}
+        {/* CHAP: FILTRLAR — hammasi ochiq, akkordeonsiz */}
         <aside className={`card filters-aside w-full flex-none overflow-hidden p-0 lg:block lg:w-[300px] ${filtersOpen ? 'block' : 'hidden'}`}>
-          <div className="flex items-center gap-2.5 px-5 py-4 text-lg font-semibold">
-            <SlidersHorizontal className="h-5 w-5" />
-            {L.filters}
+          <div className="flex items-center justify-between gap-3 px-5 py-4">
+            <span className="flex items-center gap-2.5 text-lg font-semibold">
+              <SlidersHorizontal className="h-5 w-5" />
+              {L.filters}
+              {activeCount > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 text-[11px] font-bold text-ink">{activeCount}</span>}
+            </span>
+            {activeCount > 0 && (
+              <button onClick={resetFilters} className="inline-flex items-center gap-1.5 text-xs text-white/60 transition hover:text-white">
+                <RotateCw className="h-3.5 w-3.5" strokeWidth={2} />
+                {t('catalog_reset')}
+              </button>
+            )}
           </div>
 
-          <Acc title={L.price} open={open.price} onToggle={() => tog('price')}>
-            <div className="grid grid-cols-2 gap-2">
-              <input type="number" inputMode="numeric" value={priceFrom} onChange={(e) => setPriceFrom(e.target.value)} placeholder={t('catalog_price_from')} className={inputCls} />
-              <input type="number" inputMode="numeric" value={priceTo} onChange={(e) => setPriceTo(e.target.value)} placeholder={t('catalog_price_to')} className={inputCls} />
+          <div className="space-y-6 border-t border-line px-5 py-5">
+            <div>
+              <div className="label mb-2.5">{L.price}</div>
+              <div className="grid grid-cols-2 gap-2">
+                <input type="number" inputMode="numeric" value={priceFrom} onChange={(e) => setPriceFrom(e.target.value)} placeholder={t('catalog_price_from')} className={inputCls} />
+                <input type="number" inputMode="numeric" value={priceTo} onChange={(e) => setPriceTo(e.target.value)} placeholder={t('catalog_price_to')} className={inputCls} />
+              </div>
             </div>
-          </Acc>
 
-          <Acc title={L.wear} open={open.wear} onToggle={() => tog('wear')}>
-            {wearChips}
-          </Acc>
-
-          <Acc title={L.rarity} open={open.rarity} onToggle={() => tog('rarity')}>
-            <div className="flex flex-col gap-1">
-              {rarityList.map((r) => {
-                const active = rarity === r;
-                return (
-                  <button
-                    key={r}
-                    onClick={() => setRarity(active ? 'all' : r)}
-                    aria-pressed={active}
-                    className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition ${active ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/[0.05]'}`}
-                  >
-                    <span className="h-2.5 w-2.5 flex-none rounded-full" style={{ background: RARITY_DOT[r], boxShadow: `0 0 6px ${RARITY_DOT[r]}` }} />
-                    {r.replace(' Grade', '')}
-                  </button>
-                );
-              })}
+            <div>
+              <div className="label mb-2.5">{L.wear}</div>
+              {wearChips}
+              <div className="mt-2 text-[11px] leading-snug text-muted">
+                {selectedWears.length ? selectedWears.join(' · ') : WEAR_TIERS.map((x) => x.key + ' ' + x.name).join(' · ')}
+              </div>
             </div>
-          </Acc>
 
-          <Acc title={L.float} open={open.float} onToggle={() => tog('float')}>
-            <div className="catalog-range relative mt-1 h-6">
-              <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-white/15" />
-              <div className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-accent" style={{ left: `${fl[0] * 100}%`, right: `${(1 - fl[1]) * 100}%` }} />
-              <input type="range" min="0" max="1" step="0.01" value={fl[0]} onChange={(e) => setRange(Number(e.target.value), fl[1])} aria-label="float min" className="catalog-range-input" />
-              <input type="range" min="0" max="1" step="0.01" value={fl[1]} onChange={(e) => setRange(fl[0], Number(e.target.value))} aria-label="float max" className="catalog-range-input" />
+            <div>
+              <div className="label mb-2.5">{L.rarity}</div>
+              <div className="flex flex-wrap gap-1.5">
+                {rarityList.map((r) => {
+                  const active = rarity === r;
+                  return (
+                    <button
+                      key={r}
+                      onClick={() => setRarity(active ? 'all' : r)}
+                      aria-pressed={active}
+                      className={`inline-flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs transition ${active ? 'border-white/40 bg-white/10 text-white' : 'border-line text-white/70 hover:border-white/30'}`}
+                    >
+                      <span className="h-2 w-2 flex-none rounded-full" style={{ background: RARITY_DOT[r], boxShadow: `0 0 6px ${RARITY_DOT[r]}` }} />
+                      {RARITY_SHORT[r]}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="mt-4 flex items-center gap-2">
-              <input type="number" min="0" max="1" step="0.01" value={fl[0].toFixed(2)} onChange={(e) => setRange(Number(e.target.value) || 0, fl[1])} className={inputCls} />
-              <span className="text-white/40">—</span>
-              <input type="number" min="0" max="1" step="0.01" value={fl[1].toFixed(2)} onChange={(e) => setRange(fl[0], Number(e.target.value) || 1)} className={inputCls} />
+
+            <div>
+              <div className="label mb-2.5">{t('catalog_avail')}</div>
+              <div className="grid grid-cols-3 gap-1.5 rounded-xl border border-line p-1">
+                {availOptions.map((o) => {
+                  const active = availability === o.value;
+                  return (
+                    <button
+                      key={o.value}
+                      onClick={() => setAvailability(o.value)}
+                      aria-pressed={active}
+                      className={`rounded-lg px-2 py-2 text-xs font-medium transition ${active ? 'bg-white/10 text-white' : 'text-white/65 hover:text-white'}`}
+                    >
+                      {o.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="mt-3">{wearChips}</div>
-          </Acc>
-
-          <Acc title={L.more} open={open.more} onToggle={() => tog('more')}>
-            <div className="mb-2 text-xs text-muted">{t('catalog_avail')}</div>
-            <Select value={availability} onChange={setAvailability} options={availOptions} />
-          </Acc>
-
-          <div className="border-t border-line p-4">
-            <button onClick={resetFilters} className="flex w-full items-center justify-center gap-2 rounded-xl border border-line py-2.5 text-sm transition hover:border-white/40">
-              <RotateCw className="h-4 w-4" strokeWidth={2} />
-              {t('catalog_reset')}
-            </button>
           </div>
         </aside>
 
@@ -292,7 +266,7 @@ export default function BuyCatalogHome() {
             <Select value={sort} onChange={setSort} options={sortOptions} />
           </div>
           {loading ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 min-[1700px]:grid-cols-5">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="card aspect-[3/4] animate-pulse bg-white/5" />
               ))}
@@ -308,7 +282,7 @@ export default function BuyCatalogHome() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 min-[1700px]:grid-cols-5">
                 {items.map((p) => (
                   <CatalogCard key={p.id} product={p} />
                 ))}

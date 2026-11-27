@@ -152,7 +152,7 @@ export default function SotishPage() {
   }
 
   return (
-    <section className="container-site pb-10 pt-4">
+    <section className="container-wide pb-10 pt-4">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         {/* CHAP: TOOLBAR + GRID */}
         <div className="min-w-0 flex-1">

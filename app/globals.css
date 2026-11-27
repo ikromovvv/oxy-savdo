@@ -30,6 +30,9 @@ body {
   .container-site {
     @apply mx-auto w-full max-w-site px-5 sm:px-8;
   }
+  .container-wide {
+    @apply mx-auto w-full max-w-[1840px] px-5 sm:px-8;
+  }
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold tracking-wide transition-all duration-300 ease-out;
   }

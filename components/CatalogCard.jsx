@@ -79,7 +79,7 @@ export default function CatalogCard({ product: p }) {
       {/* tana */}
       <div className="flex flex-1 flex-col px-4 pb-4 pt-1">
         <div className="truncate text-xs text-white/55">{weapon}</div>
-        <Link href={`/mahsulot/${p.id}`} className="mt-0.5 line-clamp-1 text-lg font-semibold leading-tight transition hover:text-accent">
+        <Link href={`/mahsulot/${p.id}`} className="mt-0.5 line-clamp-1 text-lg font-semibold leading-tight transition after:absolute after:inset-0 after:z-10 after:content-[''] hover:text-accent">
           {skinName}
         </Link>
 
@@ -96,7 +96,7 @@ export default function CatalogCard({ product: p }) {
             disabled={locked}
             aria-label={t('add_to_cart')}
             title={added ? t('added') : t('add_to_cart')}
-            className={`grid h-11 w-11 flex-none place-items-center rounded-xl border transition ${
+            className={`relative z-20 grid h-11 w-11 flex-none place-items-center rounded-xl border transition ${
               locked
                 ? 'cursor-not-allowed border-line text-white/30'
                 : added

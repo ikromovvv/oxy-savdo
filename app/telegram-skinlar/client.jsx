@@ -59,7 +59,7 @@ export default function TelegramSkinsClient() {
   }, [data, query, wear, sort, showSold]);
 
   return (
-    <section className="container-site pb-10 pt-4">
+    <section className="container-wide pb-10 pt-4">
       {/* bitta ixcham toolbar: holat tugmalari | qidiruv, saralash, obuna, sotilganlar */}
       <div className="mb-5 flex flex-wrap items-center gap-3 border-b border-line pb-4">
         <div className="no-scrollbar -mx-5 flex basis-full items-center gap-1.5 overflow-x-auto px-5 sm:mx-0 sm:flex-1 sm:basis-0 sm:px-0">
