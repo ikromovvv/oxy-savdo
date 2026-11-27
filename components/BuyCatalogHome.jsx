@@ -228,7 +228,13 @@ export default function BuyCatalogHome() {
                       key={r}
                       onClick={() => setRarity(active ? 'all' : r)}
                       aria-pressed={active}
-                      className={`inline-flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs transition ${active ? 'border-white/40 bg-white/10 text-white' : 'border-line text-white/70 hover:border-white/30'}`}
+                      style={{
+                        borderColor: active ? RARITY_DOT[r] : `${RARITY_DOT[r]}66`,
+                        background: active ? `${RARITY_DOT[r]}33` : `${RARITY_DOT[r]}12`,
+                        color: RARITY_DOT[r],
+                        boxShadow: active ? `0 0 12px ${RARITY_DOT[r]}55` : 'none',
+                      }}
+                      className={`inline-flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition hover:brightness-125 ${active ? '' : 'opacity-80 hover:opacity-100'}`}
                     >
                       <span className="h-2 w-2 flex-none rounded-full" style={{ background: RARITY_DOT[r], boxShadow: `0 0 6px ${RARITY_DOT[r]}` }} />
                       {RARITY_SHORT[r]}
