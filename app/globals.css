@@ -26,6 +26,10 @@ body {
   color: #080b0d;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 @layer components {
   .container-site {
     @apply mx-auto w-full max-w-site px-5 sm:px-8;

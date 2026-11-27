@@ -214,10 +214,10 @@ export default function BalansClient() {
       {status === 'ok' && sets.length > 0 && (
         <>
           <h2 className="mt-10 text-lg font-semibold">{L.sets}</h2>
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 min-[1700px]:grid-cols-4">
+          <div className="mt-4 grid grid-cols-1 items-start gap-3 sm:grid-cols-2 xl:grid-cols-4 min-[1700px]:grid-cols-5">
             {sets.map((s) => {
               const [name, desc] = L.names[s.key] || [s.key, ''];
-              const odd = s.items.length % 2 === 1 && s.items.length > 1;
+              const cols = s.items.length >= 3 ? 'grid-cols-3' : 'grid-cols-2';
               return (
                 <div
                   key={s.key}
@@ -225,7 +225,7 @@ export default function BalansClient() {
                   tabIndex={0}
                   onClick={() => setOpenSet(s.key)}
                   onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setOpenSet(s.key))}
-                  className="card card-hover flex cursor-pointer flex-col p-4 text-left outline-none focus-visible:border-white/50"
+                  className="card card-hover flex cursor-pointer flex-col p-3 text-left outline-none focus-visible:border-white/50"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -237,23 +237,20 @@ export default function BalansClient() {
                     </span>
                   </div>
 
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    {s.items.map((p, i) => (
-                      <div
-                        key={p.id}
-                        className={`relative overflow-hidden rounded-xl border border-line bg-ink/40 px-2 pb-2 pt-1 ${odd && i === s.items.length - 1 ? 'col-span-2' : ''}`}
-                      >
-                        <ProductMedia product={{ ...p, tone: 'from-transparent to-transparent' }} className={`relative ${odd && i === s.items.length - 1 ? 'aspect-[16/7]' : 'aspect-[4/3]'}`} />
-                        <div className="truncate text-[11px] text-white/80">{p.name}</div>
-                        <div className="text-[11px] text-white/45">{fmt(p.price)} so&apos;m</div>
+                  <div className={`mt-2.5 grid ${cols} gap-1.5`}>
+                    {s.items.map((p) => (
+                      <div key={p.id} className="relative overflow-hidden rounded-lg border border-line bg-ink/40 px-1.5 pb-1.5 pt-0.5">
+                        <ProductMedia product={{ ...p, tone: 'from-transparent to-transparent' }} className="relative aspect-[3/2]" />
+                        <div className="truncate text-[10px] text-white/80">{p.name}</div>
+                        <div className="text-[10px] text-white/45">{fmt(p.price)}</div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="mt-auto pt-4">
+                  <div className="pt-3">
                     <div className="flex items-baseline justify-between text-sm">
                       <span className="text-muted">{L.total}</span>
-                      <span className="text-lg font-bold">{fmt(s.total)} so&apos;m</span>
+                      <span className="text-base font-bold">{fmt(s.total)} so&apos;m</span>
                     </div>
                     <div className="flex items-baseline justify-between text-xs text-white/45">
                       <span>{L.left}</span>
@@ -264,7 +261,7 @@ export default function BalansClient() {
                         e.stopPropagation();
                         addAll(s);
                       }}
-                      className="btn-primary mt-3 w-full"
+                      className="btn-primary mt-2.5 w-full !py-2"
                     >
                       {addedKey === s.key ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ShoppingCart className="h-4 w-4" />}
                       {addedKey === s.key ? L.added : L.addAll}
