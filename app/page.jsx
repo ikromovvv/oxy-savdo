@@ -2,6 +2,7 @@
 
 import { ArrowRight } from '@/components/icons';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useStore } from '@/components/StoreProvider';
@@ -36,6 +37,12 @@ export default function Home() {
   // Steam orqali kirgan foydalanuvchiga hero (kirish taklifi) kerak emas
   // (yuklanish paytida ham ko'rsatilmaydi — kirgan foydalanuvchida hero ko'rinib-yo'qolib qolmasin)
   const showHero = !userLoading && !user;
+  const router = useRouter();
+  // Steam orqali kirgan foydalanuvchi bosh sahifa o'rniga darrov skinlar katalogiga o'tadi
+  // (kirmaganlarga sahifa avvalgidek ko'rinadi — qidiruv tizimlari ham to'liq kontentni ko'radi)
+  useEffect(() => {
+    if (!userLoading && user) router.replace('/skinlar');
+  }, [userLoading, user, router]);
   const heroRef = useRef(null);
 
   // Kovriklar endi admin panel orqali boshqariladi — real vaqtda olib kelamiz
@@ -89,7 +96,9 @@ export default function Home() {
     };
   }, [showHero]);
 
-  // Steam orqali kirilgan bo'lsa, bosh sahifa "skin sotib olish" katalogiga almashadi
+  // kirgan foydalanuvchiga bosh sahifa ko'rinib-yo'qolib qolmasin — yo'naltirilguncha bo'sh
+  if (!userLoading && user) return null;
+
   return (
     <>
       {/* HERO */}
