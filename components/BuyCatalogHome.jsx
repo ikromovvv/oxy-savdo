@@ -114,8 +114,8 @@ export default function BuyCatalogHome() {
   const hasMore = items.length < total;
   const L =
     lang === 'ru'
-      ? { filters: 'Фильтры', price: 'Цена, сум', wear: 'Состояние (wear)', rarity: 'Редкость', float: 'Float', more: 'Дополнительно', sort: 'Сортировка', found: 'Найдено', popular: 'Популярные', all: 'Все' }
-      : { filters: 'Filtrlar', price: "Narx, so'm", wear: 'Holati (wear)', rarity: 'Nodirligi', float: 'Float', more: "Qo'shimcha", sort: 'Saralash', found: 'Topildi', popular: 'Ommabop', all: 'Hammasi' };
+      ? { filters: 'Фильтры', price: 'Цена, сум', wear: 'Состояние (wear)', rarity: 'Цвета скинов', float: 'Float', more: 'Дополнительно', sort: 'Сортировка', found: 'Найдено', popular: 'Популярные', all: 'Все' }
+      : { filters: 'Filtrlar', price: "Narx, so'm", wear: 'Holati (wear)', rarity: 'Skin ranglari', float: 'Float', more: "Qo'shimcha", sort: 'Saralash', found: 'Topildi', popular: 'Ommabop', all: 'Hammasi' };
 
   const sortOptions = [
     { value: 'price_desc', label: <SortLabel text={`${L.sort}: ${t('catalog_sort_price')}`} dir="desc" /> },
