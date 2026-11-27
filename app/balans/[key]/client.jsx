@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useStore } from '@/components/StoreProvider';
 import CatalogCard from '@/components/CatalogCard';
 import { ShoppingCart, Check } from '@/components/icons';
-import { buildSets } from '@/lib/balanceSets';
+import { buildSets, popularWithin } from '@/lib/balanceSets';
 import { TXT, fmt, useBalancePool } from '../shared';
 
 // Bitta to'plamning alohida sahifasi: /balans/<kalit>?budget=<so'm>
@@ -22,6 +22,16 @@ export default function SetClient({ setKey }) {
   const current = sets.find((s) => s.key === setKey);
   const others = sets.filter((s) => s.key !== setKey);
   const [added, setAdded] = useState(false);
+
+  // to'plamdagi skinlar birinchi, keyin shu balansga mos ommabop skinlar katalogi (jami 3 qator)
+  const feed = useMemo(() => {
+    if (!current) return [];
+    const inSet = new Set(current.items.map((p) => p.id));
+    const names = new Set(current.items.map((p) => p.name));
+    const extra = popularWithin(pool, budget, 40).filter((p) => !inSet.has(p.id) && !names.has(p.name));
+    return [...current.items.map((p) => ({ p, mine: true })), ...extra.map((p) => ({ p, mine: false }))].slice(0, 15);
+  }, [current, pool, budget]);
+  const showAt = (i) => (i >= 12 ? 'hidden xl:block' : i >= 9 ? 'hidden lg:block' : i >= 6 ? 'hidden md:block' : '');
 
   const [name, desc] = L.names[setKey] || [setKey, ''];
 
@@ -47,30 +57,33 @@ export default function SetClient({ setKey }) {
       {status === 'ok' && !current && <div className="mt-8 text-sm text-muted">{L.notFound}</div>}
 
       {status === 'ok' && current && (
-        <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-start">
-          <div className="grid min-w-0 flex-1 grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
-            {current.items.map((p) => (
-              <CatalogCard key={p.id} product={p} />
+        <div className="mt-6">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {feed.map(({ p, mine }, i) => (
+              <div key={p.id} className={`${showAt(i)} ${mine ? 'rounded-2xl ring-1 ring-accent/70' : ''}`}>
+                <CatalogCard product={p} />
+              </div>
             ))}
           </div>
 
-          <aside className="card flex w-full flex-none flex-col gap-3 p-5 lg:sticky lg:top-20 lg:w-[320px]">
-            <div className="label">
-              {current.items.length} {L.items}
+          <div className="card mt-4 flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5">
+            <div>
+              <div className="label">
+                {current.items.length} {L.items}
+              </div>
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <span className="text-sm text-muted">{L.total}</span>
+                <span className="text-2xl font-bold">{fmt(current.total)} so&apos;m</span>
+                <span className="text-xs text-white/50">
+                  {L.left}: {fmt(Math.max(0, budget - current.total))} so&apos;m
+                </span>
+              </div>
             </div>
-            <div className="flex items-baseline justify-between">
-              <span className="text-sm text-muted">{L.total}</span>
-              <span className="text-2xl font-bold">{fmt(current.total)} so&apos;m</span>
-            </div>
-            <div className="flex items-baseline justify-between text-xs text-white/50">
-              <span>{L.left}</span>
-              <span>{fmt(Math.max(0, budget - current.total))} so&apos;m</span>
-            </div>
-            <button onClick={addAll} className="btn-primary w-full">
+            <button onClick={addAll} className="btn-primary w-full sm:w-auto sm:min-w-[260px]">
               {added ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ShoppingCart className="h-4 w-4" />}
               {added ? L.added : L.addAll}
             </button>
-          </aside>
+          </div>
         </div>
       )}
 
