@@ -8,10 +8,13 @@ import { weaponTypes } from '@/lib/products';
 import { wearInfo, rarityInfo, unlockLabel } from '@/lib/skinMeta';
 
 // Tanlanadigan skin kartasi (to'plam tuzish sahifasi): bosilsa tanlanadi / tanlov olinadi.
+const TIER_COLOR = { FN: '#22c55e', MW: '#a3e635', FT: '#eab308', WW: '#f97316', BS: '#ef4444' };
+
 export default function PickCard({ product: p, selected, onToggle }) {
   const { lang } = useStore();
   const rarity = rarityInfo(p);
   const wearKey = wearInfo(p.wear)?.key || null;
+  const wearColor = TIER_COLOR[wearKey] || '#9ca3af';
   const lockText = p.availableAfter ? unlockLabel(p.availableAfter, lang) : null;
   const parts = String(p.name || '').split(' | ');
   const weapon = parts.length > 1 ? parts[0] : weaponTypes.find((w) => w.slug === p.weaponType)?.[lang] || '';
@@ -30,7 +33,13 @@ export default function PickCard({ product: p, selected, onToggle }) {
       } ${selected ? 'border-accent shadow-[0_0_0_1px_rgba(255,255,255,0.25)]' : 'border-line hover:border-white/30'}`}
     >
       <div className="flex items-center justify-between px-1 text-[10px]">
-        <span className="font-semibold text-white/60">{wearKey || ''}</span>
+        {wearKey ? (
+          <span className="rounded px-1.5 py-0.5 text-[10px] font-bold" style={{ color: wearColor, background: `${wearColor}22`, border: `1px solid ${wearColor}55` }}>
+            {wearKey}
+          </span>
+        ) : (
+          <span />
+        )}
         <span className="flex items-center gap-1.5">
           {p.stattrak && <span className="rounded bg-orange-500/15 px-1 py-px text-[9px] font-bold text-orange-400">ST</span>}
           {count && <span className="text-white/45">x{count}</span>}
@@ -42,6 +51,11 @@ export default function PickCard({ product: p, selected, onToggle }) {
       <div className="px-1">
         <div className="truncate text-[10px] text-white/50">{weapon}</div>
         <div className="truncate text-[13px] font-semibold leading-tight">{skinName}</div>
+        {p.wear && (
+          <div className="truncate text-[10px] font-medium" style={{ color: wearColor }}>
+            {p.wear}
+          </div>
+        )}
         <div className="mt-1 flex items-center justify-between gap-1">
           <span className="whitespace-nowrap text-sm font-bold">
             {Number(p.price).toLocaleString('ru-RU')} <span className="text-[10px] font-normal text-white/50">so&apos;m</span>
