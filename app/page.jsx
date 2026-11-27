@@ -105,27 +105,27 @@ export default function Home() {
       {showHero && (
       <section ref={heroRef} className="grid-fade relative overflow-hidden border-b border-line">
         <div className="hero-glow" aria-hidden="true" />
-        <div className="container-site relative flex flex-col items-center justify-center py-12 text-center sm:py-16">
+        <div className="container-site relative flex min-h-[68vh] flex-col items-center justify-center py-16 text-center sm:py-20">
           <span className="hero-kicker inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/[0.07] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
             {t('hero_kicker')}
           </span>
-          <h1 className="hero-title h-display mt-5 max-w-3xl">{t('hero_h1')}</h1>
-          <p className="hero-lead mt-3 text-xl font-semibold tracking-tight sm:text-2xl">
+          <h1 className="hero-title h-display mt-7 max-w-4xl !text-[2.75rem] sm:!text-6xl lg:!text-[5rem] lg:!leading-[1.05]">{t('hero_h1')}</h1>
+          <p className="hero-lead mt-5 text-2xl font-semibold tracking-tight sm:text-3xl">
             <AccentDots text={t('hero_title')} />
           </p>
-          <p className="hero-lead mt-4 max-w-xl text-base leading-relaxed text-muted">{t('hero_text')}</p>
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
+          <p className="hero-lead mt-5 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">{t('hero_text')}</p>
+          <div className="mt-9 flex flex-wrap justify-center gap-4">
             <Magnetic strength={0.4} scale={1.05}>
-              <Link href="/skinlar" className="hero-btn btn-primary shadow-[0_0_28px_rgba(255,255,255,0.22)]">
+              <Link href="/skinlar" className="hero-btn btn-primary !px-8 !py-4 !text-base shadow-[0_0_28px_rgba(255,255,255,0.22)]">
                 {t('hero_cta_skins')}
               </Link>
             </Magnetic>
             <Magnetic strength={0.4} scale={1.05}>
-              <Link href="/balans" className="hero-btn btn-ghost">{t('hero_cta_balance')}</Link>
+              <Link href="/balans" className="hero-btn btn-ghost !px-8 !py-4 !text-base">{t('hero_cta_balance')}</Link>
             </Magnetic>
           </div>
 
-          <ul className="hero-lead mt-5 flex flex-wrap items-center justify-center gap-2">
+          <ul className="hero-lead mt-8 flex flex-wrap items-center justify-center gap-2.5">
             {['hero_chip1', 'hero_chip2', 'hero_chip3', 'hero_chip4'].map((k) => (
               <li
                 key={k}
