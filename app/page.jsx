@@ -100,9 +100,10 @@ export default function Home() {
           <span className="hero-kicker inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/[0.07] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
             {t('hero_kicker')}
           </span>
-          <h1 className="hero-title h-display mt-5 max-w-3xl">
+          <h1 className="hero-title h-display mt-5 max-w-3xl">{t('hero_h1')}</h1>
+          <p className="hero-lead mt-3 text-xl font-semibold tracking-tight sm:text-2xl">
             <AccentDots text={t('hero_title')} />
-          </h1>
+          </p>
           <p className="hero-lead mt-4 max-w-xl text-base leading-relaxed text-muted">{t('hero_text')}</p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Magnetic strength={0.4} scale={1.05}>
@@ -138,6 +139,27 @@ export default function Home() {
 
       {/* AFZALLIKLAR */}
       <FeatureCards />
+
+      {/* QANDAY ISHLAYDI */}
+      <section className="container-site pb-6 pt-2">
+        <Reveal className="mb-5 flex items-end justify-between gap-3">
+          <h2 className="text-2xl font-semibold tracking-tight">{t('how_title')}</h2>
+          <a href={site.telegram} target="_blank" rel="noreferrer" className="text-sm text-muted hover:text-white">
+            {t('how_q')} Telegram {site.telegramName} <ArrowRight className="ml-1 inline h-3.5 w-3.5" />
+          </a>
+        </Reveal>
+        <Reveal stagger className="grid gap-4 sm:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="card flex items-start gap-4 p-5">
+              <span className="grid h-9 w-9 flex-none place-items-center rounded-full border border-accent/40 bg-accent/10 text-sm font-bold text-accent">{i}</span>
+              <div>
+                <div className="font-medium">{t(`how${i}_t`)}</div>
+                <p className="mt-1 text-sm text-muted">{t(`how${i}_d`)}</p>
+              </div>
+            </div>
+          ))}
+        </Reveal>
+      </section>
 
       {/* KATEGORIYALAR */}
       <section className="pb-14 pt-4">

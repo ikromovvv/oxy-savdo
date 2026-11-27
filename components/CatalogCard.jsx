@@ -46,7 +46,7 @@ export default function CatalogCard({ product: p }) {
         <span className="flex items-center gap-2">
           {p.stattrak && <span className="rounded bg-orange-500/15 px-1.5 py-0.5 text-[10px] font-bold text-orange-400">ST</span>}
           {p.souvenir && <span className="rounded bg-yellow-400/15 px-1.5 py-0.5 text-[10px] font-bold text-yellow-300">SV</span>}
-          {count && <span className="text-white/55">x{count}</span>}
+          {count && <span className="text-white/55">{count} {t('count_unit')}</span>}
         </span>
       </div>
 

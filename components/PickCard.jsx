@@ -11,7 +11,7 @@ import { wearInfo, rarityInfo, unlockLabel } from '@/lib/skinMeta';
 const TIER_COLOR = { FN: '#22c55e', MW: '#a3e635', FT: '#eab308', WW: '#f97316', BS: '#ef4444' };
 
 export default function PickCard({ product: p, selected, onToggle }) {
-  const { lang } = useStore();
+  const { lang, t } = useStore();
   const rarity = rarityInfo(p);
   const wearKey = wearInfo(p.wear)?.key || null;
   const wearColor = TIER_COLOR[wearKey] || '#9ca3af';
@@ -42,7 +42,7 @@ export default function PickCard({ product: p, selected, onToggle }) {
         )}
         <span className="flex items-center gap-1.5">
           {p.stattrak && <span className="rounded bg-orange-500/15 px-1 py-px text-[9px] font-bold text-orange-400">ST</span>}
-          {count && <span className="text-white/45">x{count}</span>}
+          {count && <span className="text-white/45">{count} {t('count_unit')}</span>}
         </span>
       </div>
 
