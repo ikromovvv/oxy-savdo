@@ -97,10 +97,12 @@ export default function SupportPage() {
         {site.phone2 && <a href={`tel:${site.phone2.replace(/\s/g, '')}`} className="btn-ghost">{site.phone2}</a>}
       </Reveal>
 
+      {/* TODO: savol-javob (FAQ) bo'limi vaqtincha o'chirilgan — keyin chiroyli qilib qaytaramiz
       <Reveal className="mt-12">
         <h2 className="label">{c.faqTitle}</h2>
         <Faq items={c.faq} />
       </Reveal>
+      */}
 
       <Reveal className="mt-12">
         <h2 className="label">{c.docsTitle}</h2>

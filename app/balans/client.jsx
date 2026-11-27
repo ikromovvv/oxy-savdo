@@ -214,7 +214,7 @@ export default function BalansClient() {
       {status === 'ok' && sets.length > 0 && (
         <>
           <h2 className="mt-10 text-lg font-semibold">{L.sets}</h2>
-          <div className="mt-4 grid grid-cols-1 items-start gap-3 sm:grid-cols-2 xl:grid-cols-4 min-[1700px]:grid-cols-5">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 min-[1700px]:grid-cols-5">
             {sets.map((s) => {
               const [name, desc] = L.names[s.key] || [s.key, ''];
               const cols = s.items.length >= 3 ? 'grid-cols-3' : 'grid-cols-2';
@@ -225,7 +225,7 @@ export default function BalansClient() {
                   tabIndex={0}
                   onClick={() => setOpenSet(s.key)}
                   onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setOpenSet(s.key))}
-                  className="card card-hover flex cursor-pointer flex-col p-3 text-left outline-none focus-visible:border-white/50"
+                  className="card card-hover flex h-[440px] cursor-pointer flex-col p-3 text-left outline-none focus-visible:border-white/50"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -237,7 +237,7 @@ export default function BalansClient() {
                     </span>
                   </div>
 
-                  <div className={`mt-2.5 grid ${cols} gap-1.5`}>
+                  <div className={`admin-scroll mt-2.5 grid min-h-0 flex-1 content-start ${cols} gap-1.5 overflow-y-auto`}>
                     {s.items.map((p) => (
                       <div key={p.id} className="relative overflow-hidden rounded-lg border border-line bg-ink/40 px-1.5 pb-1.5 pt-0.5">
                         <ProductMedia product={{ ...p, tone: 'from-transparent to-transparent' }} className="relative aspect-[3/2]" />
@@ -247,7 +247,7 @@ export default function BalansClient() {
                     ))}
                   </div>
 
-                  <div className="pt-3">
+                  <div className="flex-none pt-3">
                     <div className="flex items-baseline justify-between text-sm">
                       <span className="text-muted">{L.total}</span>
                       <span className="text-base font-bold">{fmt(s.total)} so&apos;m</span>
