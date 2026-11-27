@@ -1,6 +1,6 @@
 'use client';
 
-import { SteamIcon, ArrowRight } from '@/components/icons';
+import { ArrowRight } from '@/components/icons';
 import Link from 'next/link';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
@@ -96,30 +96,26 @@ export default function Home() {
       {showHero && (
       <section ref={heroRef} className="grid-fade relative overflow-hidden border-b border-line">
         <div className="hero-glow" aria-hidden="true" />
-        <div className="container-site relative flex min-h-[80vh] flex-col items-center justify-center py-20 text-center">
+        <div className="container-site relative flex flex-col items-center justify-center py-12 text-center sm:py-16">
           <span className="hero-kicker inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/[0.07] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
             {t('hero_kicker')}
           </span>
-          <h1 className="hero-title h-display mt-6 max-w-3xl">
+          <h1 className="hero-title h-display mt-5 max-w-3xl">
             <AccentDots text={t('hero_title')} />
           </h1>
-          <p className="hero-lead mt-5 max-w-xl text-base leading-relaxed text-muted">{t('hero_text')}</p>
-          <div className="mt-9 flex flex-wrap justify-center gap-3">
+          <p className="hero-lead mt-4 max-w-xl text-base leading-relaxed text-muted">{t('hero_text')}</p>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Magnetic strength={0.4} scale={1.05}>
-              <a
-                href="/api/auth/steam/login"
-                className="hero-btn btn-primary gap-2.5 shadow-[0_0_28px_rgba(255,255,255,0.22)]"
-              >
-                <SteamIcon className="h-4 w-4" />
-                {t('hero_cta')}
-              </a>
+              <Link href="/skinlar" className="hero-btn btn-primary shadow-[0_0_28px_rgba(255,255,255,0.22)]">
+                {t('hero_cta_skins')}
+              </Link>
             </Magnetic>
             <Magnetic strength={0.4} scale={1.05}>
-              <Link href="/katalog/kovriklar" className="hero-btn btn-ghost">{t('hero_cta2')}</Link>
+              <Link href="/balans" className="hero-btn btn-ghost">{t('hero_cta_balance')}</Link>
             </Magnetic>
           </div>
 
-          <ul className="hero-lead mt-7 flex flex-wrap items-center justify-center gap-2">
+          <ul className="hero-lead mt-5 flex flex-wrap items-center justify-center gap-2">
             {['hero_chip1', 'hero_chip2', 'hero_chip3', 'hero_chip4'].map((k) => (
               <li
                 key={k}
@@ -136,7 +132,7 @@ export default function Home() {
       )}
 
       {/* TELEGRAM KANALDAGI YANGI SKINLAR */}
-      <div className={`container-site ${showHero ? 'pt-10' : 'pt-8'}`}>
+      <div className={`container-site ${showHero ? 'pt-8' : 'pt-8'}`}>
         <SkinStrip />
       </div>
 
@@ -201,7 +197,7 @@ export default function Home() {
       {/* KOVRIKLAR */}
       <Section title={t('nav_pads')} href="/katalog/kovriklar" cta={t('all_products')}>
         <Reveal stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {pads.slice(0, 3).map((p) => <ProductCard key={p.id} product={p} />)}
+          {pads.filter((p) => p.id !== featured?.id).slice(0, 3).map((p) => <ProductCard key={p.id} product={p} />)}
         </Reveal>
       </Section>
 
