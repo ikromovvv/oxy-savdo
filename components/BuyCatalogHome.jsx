@@ -7,6 +7,8 @@ import CatalogCard from './CatalogCard';
 import { weaponTypes as weaponTypeLabels } from '@/lib/products';
 import { WEAR_TIERS } from '@/lib/skinMeta';
 import Select from './Select';
+import Link from 'next/link';
+import { Wallet } from './icons';
 
 const TIER_COLOR = { FN: '#22c55e', MW: '#a3e635', FT: '#eab308', WW: '#f97316', BS: '#ef4444' };
 const RARITY_DOT = {
@@ -23,7 +25,7 @@ export default function BuyCatalogHome() {
   const [wear, setWear] = useState('all');
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
-  const [sort, setSort] = useState('price_desc');
+  const [sort, setSort] = useState('price_asc');
   const [rarity, setRarity] = useState('all');
   const [availability, setAvailability] = useState('all');
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -118,8 +120,8 @@ export default function BuyCatalogHome() {
       : { filters: 'Filtrlar', price: "Narx, so'm", wear: 'Holati (wear)', rarity: 'Skin ranglari', float: 'Float', more: "Qo'shimcha", sort: 'Saralash', found: 'Topildi', popular: 'Ommabop', all: 'Hammasi' };
 
   const sortOptions = [
-    { value: 'price_desc', label: <SortLabel text={`${L.sort}: ${t('catalog_sort_price')}`} dir="desc" /> },
     { value: 'price_asc', label: <SortLabel text={`${L.sort}: ${t('catalog_sort_price')}`} dir="asc" /> },
+    { value: 'price_desc', label: <SortLabel text={`${L.sort}: ${t('catalog_sort_price')}`} dir="desc" /> },
     { value: 'count_desc', label: `${L.sort}: ${L.popular}` },
   ];
   const rarityList = ['Consumer Grade', 'Industrial Grade', 'Mil-Spec Grade', 'Restricted', 'Classified', 'Covert', 'Extraordinary', 'Contraband'];
@@ -268,7 +270,13 @@ export default function BuyCatalogHome() {
         {/* O'NG: GRID */}
         <div className="min-w-0 flex-1">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <span className="text-sm text-muted">{loading && !total ? '…' : `${total.toLocaleString('ru-RU')} ${L.found.toLowerCase()}`}</span>
+            <span className="flex flex-wrap items-center gap-3 text-sm text-muted">
+              {loading && !total ? '…' : `${total.toLocaleString('ru-RU')} ${L.found.toLowerCase()}`}
+              <Link href="/balans" className="inline-flex items-center gap-1.5 rounded-lg border border-accent/40 px-2.5 py-1 text-xs font-medium text-accent transition hover:bg-accent/10">
+                <Wallet className="h-3.5 w-3.5" />
+                {t('nav_balance')}
+              </Link>
+            </span>
             <Select value={sort} onChange={setSort} options={sortOptions} />
           </div>
           {loading ? (
