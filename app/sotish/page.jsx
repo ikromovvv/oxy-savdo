@@ -185,7 +185,7 @@ export default function SotishPage() {
           </div>
 
           {loading && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 min-[1700px]:grid-cols-6">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="card aspect-[3/4] animate-pulse bg-white/5" />
               ))}
@@ -269,7 +269,7 @@ export default function SotishPage() {
           )}
 
           {!loading && !error && filtered.length > 0 && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 min-[1700px]:grid-cols-6">
               {filtered.map((it) => {
                 const isSelected = selected.has(it.assetid);
                 const sellable = it.price != null;
@@ -279,7 +279,7 @@ export default function SotishPage() {
                     type="button"
                     onClick={() => toggle(it)}
                     disabled={!sellable}
-                    className={`card relative flex flex-col overflow-hidden p-3 text-left transition ${
+                    className={`card relative flex flex-col overflow-hidden p-2 text-left transition ${
                       isSelected ? 'border-accent ring-1 ring-accent' : 'hover:border-white/30'
                     } ${!sellable ? 'cursor-not-allowed opacity-45' : ''}`}
                   >
@@ -295,7 +295,7 @@ export default function SotishPage() {
                     >
                       <Check className="h-3 w-3" strokeWidth={3} />
                     </span>
-                    <div className="mt-4 flex aspect-square items-center justify-center">
+                    <div className="mt-3 flex aspect-[4/3] items-center justify-center">
                       {it.icon ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={it.icon} alt={it.name} className="max-h-full max-w-full object-contain" />

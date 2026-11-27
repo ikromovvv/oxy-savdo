@@ -38,7 +38,7 @@ export default function CatalogCard({ product: p }) {
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-panel transition duration-300 hover:-translate-y-0.5 hover:border-white/25 hover:shadow-[0_12px_40px_rgba(0,0,0,0.45)]">
       {/* yuqori qator: holati / StatTrak / soni */}
-      <div className="flex items-center justify-between px-4 pt-3 text-xs">
+      <div className="flex items-center justify-between px-2.5 pt-2.5 text-[11px] sm:px-4 sm:pt-3 sm:text-xs">
         <span className="font-semibold text-white/60">
           {wearKey || ''}
           {p.phase ? <span className="ml-1.5 font-normal">{p.phase}</span> : null}
@@ -51,7 +51,7 @@ export default function CatalogCard({ product: p }) {
       </div>
 
       {/* rasm + podium */}
-      <Link href={`/mahsulot/${p.id}`} className="relative block px-3 pb-2 pt-1">
+      <Link href={`/mahsulot/${p.id}`} className="relative block px-1.5 pb-1 pt-0.5 sm:px-3 sm:pb-2 sm:pt-1">
         <div className="relative">
           <span
             aria-hidden="true"
@@ -70,25 +70,25 @@ export default function CatalogCard({ product: p }) {
             toggleFavorite(p);
           }}
           aria-label="favorite"
-          className="absolute bottom-3 left-3 z-20 grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-black/45 backdrop-blur transition hover:bg-black/70"
+          className="absolute bottom-1.5 left-1.5 z-20 grid h-7 w-7 place-items-center sm:bottom-3 sm:left-3 sm:h-8 sm:w-8 rounded-full border border-white/10 bg-black/45 backdrop-blur transition hover:bg-black/70"
         >
           <Heart className={`h-4 w-4 ${fav ? 'fill-current text-accent' : 'text-white/70'}`} />
         </button>
       </Link>
 
       {/* tana */}
-      <div className="flex flex-1 flex-col px-4 pb-4 pt-1">
+      <div className="flex flex-1 flex-col px-2.5 pb-3 pt-1 sm:px-4 sm:pb-4">
         <div className="truncate text-xs text-white/55">{weapon}</div>
-        <Link href={`/mahsulot/${p.id}`} className="mt-0.5 line-clamp-1 text-lg font-semibold leading-tight transition after:absolute after:inset-0 after:z-10 after:content-[''] hover:text-accent">
+        <Link href={`/mahsulot/${p.id}`} className="mt-0.5 line-clamp-1 text-sm font-semibold leading-tight sm:text-lg transition after:absolute after:inset-0 after:z-10 after:content-[''] hover:text-accent">
           {skinName}
         </Link>
 
-        <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+        <div className="mt-auto flex items-end justify-between gap-1.5 pt-2 sm:gap-2 sm:pt-3">
           <div className="min-w-0">
-            <div className="whitespace-nowrap text-xl font-bold leading-tight tracking-tight">
-              {Number(p.price).toLocaleString('ru-RU')} <span className="text-sm font-normal text-white/55">so&apos;m</span>
+            <div className="whitespace-nowrap text-[15px] font-bold leading-tight tracking-tight sm:text-xl">
+              {Number(p.price).toLocaleString('ru-RU')} <span className="text-[11px] font-normal text-white/55 sm:text-sm">so&apos;m</span>
             </div>
-            {p.priceUsd != null && <div className="mt-0.5 text-xs text-white/45">≈ {usd(p.priceUsd)}</div>}
+            {p.priceUsd != null && <div className="mt-0.5 text-[11px] text-white/45 sm:text-xs">≈ {usd(p.priceUsd)}</div>}
             {locked && <div className="mt-1 text-[11px] text-amber-300">{t('btn_locked')} · {lockText}</div>}
           </div>
           <button
@@ -96,7 +96,7 @@ export default function CatalogCard({ product: p }) {
             disabled={locked}
             aria-label={t('add_to_cart')}
             title={added ? t('added') : t('add_to_cart')}
-            className={`relative z-20 grid h-11 w-11 flex-none place-items-center rounded-xl border transition ${
+            className={`relative z-20 grid h-9 w-9 flex-none place-items-center rounded-xl border transition sm:h-11 sm:w-11 ${
               locked
                 ? 'cursor-not-allowed border-line text-white/30'
                 : added

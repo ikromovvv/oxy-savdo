@@ -34,7 +34,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
       {/* rasm */}
       <Link
         href={`/telegram-skinlar/${String(p.id).split('/')[1]}`}
-        className="relative block w-full px-3 pb-1 pt-5 text-left"
+        className="relative block w-full px-2 pb-1 pt-4 text-left sm:px-3 sm:pt-5"
         aria-label={p.name}
       >
         <span
@@ -81,8 +81,8 @@ export default function TgSkinCard({ item: p, onOpen }) {
       )}
 
       {/* tana */}
-      <div className="flex flex-1 flex-col px-4 pb-4 pt-2">
-        <Link href={`/telegram-skinlar/${String(p.id).split('/')[1]}`} className="line-clamp-2 min-h-[2.5em] text-[15px] font-semibold leading-tight hover:text-white/80">
+      <div className="flex flex-1 flex-col px-2.5 pb-3 pt-2 sm:px-4 sm:pb-4">
+        <Link href={`/telegram-skinlar/${String(p.id).split('/')[1]}`} className="line-clamp-2 min-h-[2.5em] text-[13px] font-semibold leading-tight hover:text-white/80 sm:text-[15px]">
           {p.name}
         </Link>
 
@@ -105,7 +105,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
         <div className="mt-auto pt-3">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <div className="text-lg font-bold leading-tight">
+              <div className="whitespace-nowrap text-[15px] font-bold leading-tight sm:text-lg">
                 {p.priceUzs != null ? formatPrice(p.priceUzs) : sold ? '—' : t('tg_price_ask')}
               </div>
               {p.priceUsdShown != null && !sold && (
@@ -129,7 +129,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
                 }
                 aria-label={inCart ? t('tg_in_cart') : t('tg_add')}
                 title={inCart ? t('tg_in_cart') : t('tg_add')}
-                className={`grid h-11 w-11 flex-none place-items-center rounded-full border transition-all duration-300 hover:scale-110 ${
+                className={`grid h-9 w-9 flex-none place-items-center rounded-full border transition-all sm:h-11 sm:w-11 duration-300 hover:scale-110 ${
                   inCart
                     ? 'border-accent/60 bg-accent/15 text-accent shadow-[0_0_16px_rgba(255,255,255,0.35)]'
                     : 'border-accent bg-accent text-ink shadow-[0_0_18px_rgba(255,255,255,0.4)] hover:shadow-[0_0_26px_rgba(255,255,255,0.65)]'
@@ -145,14 +145,14 @@ export default function TgSkinCard({ item: p, onOpen }) {
               {t('tg_sold')}
             </div>
           ) : (
-            <div className="mt-3 flex items-stretch gap-2">
+            <div className="mt-2 flex items-stretch gap-1.5 sm:mt-3 sm:gap-2">
               <a
                 href={p.buyUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:border-accent/50 hover:bg-white/10 hover:text-accent"
+                className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-1 py-2 text-center text-[11px] font-semibold leading-tight sm:py-2.5 sm:text-sm text-white backdrop-blur-md transition-all duration-300 hover:border-accent/50 hover:bg-white/10 hover:text-accent"
               >
-                <Send className="h-4 w-4" strokeWidth={2.25} />
+                <Send className="hidden h-4 w-4 sm:block" strokeWidth={2.25} />
                 {t('tg_buy')}
               </a>
               <a
@@ -161,7 +161,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
                 rel="noreferrer"
                 title={t('tg_view_post')}
                 aria-label={t('tg_view_post')}
-                className="grid w-11 flex-none place-items-center rounded-xl border border-white/10 text-muted transition hover:border-white/40 hover:text-white"
+                className="grid w-8 flex-none place-items-center rounded-xl border border-white/10 sm:w-11 text-muted transition hover:border-white/40 hover:text-white"
               >
                 <ArrowUpRight className="h-4 w-4" strokeWidth={2.25} />
               </a>
