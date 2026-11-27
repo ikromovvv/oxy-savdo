@@ -129,6 +129,7 @@ test('webhook: kanal posti saqlanadi, tahrir (SOTILDI) shu qatorni yangilaydi', 
   row = list.find((p) => p.id === 'oxyskinshop/77');
   assert.equal(row.status, 'sold');
   assert.equal(row.fileId, 'BIG-FILE-ID'); // rasm yo'qolmaydi
+  assert.equal(row.priceUzs, 500000); // sotilgach ham avvalgi narx saqlanadi (statistika uchun)
   assert.equal(list.filter((p) => p.id === 'oxyskinshop/77').length, 1);
 });
 
