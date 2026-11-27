@@ -10,7 +10,7 @@ import Reveal from '@/components/Reveal';
 import Magnetic from '@/components/Magnetic';
 import FeatureCards from '@/components/FeatureCards';
 // import HeroSkins from '@/components/HeroSkins';
-import TgStrip from '@/components/TgStrip';
+import SkinStrip from '@/components/SkinStrip';
 import { categories, formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
 
@@ -137,7 +137,7 @@ export default function Home() {
 
       {/* TELEGRAM KANALDAGI YANGI SKINLAR */}
       <div className={`container-site ${showHero ? 'pt-10' : 'pt-8'}`}>
-        <TgStrip />
+        <SkinStrip />
       </div>
 
       {/* AFZALLIKLAR */}
