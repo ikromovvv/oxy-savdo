@@ -9,6 +9,7 @@ export async function GET() {
   return NextResponse.json({
     admin: Boolean(a),
     configured: adminPasswordConfigured(),
-    ...(a ? { provider: activeProvider(), name: a.name, lisKeyConfigured: Boolean(a.lisKey) } : {}),
+    ...(a ? { role: a.role || 'admin', name: a.name } : {}),
+    ...(a && a.role !== 'stats' ? { provider: activeProvider(), lisKeyConfigured: Boolean(a.lisKey) } : {}),
   });
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { currentAdmin } from '@/lib/adminAuth';
+import { currentFullAdmin } from '@/lib/adminAuth';
 import { runWithLisKey } from '@/lib/lisContext';
 import { activeProvider } from '@/lib/fulfillment';
 import { configured, balance, buy, status, purchaseHistory, cheapestUnlocked } from '@/lib/fulfill/lis';
@@ -279,7 +279,7 @@ async function handlePOST(req, admin) {
 // Har admin o'z LIS akkaunti (kaliti, balansi) bilan ishlaydi
 function withAdmin(handler) {
   return async (req) => {
-    const admin = currentAdmin();
+    const admin = currentFullAdmin();
     if (!admin) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
     return runWithLisKey(admin.lisKey, () => handler(req, admin));
   };

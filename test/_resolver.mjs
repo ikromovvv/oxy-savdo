@@ -22,6 +22,10 @@ export async function resolve(specifier, context, nextResolve) {
         }
       }
     }
+    // 'next/headers' kabi Next subpath importlari Node ESM'da '.js' kengaytmasiz topilmaydi
+    if (err?.code === 'ERR_MODULE_NOT_FOUND' && /^next\/[a-z-]+$/.test(specifier)) {
+      return nextResolve(specifier + '.js', context);
+    }
     throw err;
   }
 }

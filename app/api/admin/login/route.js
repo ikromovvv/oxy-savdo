@@ -15,8 +15,9 @@ export async function POST(req) {
   }
 
   let password = '';
+  let username = '';
   try {
-    ({ password } = await req.json());
+    ({ password, username = '' } = await req.json());
   } catch {
     return NextResponse.json({ ok: false, error: 'Noto\'g\'ri so\'rov' }, { status: 400 });
   }
@@ -26,7 +27,13 @@ export async function POST(req) {
     return NextResponse.json({ ok: false, error: 'Parol noto\'g\'ri' }, { status: 401 });
   }
 
-  const res = NextResponse.json({ ok: true, name: account.name });
+  // login kiritilgan bo'lsa u akkaunt nomiga mos kelishi kerak (bo'sh qoldirsa — faqat parol, avvalgidek)
+  const u = String(username || '').trim().toLowerCase();
+  if (u && u !== String(account.name).trim().toLowerCase()) {
+    return NextResponse.json({ ok: false, error: "Login yoki parol noto'g'ri" }, { status: 401 });
+  }
+
+  const res = NextResponse.json({ ok: true, name: account.name, role: account.role });
   const c = makeAdminCookie(account);
   res.cookies.set(c.name, c.value, c.options);
   return res;

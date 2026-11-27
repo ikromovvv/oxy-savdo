@@ -8,6 +8,7 @@ import AdminOrders from '@/components/admin/AdminOrders';
 import AdminFailed from '@/components/admin/AdminFailed';
 import AdminCs2shop from '@/components/admin/AdminCs2shop';
 import AdminLis from '@/components/admin/AdminLis';
+import AdminStats from '@/components/admin/AdminStats';
 import { ToastHost } from '@/components/admin/Toast';
 
 const NAV = [
@@ -15,6 +16,15 @@ const NAV = [
   { key: 'products', label: 'Mahsulotlar', icon: Icon.box },
   { key: 'cs2shop', label: 'cs2shop', icon: Icon.wallet, provider: 'cs2shop' },
   { key: 'lis', label: 'LIS-SKINS', icon: Icon.wallet, provider: 'lis' },
+];
+
+// Statistika bo'limlari (har biri alohida sahifa). Faqat-statistika akkaunti faqat shularni ko'radi.
+const STAT_NAV = [
+  { key: 'stat_overview', label: 'Statistika', icon: Icon.grid, stat: true },
+  { key: 'stat_tg', label: 'Telegram skinlar', icon: Icon.box, stat: true },
+  { key: 'stat_sales', label: 'Sayt savdosi', icon: Icon.cart, stat: true },
+  { key: 'stat_traffic', label: 'Tashrifchilar', icon: Icon.star, stat: true },
+  { key: 'stat_users', label: 'Foydalanuvchilar', icon: Icon.wallet, stat: true },
 ];
 
 function Sidebar({ view, setView, onLogout, onNav, nav = NAV, adminName }) {
@@ -60,6 +70,8 @@ export default function AdminPage() {
   const [configured, setConfigured] = useState(true);
   const [provider, setProvider] = useState('');
   const [adminName, setAdminName] = useState('');
+  const [role, setRole] = useState('admin');
+  const [username, setUsername] = useState('');
 
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -82,6 +94,8 @@ export default function AdminPage() {
         setAuthed(Boolean(d.admin));
         setProvider(d.provider || '');
         setAdminName(d.name || '');
+        setRole(d.role || 'admin');
+        if (d.role === 'stats') setView('stat_overview');
         setConfigured(d.configured !== false);
       })
       .catch(() => {})
@@ -96,7 +110,7 @@ export default function AdminPage() {
       const r = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password, username }),
       });
       const d = await r.json();
       if (d.ok) {
@@ -104,10 +118,15 @@ export default function AdminPage() {
         // provider (LIS menyusi) kirgandan keyin darhol chiqishi uchun
         await fetch('/api/admin/me', { cache: 'no-store' })
           .then((x) => x.json())
-          .then((m) => setProvider(m.provider || ''))
+          .then((m) => {
+            setProvider(m.provider || '');
+            setRole(m.role || 'admin');
+            setView(m.role === 'stats' ? 'stat_overview' : 'dashboard');
+          })
           .catch(() => {});
         setAuthed(true);
         setPassword('');
+        setUsername('');
       } else {
         setLoginErr(d.error || 'Kirib bo\'lmadi');
       }
@@ -150,7 +169,7 @@ export default function AdminPage() {
             </span>
             Kirish
           </h1>
-          <p className="mt-2 text-sm leading-relaxed text-muted">Boshqaruv paneliga kirish uchun parolni kiriting.</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted">Boshqaruv paneliga kirish uchun login va parolni kiriting.</p>
 
           {!configured && (
             <p className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-amber-300">
@@ -158,7 +177,9 @@ export default function AdminPage() {
             </p>
           )}
 
-          <div className="relative mt-6">
+          <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Login" autoComplete="username" className={`${inputCls} mt-6`} />
+
+          <div className="relative mt-3">
             <input type={showPw ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" autoFocus autoComplete="current-password" className={`${inputCls} pr-20`} />
             <button
               type="button"
@@ -180,7 +201,7 @@ export default function AdminPage() {
   }
 
   // Yetkazib beruvchi bo'limi faqat faol provayderga (FULFILL_PROVIDER) ko'rinadi
-  const nav = NAV.filter((n) => !n.provider || n.provider === provider);
+  const nav = role === 'stats' ? STAT_NAV : [...NAV.filter((n) => !n.provider || n.provider === provider), ...STAT_NAV];
   const active = nav.find((n) => n.key === view);
 
   // ——— shell ———
@@ -224,6 +245,7 @@ export default function AdminPage() {
             {view === 'failed' && <AdminFailed onOpenOrders={() => setView('orders')} />}
             {view === 'cs2shop' && <AdminCs2shop />}
             {view === 'lis' && <AdminLis />}
+            {view.startsWith('stat_') && <AdminStats view={view} onGo={setView} />}
           </div>
         </main>
       </div>

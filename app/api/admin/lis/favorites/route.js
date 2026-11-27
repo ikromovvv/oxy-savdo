@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { currentAdmin } from '@/lib/adminAuth';
+import { currentFullAdmin } from '@/lib/adminAuth';
 import { getFavorites, setFavorite } from '@/lib/lisFavorites';
 
 export const dynamic = 'force-dynamic';
@@ -7,13 +7,13 @@ export const dynamic = 'force-dynamic';
 // GET  — { names: string[] }
 // POST { name, on } — sevimlilarga qo'shadi / olib tashlaydi
 export async function GET() {
-  const a = currentAdmin();
+  const a = currentFullAdmin();
   if (!a) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   return NextResponse.json({ names: await getFavorites(a.id) });
 }
 
 export async function POST(req) {
-  const a = currentAdmin();
+  const a = currentFullAdmin();
   if (!a) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const body = await req.json().catch(() => ({}));
   try {

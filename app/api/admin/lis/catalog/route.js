@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { currentAdmin } from '@/lib/adminAuth';
+import { currentFullAdmin } from '@/lib/adminAuth';
 import { fetchLisShortList } from '@/lib/lisCatalog';
 import { queryLisList } from '@/lib/lisAdminCatalog';
 import { getSkinMeta } from '@/lib/skinImages';
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 // GET /api/admin/lis/catalog — LIS-SKINS katalogi (admin uchun): filtr, saralash, sahifalash.
 // Query: query, weaponType, wear, rarity, availability, priceFrom, priceTo, sort, page
 export async function GET(req) {
-  const admin = currentAdmin();
+  const admin = currentFullAdmin();
   if (!admin) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
 
   const sp = new URL(req.url).searchParams;

@@ -6,6 +6,7 @@ import CartDrawer from '@/components/CartDrawer';
 import ScrollToTop from '@/components/ScrollToTop';
 import TgWebApp from '@/components/TgWebApp';
 import IntroLoader from '@/components/IntroLoader';
+import Tracker from '@/components/Tracker';
 import { organizationLd, websiteLd } from '@/lib/seo';
 
 const SITE_URL = (
@@ -74,6 +75,7 @@ export default function RootLayout({ children }) {
         <div className="grid-bg" aria-hidden="true" />
         <StoreProvider>
           <ScrollToTop />
+          <Tracker />
           <TgWebApp />
           <div className="relative z-10">
             <Header />
