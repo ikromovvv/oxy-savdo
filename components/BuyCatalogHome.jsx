@@ -130,7 +130,7 @@ export default function BuyCatalogHome() {
     { value: 'now', label: t('avail_now') },
     { value: 'later', label: t('avail_later') },
   ];
-  const inputCls = 'w-full rounded-xl border border-line bg-ink/40 px-3 py-2.5 text-sm outline-none placeholder:text-muted/60 focus:border-white/40';
+  const inputCls = 'w-full rounded-xl border border-line bg-ink/40 px-3 py-2 text-[13px] outline-none placeholder:text-muted/60 focus:border-white/40';
   const selectedWears = wear === 'all' ? [] : wear.split(',');
   const activeCount = (priceFrom || priceTo ? 1 : 0) + (wear !== 'all' ? 1 : 0) + (rarity !== 'all' ? 1 : 0) + (availability !== 'all' ? 1 : 0);
   const RARITY_SHORT = { 'Consumer Grade': 'Consumer', 'Industrial Grade': 'Industrial', 'Mil-Spec Grade': 'Mil-Spec', Restricted: 'Restricted', Classified: 'Classified', Covert: 'Covert', Extraordinary: 'Extraordinary', Contraband: 'Contraband' };
@@ -146,7 +146,7 @@ export default function BuyCatalogHome() {
             onClick={() => toggleWear(tier.name)}
             aria-pressed={active}
             title={tier.name}
-            className="rounded-lg border px-3 py-1.5 text-xs font-semibold transition"
+            className="rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition"
             style={active ? { borderColor: `${color}99`, background: `${color}22`, color } : { borderColor: '#1E1E21', color: 'rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.03)' }}
           >
             {tier.key}
@@ -188,10 +188,10 @@ export default function BuyCatalogHome() {
         </button>
 
         {/* CHAP: FILTRLAR — hammasi ochiq, akkordeonsiz */}
-        <aside className={`card filters-aside w-full flex-none overflow-hidden p-0 lg:block lg:w-[300px] ${filtersOpen ? 'block' : 'hidden'}`}>
-          <div className="flex items-center justify-between gap-3 px-5 py-4">
-            <span className="flex items-center gap-2.5 text-lg font-semibold">
-              <SlidersHorizontal className="h-5 w-5" />
+        <aside className={`card filters-aside w-full flex-none overflow-hidden p-0 lg:block lg:w-[280px] ${filtersOpen ? 'block' : 'hidden'}`}>
+          <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <span className="flex items-center gap-2 text-base font-semibold">
+              <SlidersHorizontal className="h-4 w-4" />
               {L.filters}
               {activeCount > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 text-[11px] font-bold text-ink">{activeCount}</span>}
             </span>
@@ -203,9 +203,9 @@ export default function BuyCatalogHome() {
             )}
           </div>
 
-          <div className="space-y-6 border-t border-line px-5 py-5">
+          <div className="space-y-5 border-t border-line px-4 py-4">
             <div>
-              <div className="label mb-2.5">{L.price}</div>
+              <div className="label mb-2 !text-[10px]">{L.price}</div>
               <div className="grid grid-cols-2 gap-2">
                 <input type="number" inputMode="numeric" value={priceFrom} onChange={(e) => setPriceFrom(e.target.value)} placeholder={t('catalog_price_from')} className={inputCls} />
                 <input type="number" inputMode="numeric" value={priceTo} onChange={(e) => setPriceTo(e.target.value)} placeholder={t('catalog_price_to')} className={inputCls} />
@@ -213,15 +213,15 @@ export default function BuyCatalogHome() {
             </div>
 
             <div>
-              <div className="label mb-2.5">{L.wear}</div>
+              <div className="label mb-2 !text-[10px]">{L.wear}</div>
               {wearChips}
-              <div className="mt-2 text-[11px] leading-snug text-muted">
+              <div className="mt-1.5 text-[10px] leading-snug text-muted">
                 {selectedWears.length ? selectedWears.join(' · ') : WEAR_TIERS.map((x) => x.key + ' ' + x.name).join(' · ')}
               </div>
             </div>
 
             <div>
-              <div className="label mb-2.5">{L.rarity}</div>
+              <div className="label mb-2 !text-[10px]">{L.rarity}</div>
               <div className="flex flex-wrap gap-1.5">
                 {rarityList.map((r) => {
                   const active = rarity === r;
@@ -236,7 +236,7 @@ export default function BuyCatalogHome() {
                         color: RARITY_DOT[r],
                         boxShadow: active ? `0 0 12px ${RARITY_DOT[r]}55` : 'none',
                       }}
-                      className={`inline-flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition hover:brightness-125 ${active ? '' : 'opacity-80 hover:opacity-100'}`}
+                      className={`inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-[11px] font-medium transition hover:brightness-125 ${active ? '' : 'opacity-80 hover:opacity-100'}`}
                     >
                       <span className="h-2 w-2 flex-none rounded-full" style={{ background: RARITY_DOT[r], boxShadow: `0 0 6px ${RARITY_DOT[r]}` }} />
                       {RARITY_SHORT[r]}
@@ -247,7 +247,7 @@ export default function BuyCatalogHome() {
             </div>
 
             <div>
-              <div className="label mb-2.5">{t('catalog_avail')}</div>
+              <div className="label mb-2 !text-[10px]">{t('catalog_avail')}</div>
               <div className="grid grid-cols-3 gap-1.5 rounded-xl border border-line p-1">
                 {availOptions.map((o) => {
                   const active = availability === o.value;
@@ -256,7 +256,7 @@ export default function BuyCatalogHome() {
                       key={o.value}
                       onClick={() => setAvailability(o.value)}
                       aria-pressed={active}
-                      className={`rounded-lg px-2 py-2 text-xs font-medium transition ${active ? 'bg-white/10 text-white' : 'text-white/65 hover:text-white'}`}
+                      className={`rounded-lg px-1.5 py-1.5 text-[11px] font-medium transition ${active ? 'bg-white/10 text-white' : 'text-white/65 hover:text-white'}`}
                     >
                       {o.label}
                     </button>
