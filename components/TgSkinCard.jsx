@@ -42,7 +42,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
           className="pointer-events-none absolute left-1/2 top-[45%] h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25 blur-3xl"
           style={{ background: color }}
         />
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-white/5 bg-black/40">
+        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg border border-white/5 bg-black/40">
           {p.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -81,14 +81,14 @@ export default function TgSkinCard({ item: p, onOpen }) {
       )}
 
       {/* tana */}
-      <div className="flex flex-1 flex-col px-2.5 pb-3 pt-2 sm:px-4 sm:pb-4">
-        <Link href={`/telegram-skinlar/${String(p.id).split('/')[1]}`} className="line-clamp-2 min-h-[2.5em] text-[13px] font-semibold leading-tight hover:text-white/80 sm:text-[15px]">
+      <div className="flex flex-1 flex-col px-2.5 pb-3 pt-1.5 sm:px-3.5 sm:pb-3.5">
+        <Link href={`/telegram-skinlar/${String(p.id).split('/')[1]}`} className="line-clamp-1 text-[13px] font-semibold leading-tight hover:text-white/80 sm:text-[15px]">
           {p.name}
         </Link>
 
         {p.quality && <WearBar wear={p.quality} minFloat={p.minFloat} maxFloat={p.maxFloat} value={p.float} />}
 
-        <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[11px]">
+        <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
           {p.float != null && (
             <span className="rounded-md bg-white/[0.06] px-2 py-0.5 font-mono text-white/80">Float {p.float}</span>
           )}
@@ -102,7 +102,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
           )}
         </div>
 
-        <div className="mt-auto pt-3">
+        <div className="mt-auto pt-2">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="whitespace-nowrap text-[15px] font-bold leading-tight sm:text-lg">
@@ -145,7 +145,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
               {t('tg_sold')}
             </div>
           ) : (
-            <div className="mt-2 flex items-stretch gap-1.5 sm:mt-3 sm:gap-2">
+            <div className="mt-2 flex items-stretch gap-1.5 sm:gap-2">
               <a
                 href={p.buyUrl}
                 target="_blank"
