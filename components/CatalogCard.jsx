@@ -55,14 +55,14 @@ export default function CatalogCard({ product: p }) {
         <div className="relative">
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute bottom-1 left-1/2 h-10 w-[74%] -translate-x-1/2 rounded-[50%] border-t"
+            className="pointer-events-none absolute bottom-1 left-1/2 h-8 w-[62%] -translate-x-1/2 rounded-[50%] border-t"
             style={{
               background: 'radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.12), rgba(0,0,0,0.6) 72%)',
               borderColor: `${rarity.color}b0`,
               boxShadow: `0 -3px 16px ${rarity.color}45`,
             }}
           />
-          <ProductMedia product={{ ...p, tone: 'from-transparent to-transparent' }} className="relative aspect-[4/3]" />
+          <ProductMedia product={{ ...p, tone: 'from-transparent to-transparent' }} className="relative mx-auto aspect-[4/3] w-[80%]" />
         </div>
         <button
           onClick={(e) => {
