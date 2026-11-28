@@ -36,6 +36,10 @@ const T2 = {
     priceAsc: 'Narx: arzonidan',
     priceDesc: 'Narx: qimmatidan',
   },
+  es: {"selected":"Skins seleccionadas","sum":"Importe total","over":"Supera el saldo","empty":"Elige skins del catálogo de la izquierda","addCart":"Añadir al carrito","buyNow":"Comprar","clear":"Borrar","search":"Buscar por nombre de skin","from":"Precio desde","to":"Precio hasta","all":"Todo","more":"Mostrar más","found":"encontrados","popular":"Populares","priceAsc":"Precio: de menor a mayor","priceDesc":"Precio: de mayor a menor"},
+  zh: {"selected":"已选饰品","sum":"总金额","over":"超出余额","empty":"请从左侧目录中选择饰品","addCart":"加入购物车","buyNow":"立即购买","clear":"清空","search":"按饰品名称搜索","from":"最低价","to":"最高价","all":"全部","more":"显示更多","found":"个结果","popular":"热门","priceAsc":"价格：由低到高","priceDesc":"价格：由高到低"},
+  tr: {"selected":"Seçilen skinler","sum":"Toplam tutar","over":"Bakiyeyi aşıyor","empty":"Soldaki katalogdan skin seçin","addCart":"Sepete ekle","buyNow":"Satın al","clear":"Temizle","search":"Skin adına göre ara","from":"En az fiyat","to":"En çok fiyat","all":"Tümü","more":"Daha fazla göster","found":"bulundu","popular":"Popüler","priceAsc":"Fiyat: düşükten yükseğe","priceDesc":"Fiyat: yüksekten düşüğe"},
+  kk: {"selected":"Таңдалған скиндер","sum":"Жалпы сома","over":"Баланстан асып кетті","empty":"Скиндерді сол жақтағы каталогтан таңдаңыз","addCart":"Себетке қосу","buyNow":"Сатып алу","clear":"Тазалау","search":"Скин атауы бойынша іздеу","from":"Бағасы бастап","to":"Бағасы дейін","all":"Барлығы","more":"Тағы көрсету","found":"табылды","popular":"Танымал","priceAsc":"Баға: арзаннан қымбатқа","priceDesc":"Баға: қымбаттан арзанға"},
   en: {
     selected: 'Selected skins',
     sum: 'Total amount',
