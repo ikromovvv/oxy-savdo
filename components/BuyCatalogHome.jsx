@@ -1,6 +1,6 @@
 'use client';
 
-import { RotateCw, SlidersHorizontal, ChevronDown, SortLabel } from './icons';
+import { RotateCw, SlidersHorizontal, ChevronDown, SortLabel, X, Check } from './icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from './StoreProvider';
 import CatalogCard from './CatalogCard';
@@ -112,12 +112,22 @@ export default function BuyCatalogHome() {
     setPriceTo('');
   }
 
+  // mobil filtr oynasi ochiq bo'lsa orqa fon aylanmasin
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [filtersOpen]);
+
   const tabs = weaponTypeLabels.filter((w) => availableWeaponTypes.includes(w.slug));
   const hasMore = items.length < total;
   const L =
     lang === 'ru'
-      ? { filters: 'Фильтры', price: 'Цена, сум', wear: 'Состояние (wear)', rarity: 'Цвета скинов', float: 'Float', more: 'Дополнительно', sort: 'Сортировка', found: 'Найдено', popular: 'Популярные', all: 'Все' }
-      : { filters: 'Filtrlar', price: "Narx, so'm", wear: 'Holati (wear)', rarity: 'Skin ranglari', float: 'Float', more: "Qo'shimcha", sort: 'Saralash', found: 'Topildi', popular: 'Ommabop', all: 'Hammasi' };
+      ? { filters: 'Фильтры', price: 'Цена, сум', wear: 'Состояние (wear)', rarity: 'Цвета скинов', float: 'Float', more: 'Дополнительно', sort: 'Сортировка', found: 'Найдено', popular: 'Популярные', all: 'Все', show: 'Показать скины' }
+      : { filters: 'Filtrlar', price: "Narx, so'm", wear: 'Holati (wear)', rarity: 'Skin ranglari', float: 'Float', more: "Qo'shimcha", sort: 'Saralash', found: 'Topildi', popular: 'Ommabop', all: 'Hammasi', show: "Skinlarni ko'rsatish" };
 
   const sortOptions = [
     { value: 'price_asc', label: <SortLabel text={`${L.sort}: ${t('catalog_sort_price')}`} dir="asc" /> },
@@ -132,6 +142,13 @@ export default function BuyCatalogHome() {
   ];
   const inputCls = 'w-full rounded-xl border border-line bg-ink/40 px-3 py-2 text-[13px] outline-none placeholder:text-muted/60 focus:border-white/40';
   const selectedWears = wear === 'all' ? [] : wear.split(',');
+  // mobil filtr oynasi uchun tez narx oraliqlari
+  const quickRanges = [
+    { label: '< 100K', from: '', to: '100000' },
+    { label: '100K–1M', from: '100000', to: '1000000' },
+    { label: '1M–10M', from: '1000000', to: '10000000' },
+    { label: '10M+', from: '10000000', to: '' },
+  ];
   const activeCount = (priceFrom || priceTo ? 1 : 0) + (wear !== 'all' ? 1 : 0) + (rarity !== 'all' ? 1 : 0) + (availability !== 'all' ? 1 : 0);
   const RARITY_SHORT = { 'Consumer Grade': 'Consumer', 'Industrial Grade': 'Industrial', 'Mil-Spec Grade': 'Mil-Spec', Restricted: 'Restricted', Classified: 'Classified', Covert: 'Covert', Extraordinary: 'Extraordinary', Contraband: 'Contraband' };
 
@@ -178,17 +195,8 @@ export default function BuyCatalogHome() {
       </div>
 
       <div className="mt-5 flex flex-col gap-6 lg:flex-row lg:items-start">
-        <button
-          onClick={() => setFiltersOpen((v) => !v)}
-          aria-expanded={filtersOpen}
-          className="flex items-center justify-between rounded-xl border border-line bg-panel px-4 py-3 text-sm font-medium lg:hidden"
-        >
-          <span className="flex items-center gap-2"><SlidersHorizontal className="h-4 w-4" />{L.filters}</span>
-          <ChevronDown className={`h-4 w-4 text-muted transition-transform ${filtersOpen ? 'rotate-180' : ''}`} />
-        </button>
-
         {/* CHAP: FILTRLAR — hammasi ochiq, akkordeonsiz */}
-        <aside className={`card filters-aside w-full flex-none overflow-hidden p-0 lg:block lg:w-[280px] ${filtersOpen ? 'block' : 'hidden'}`}>
+        <aside className="card filters-aside hidden w-full flex-none overflow-hidden p-0 lg:block lg:w-[280px]">
           <div className="flex items-center justify-between gap-3 px-4 py-3">
             <span className="flex items-center gap-2 text-base font-semibold">
               <SlidersHorizontal className="h-4 w-4" />
@@ -269,7 +277,30 @@ export default function BuyCatalogHome() {
 
         {/* O'NG: GRID */}
         <div className="min-w-0 flex-1">
-          <div className="mb-4 flex items-center justify-between gap-3">
+          {/* mobil: [Filtrlar] [Saralash] ........ soni */}
+          <div className="mb-3 flex items-center gap-2 lg:hidden">
+            <button
+              onClick={() => setFiltersOpen(true)}
+              className="relative inline-flex h-11 flex-none items-center gap-2 rounded-xl border border-line bg-panel px-4 text-sm font-medium"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              {L.filters}
+              {activeCount > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 text-[11px] font-bold text-ink">{activeCount}</span>}
+            </button>
+            <div className="min-w-0 flex-1">
+              <Select value={sort} onChange={setSort} options={sortOptions} className="h-11 w-full justify-between" />
+            </div>
+          </div>
+          <div className="mb-3 flex items-center justify-between gap-3 text-xs text-muted lg:hidden">
+            <span>{loading && !total ? '…' : `${total.toLocaleString('ru-RU')} ${L.found.toLowerCase()}`}</span>
+            <Link href="/balans" className="inline-flex items-center gap-1.5 rounded-lg border border-accent/40 px-2.5 py-1 font-medium text-accent">
+              <Wallet className="h-3.5 w-3.5" />
+              {t('nav_balance')}
+            </Link>
+          </div>
+
+          {/* kompyuter: soni + Balans havolasi, o'ngda saralash */}
+          <div className="mb-4 hidden items-center justify-between gap-3 lg:flex">
             <span className="flex flex-wrap items-center gap-3 text-sm text-muted">
               {loading && !total ? '…' : `${total.toLocaleString('ru-RU')} ${L.found.toLowerCase()}`}
               <Link href="/balans" className="inline-flex items-center gap-1.5 rounded-lg border border-accent/40 px-2.5 py-1 text-xs font-medium text-accent transition hover:bg-accent/10">
@@ -311,6 +342,117 @@ export default function BuyCatalogHome() {
               )}
             </>
           )}
+        </div>
+      </div>
+
+      {/* MOBIL FILTR OYNASI (pastdan chiqadigan sheet): checkbox'lar, tez narx oraliqlari, "Tozalash" va "Skinlarni ko'rsatish: N" */}
+      <div className={`fixed inset-0 z-[70] lg:hidden ${filtersOpen ? '' : 'pointer-events-none'}`} aria-hidden={!filtersOpen}>
+        <div onClick={() => setFiltersOpen(false)} className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${filtersOpen ? 'opacity-100' : 'opacity-0'}`} />
+        <div
+          role="dialog"
+          aria-modal="true"
+          className={`absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-3xl border border-line bg-ink transition-transform duration-300 ease-out ${filtersOpen ? 'translate-y-0' : 'translate-y-full'}`}
+        >
+          <div className="mx-auto mt-2 h-1 w-10 flex-none rounded-full bg-white/20" aria-hidden="true" />
+          <div className="flex flex-none items-center justify-between px-5 pb-2 pt-3">
+            <h2 className="text-lg font-semibold">{L.filters}</h2>
+            <button onClick={() => setFiltersOpen(false)} aria-label="close" className="grid h-9 w-9 place-items-center rounded-full border border-line text-white/70">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="admin-scroll min-h-0 flex-1 overflow-y-auto border-t border-line">
+            {/* narx */}
+            <div className="border-b border-line px-5 py-4">
+              <div className="label mb-2.5">{L.price}</div>
+              <div className="flex items-center gap-2">
+                <input type="number" inputMode="numeric" value={priceFrom} onChange={(e) => setPriceFrom(e.target.value)} placeholder={t('catalog_price_from')} className={inputCls} />
+                <span className="text-muted">—</span>
+                <input type="number" inputMode="numeric" value={priceTo} onChange={(e) => setPriceTo(e.target.value)} placeholder={t('catalog_price_to')} className={inputCls} />
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {quickRanges.map((r) => {
+                  const active = priceFrom === r.from && priceTo === r.to;
+                  return (
+                    <button
+                      key={r.label}
+                      onClick={() => {
+                        setPriceFrom(active ? '' : r.from);
+                        setPriceTo(active ? '' : r.to);
+                      }}
+                      aria-pressed={active}
+                      className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${active ? 'bg-white/15 text-white' : 'bg-white/[0.05] text-white/70'}`}
+                    >
+                      {r.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* holati */}
+            <div className="border-b border-line px-5 py-4">
+              <div className="label mb-2">{L.wear}</div>
+              {WEAR_TIERS.map((tier) => {
+                const on = selectedWears.includes(tier.name);
+                return (
+                  <button key={tier.key} onClick={() => toggleWear(tier.name)} aria-pressed={on} className="flex w-full items-center gap-3 py-2.5 text-left text-[15px] text-white/85">
+                    <span className={`grid h-5 w-5 flex-none place-items-center rounded-md border ${on ? 'border-accent bg-accent text-ink' : 'border-white/30'}`}>
+                      {on && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+                    </span>
+                    <span className="font-semibold" style={{ color: TIER_COLOR[tier.key] }}>{tier.key}</span>
+                    <span className="text-white/70">{tier.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* skin ranglari */}
+            <div className="border-b border-line px-5 py-4">
+              <div className="label mb-2">{L.rarity}</div>
+              {rarityList.map((r) => {
+                const on = rarity === r;
+                return (
+                  <button key={r} onClick={() => setRarity(on ? 'all' : r)} aria-pressed={on} className="flex w-full items-center gap-3 py-2.5 text-left text-[15px] text-white/85">
+                    <span className={`grid h-5 w-5 flex-none place-items-center rounded-md border ${on ? 'border-accent bg-accent text-ink' : 'border-white/30'}`}>
+                      {on && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+                    </span>
+                    <span className="h-2.5 w-2.5 flex-none rounded-full" style={{ background: RARITY_DOT[r], boxShadow: `0 0 6px ${RARITY_DOT[r]}` }} />
+                    <span>{RARITY_SHORT[r]}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* mavjudlik */}
+            <div className="px-5 py-4">
+              <div className="label mb-2.5">{t('catalog_avail')}</div>
+              <div className="grid grid-cols-3 gap-1.5 rounded-xl border border-line p-1">
+                {availOptions.map((o) => {
+                  const active = availability === o.value;
+                  return (
+                    <button
+                      key={o.value}
+                      onClick={() => setAvailability(o.value)}
+                      aria-pressed={active}
+                      className={`rounded-lg px-1.5 py-2.5 text-xs font-medium transition ${active ? 'bg-white/10 text-white' : 'text-white/65'}`}
+                    >
+                      {o.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-none gap-3 border-t border-line bg-ink px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <button onClick={resetFilters} disabled={activeCount === 0} className="btn-ghost flex-none px-5 disabled:opacity-40">
+              {t('catalog_reset')}
+            </button>
+            <button onClick={() => setFiltersOpen(false)} className="btn-primary flex-1">
+              {L.show}: {loading && !total ? '…' : total.toLocaleString('ru-RU')}
+            </button>
+          </div>
         </div>
       </div>
     </section>
