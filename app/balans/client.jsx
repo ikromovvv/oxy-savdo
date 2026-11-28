@@ -112,7 +112,7 @@ export default function BalansClient() {
                   tabIndex={0}
                   onClick={() => openSet(s.key)}
                   onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), openSet(s.key))}
-                  className="card card-hover flex h-[440px] cursor-pointer flex-col p-3 text-left outline-none focus-visible:border-white/50"
+                  className="card card-hover flex max-h-[440px] cursor-pointer sm:h-[440px] flex-col p-3 text-left outline-none focus-visible:border-white/50"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
