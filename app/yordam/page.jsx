@@ -41,6 +41,50 @@ const content = {
       { href: '/maxfiylik', title: 'Privacy policy', text: 'What data is collected and how it is protected' },
     ],
   },
+  es: {
+    intro: "Si tienes preguntas, escríbenos por Telegram: respondemos en unos 10 minutos de media.",
+    faqTitle: "Preguntas frecuentes",
+    faq: [],
+    docsTitle: "Documentos y condiciones",
+    docs: [
+      { href: '/qaytarish', title: "Política de devoluciones", text: "Cómo funcionan los reembolsos y los cambios de producto" },
+      { href: '/oferta', title: "Oferta pública", text: "Pedidos, pago, entrega y responsabilidad de las partes" },
+      { href: '/maxfiylik', title: "Política de privacidad", text: "Qué datos se recogen y cómo se protegen" },
+    ],
+  },
+  zh: {
+    intro: "如有问题，请通过 Telegram 联系我们——平均 10 分钟内回复。",
+    faqTitle: "常见问题",
+    faq: [],
+    docsTitle: "文件与条款",
+    docs: [
+      { href: '/qaytarish', title: "退货政策", text: "退款与商品更换流程" },
+      { href: '/oferta', title: "公开要约", text: "订单、付款、发货及双方责任" },
+      { href: '/maxfiylik', title: "隐私政策", text: "收集哪些数据以及如何保护" },
+    ],
+  },
+  tr: {
+    intro: "Sorularınız varsa bize Telegram’dan yazın — ortalama 10 dakikada yanıtlıyoruz.",
+    faqTitle: "Sık sorulan sorular",
+    faq: [],
+    docsTitle: "Belgeler ve koşullar",
+    docs: [
+      { href: '/qaytarish', title: "İade koşulları", text: "Para iadesi ve ürün değişimi nasıl yapılır" },
+      { href: '/oferta', title: "Genel teklif", text: "Sipariş, ödeme, teslimat ve tarafların sorumluluğu" },
+      { href: '/maxfiylik', title: "Gizlilik politikası", text: "Hangi veriler toplanır ve nasıl korunur" },
+    ],
+  },
+  kk: {
+    intro: "Сұрақтарыңыз болса, Telegram арқылы жазыңыз — орта есеппен 10 минутта жауап береміз.",
+    faqTitle: "Жиі қойылатын сұрақтар",
+    faq: [],
+    docsTitle: "Құжаттар және шарттар",
+    docs: [
+      { href: '/qaytarish', title: "Қайтару шарттары", text: "Ақшаны қайтару және тауарды ауыстыру тәртібі" },
+      { href: '/oferta', title: "Жария оферта", text: "Тапсырыс, төлем, жеткізу және тараптардың жауапкершілігі" },
+      { href: '/maxfiylik', title: "Құпиялылық саясаты", text: "Қандай деректер жиналады және қалай қорғалады" },
+    ],
+  },
   ru: {
     intro: 'Есть вопросы? Напишите в Telegram — отвечаем в среднем за 10 минут.',
     faqTitle: 'Частые вопросы',

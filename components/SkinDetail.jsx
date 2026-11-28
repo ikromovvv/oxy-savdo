@@ -52,6 +52,70 @@ const DICT = {
     also: 'You may also like', description: 'Description', whatToCheck: 'Check before you buy',
     favorite: 'Favorite', noFloat: 'Float not determined',
   },
+  es: {
+    home: 'Inicio', skins: 'Skins', copy: 'Copiar nombre', copied: 'Copiado',
+    regular: 'Normal', stattrak: 'StatTrak™', souvenir: 'Souvenir',
+    float: 'Float', type: 'Tipo', rarity: 'Rareza', exterior: 'Desgaste', pattern: 'Patrón (seed)', stock: 'En stock',
+    inspect: 'Inspeccionar en el juego', inspectNone: 'Sin enlace de inspección', view3d: 'Ver en 3D', full3d: 'Pantalla completa', exitFull3d: 'Salir de pantalla completa', close: 'Cerrar', loading3d: 'Cargando…',
+    inspectHint: 'Se abrirá CS2 y mostrará la skin en el juego (Steam debe estar instalado)',
+    stickers: 'Pegatinas', instant: 'Instantánea', slow: 'hasta 12 horas', slowFull: 'Lenta (hasta 12 horas)',
+    addToCart: 'Añadir al carrito', added: 'Añadido', buyNow: 'Comprar',
+    offers: 'ofertas', offersFrom: 'desde', offer1: 'oferta',
+    delivery: 'Entrega', all: 'Todo', fast: 'Instantánea',
+    from: 'desde', to: 'hasta', floatFrom: 'Float desde', floatTo: 'Float hasta', priceFrom: 'Precio desde', priceTo: 'Precio hasta',
+    price: 'Precio', actions: '', noOffers: 'No hay ofertas con este filtro.', loading: 'Cargando...',
+    err: 'No se pudieron cargar las ofertas.', reset: 'Restablecer',
+    also: 'Quizás también te guste', description: 'Descripción', whatToCheck: 'Comprueba antes de comprar',
+    favorite: 'Favorito', noFloat: 'Float no determinado',
+  },
+  zh: {
+    home: '首页', skins: '饰品', copy: '复制名称', copied: '已复制',
+    regular: '普通', stattrak: 'StatTrak™', souvenir: '纪念品',
+    float: '磨损值', type: '类型', rarity: '稀有度', exterior: '磨损', pattern: '图案（seed）', stock: '库存',
+    inspect: '在游戏中查看', inspectNone: '没有检视链接', view3d: '3D 查看', full3d: '全屏', exitFull3d: '退出全屏', close: '关闭', loading3d: '加载中…',
+    inspectHint: '将打开 CS2 并在游戏中展示饰品（需已安装 Steam）',
+    stickers: '印花', instant: '即时', slow: '最多 12 小时', slowFull: '较慢（最多 12 小时）',
+    addToCart: '加入购物车', added: '已添加', buyNow: '立即购买',
+    offers: '个报价', offersFrom: '起', offer1: '个报价',
+    delivery: '发货', all: '全部', fast: '即时',
+    from: '从', to: '到', floatFrom: '磨损值 从', floatTo: '磨损值 到', priceFrom: '最低价', priceTo: '最高价',
+    price: '价格', actions: '', noOffers: '没有符合该筛选条件的报价。', loading: '加载中...',
+    err: '无法加载报价。', reset: '重置',
+    also: '您可能还喜欢', description: '描述', whatToCheck: '购买前请确认',
+    favorite: '收藏', noFloat: '磨损值未确定',
+  },
+  tr: {
+    home: 'Ana sayfa', skins: 'Skinler', copy: 'Adı kopyala', copied: 'Kopyalandı',
+    regular: 'Normal', stattrak: 'StatTrak™', souvenir: 'Souvenir',
+    float: 'Float', type: 'Tür', rarity: 'Nadirlik', exterior: 'Aşınma', pattern: 'Desen (seed)', stock: 'Stokta',
+    inspect: 'Oyunda incele', inspectNone: 'İnceleme bağlantısı yok', view3d: '3D görüntüle', full3d: 'Tam ekran', exitFull3d: 'Tam ekrandan çık', close: 'Kapat', loading3d: 'Yükleniyor…',
+    inspectHint: 'CS2 açılır ve skin oyunda gösterilir (Steam kurulu olmalı)',
+    stickers: 'Çıkartmalar', instant: 'Anında', slow: '12 saate kadar', slowFull: 'Yavaş (12 saate kadar)',
+    addToCart: 'Sepete ekle', added: 'Eklendi', buyNow: 'Satın al',
+    offers: 'teklif', offersFrom: 'başlayan', offer1: 'teklif',
+    delivery: 'Teslimat', all: 'Tümü', fast: 'Anında',
+    from: 'en az', to: 'en çok', floatFrom: 'Float en az', floatTo: 'Float en çok', priceFrom: 'En az fiyat', priceTo: 'En çok fiyat',
+    price: 'Fiyat', actions: '', noOffers: 'Bu filtreye uygun teklif yok.', loading: 'Yükleniyor...',
+    err: 'Teklifler yüklenemedi.', reset: 'Sıfırla',
+    also: 'Bunlar da hoşunuza gidebilir', description: 'Açıklama', whatToCheck: 'Satın almadan önce kontrol edin',
+    favorite: 'Favori', noFloat: 'Float belirlenmedi',
+  },
+  kk: {
+    home: 'Басты бет', skins: 'Скиндер', copy: 'Атауды көшіру', copied: 'Көшірілді',
+    regular: 'Қарапайым', stattrak: 'StatTrak™', souvenir: 'Сувенир',
+    float: 'Float', type: 'Түрі', rarity: 'Сиректігі', exterior: 'Тозуы', pattern: 'Өрнек (seed)', stock: 'Саны',
+    inspect: 'Ойын ішінде қарау', inspectNone: 'Inspect сілтемесі жоқ', view3d: '3D көру', full3d: 'Толық экран', exitFull3d: 'Кішірейту', close: 'Жабу', loading3d: 'Жүктелуде…',
+    inspectHint: 'CS2 ашылып, скин ойын ішінде көрсетіледі (Steam орнатылған болуы керек)',
+    stickers: 'Стикерлер', instant: 'Лезде', slow: '12 сағатқа дейін', slowFull: 'Баяу (12 сағатқа дейін)',
+    addToCart: 'Себетке', added: 'Қосылды', buyNow: 'Сатып алу',
+    offers: 'ұсыныс', offersFrom: 'бастап', offer1: 'ұсыныс',
+    delivery: 'Жеткізу', all: 'Барлығы', fast: 'Лезде',
+    from: 'бастап', to: 'дейін', floatFrom: 'Float бастап', floatTo: 'Float дейін', priceFrom: 'Бағасы бастап', priceTo: 'Бағасы дейін',
+    price: 'Баға', actions: '', noOffers: 'Бұл сүзгі бойынша ұсыныс жоқ.', loading: 'Жүктелуде...',
+    err: 'Ұсыныстарды жүктеу мүмкін болмады.', reset: 'Тазалау',
+    also: 'Сізге ұнауы мүмкін', description: 'Сипаттама', whatToCheck: 'Сатып алар алдында тексеріңіз',
+    favorite: 'Таңдаулы', noFloat: 'Float анықталмаған',
+  },
   ru: {
     home: 'Главная', skins: 'Скины', copy: 'Копировать название', copied: 'Скопировано',
     regular: 'Обычный', stattrak: 'StatTrak™', souvenir: 'Сувенир',
@@ -227,9 +291,27 @@ export default function SkinDetail({ product, related = [], variants = [], switc
     `${product.fullName} — a ${rarity.label} skin for ${weapon}${typeLabel ? ` (${typeLabel})` : ''}.${wInfo ? ` Wear ${product.wear}: float ${range}.` : ''}${product.minFloat != null ? ` The skin's own float range: ${product.minFloat}–${product.maxFloat}.` : ''}`,
     `OXY SAVDO currently has ${countOffers} offers, the cheapest is ${formatPrice(minP)}${minUsd ? ` (${fmtUsd(minUsd)})` : ''}.`,
   ];
+  const descBy = {
+    es: [
+      `${product.fullName} — skin ${rarity.label} para ${weapon}${typeLabel ? ` (${typeLabel})` : ''}.${wInfo ? ` Desgaste ${product.wear}: float ${range}.` : ''}${product.minFloat != null ? ` Rango de float de la skin: ${product.minFloat}–${product.maxFloat}.` : ''}`,
+      `Ahora mismo hay ${countOffers} ofertas en OXY SAVDO; la más barata cuesta ${formatPrice(minP)}${minUsd ? ` (${fmtUsd(minUsd)})` : ''}.`,
+    ],
+    zh: [
+      `${product.fullName} —— ${weapon} 的 ${rarity.label} 级饰品${typeLabel ? `（${typeLabel}）` : ''}。${wInfo ? `磨损 ${product.wear}：磨损值 ${range}。` : ''}${product.minFloat != null ? `该饰品自身的磨损值范围：${product.minFloat}–${product.maxFloat}。` : ''}`,
+      `OXY SAVDO 目前有 ${countOffers} 个报价，最低 ${formatPrice(minP)}${minUsd ? `（${fmtUsd(minUsd)}）` : ''}。`,
+    ],
+    tr: [
+      `${product.fullName} — ${weapon} için ${rarity.label} nadirliğinde skin${typeLabel ? ` (${typeLabel})` : ''}.${wInfo ? ` Aşınma ${product.wear}: float ${range}.` : ''}${product.minFloat != null ? ` Skinin kendi float aralığı: ${product.minFloat}–${product.maxFloat}.` : ''}`,
+      `Şu anda OXY SAVDO'da ${countOffers} teklif var, en ucuzu ${formatPrice(minP)}${minUsd ? ` (${fmtUsd(minUsd)})` : ''}.`,
+    ],
+    kk: [
+      `${product.fullName} — ${weapon} үшін ${rarity.label} сиректігіндегі скин${typeLabel ? ` (${typeLabel})` : ''}.${wInfo ? ` Тозуы ${product.wear}: float ${range}.` : ''}${product.minFloat != null ? ` Скиннің өз float диапазоны: ${product.minFloat}–${product.maxFloat}.` : ''}`,
+      `Қазір OXY SAVDO-да ${countOffers} ұсыныс бар, ең арзаны — ${formatPrice(minP)}${minUsd ? ` (${fmtUsd(minUsd)})` : ''}.`,
+    ],
+  };
   const desc =
     lang !== 'uz' && lang !== 'ru'
-      ? descEn
+      ? descBy[lang] || descEn
       : lang === 'ru'
       ? [
           `${product.fullName} — скин для ${weapon}${typeLabel ? ` (${typeLabel})` : ''}, редкость ${rarity.label}.${wInfo ? ` Состояние ${product.wear}: float ${range}.` : ''}${product.minFloat != null ? ` Float самого скина: ${product.minFloat}–${product.maxFloat}.` : ''}`,
@@ -240,9 +322,15 @@ export default function SkinDetail({ product, related = [], variants = [], switc
           `Hozir OXY SAVDO'da ${countOffers} ta taklif bor, eng arzoni — ${formatPrice(minP)}${minUsd ? ` (${fmtUsd(minUsd)})` : ''}.`,
         ];
   const checksEn = ['Float and pattern (seed) are unique to each copy', 'Stickers on the copy', 'The "Inspect in game" button opens the skin in CS2', 'A Steam Trade URL is required and Steam Guard must be enabled'];
+  const checksBy = {
+    es: ['El float y el patrón (seed) son únicos de cada copia', 'Pegatinas de la copia', 'El botón "Inspeccionar en el juego" abre la skin en CS2', 'Se necesita el Trade URL de Steam y Steam Guard activado'],
+    zh: ['每件饰品的磨损值和图案（seed）都是独一无二的', '该饰品上的印花', '“在游戏中查看”按钮会在 CS2 中打开该饰品', '需要 Steam 交易链接，并已开启 Steam 令牌'],
+    tr: ['Float ve desen (seed) her kopyaya özgüdür', 'Kopyadaki çıkartmalar', '"Oyunda incele" düğmesi skini CS2 içinde açar', 'Steam Trade URL gerekir ve Steam Guard açık olmalıdır'],
+    kk: ['Float және өрнек (seed) — әр данада өзінше', 'Данадағы стикерлер', '"Ойын ішінде қарау" батырмасы скинді CS2 ішінде ашады', 'Steam Trade URL керек, Steam Guard қосулы болуы тиіс'],
+  };
   const checks =
     lang !== 'uz' && lang !== 'ru'
-      ? checksEn
+      ? checksBy[lang] || checksEn
       : lang === 'ru'
       ? ['Float и паттерн (seed) — у каждого экземпляра свои', 'Стикеры на экземпляре', 'Кнопка «Осмотреть в игре» откроет скин в CS2', 'Нужна ссылка на обмен (Trade URL), Steam Guard включён']
       : ["Float va naqsh (seed) — har bir nusxada o'zi", 'Nusxadagi stikerlar', "\"O'yin ichida ko'rish\" tugmasi skinni CS2 ichida ochadi", "Steam Trade URL kerak, Steam Guard yoqilgan bo'lsin"];
