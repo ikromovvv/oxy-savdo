@@ -42,7 +42,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
           className="pointer-events-none absolute left-1/2 top-[45%] h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25 blur-3xl"
           style={{ background: color }}
         />
-        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg border border-white/5 bg-black/40">
+        <div className="relative aspect-[233/136] w-full overflow-hidden rounded-lg border border-white/5 bg-black/40">
           {p.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

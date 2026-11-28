@@ -118,7 +118,7 @@ export default function TelegramSkinsClient() {
           <button onClick={load} className="btn-ghost mt-4 inline-flex">{t('sell_refresh')}</button>
         </div>
       ) : data === null ? (
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 xl:grid-cols-4 min-[1700px]:grid-cols-5">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 xl:grid-cols-5 min-[1700px]:grid-cols-6">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="card aspect-[3/4] animate-pulse bg-white/5" />
           ))}
@@ -126,7 +126,7 @@ export default function TelegramSkinsClient() {
       ) : items.length === 0 ? (
         <div className="card p-10 text-center text-sm text-muted">{t('tg_empty')}</div>
       ) : (
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 xl:grid-cols-4 min-[1700px]:grid-cols-5">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 xl:grid-cols-5 min-[1700px]:grid-cols-6">
           {items.map((p) => (
             <TgSkinCard key={p.id} item={p} onOpen={setLightbox} />
           ))}

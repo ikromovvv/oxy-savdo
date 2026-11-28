@@ -51,18 +51,18 @@ export default function CatalogCard({ product: p }) {
       </div>
 
       {/* rasm + podium */}
-      <Link href={`/mahsulot/${p.id}`} className="relative block px-1.5 pb-1 pt-0.5 sm:px-3 sm:pb-2 sm:pt-1">
+      <Link href={`/mahsulot/${p.id}`} className="relative block px-1.5 pb-1 pt-0.5 sm:px-3 sm:pb-1.5 sm:pt-0.5">
         <div className="relative">
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute bottom-1 left-1/2 h-9 w-[68%] -translate-x-1/2 rounded-[50%] border-t"
+            className="pointer-events-none absolute bottom-1 left-1/2 h-8 w-[62%] -translate-x-1/2 rounded-[50%] border-t"
             style={{
               background: 'radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.12), rgba(0,0,0,0.6) 72%)',
               borderColor: `${rarity.color}b0`,
               boxShadow: `0 -3px 16px ${rarity.color}45`,
             }}
           />
-          <ProductMedia product={{ ...p, tone: 'from-transparent to-transparent' }} className="relative mx-auto aspect-[4/3] w-[85%]" />
+          <ProductMedia product={{ ...p, tone: 'from-transparent to-transparent' }} className="relative aspect-[233/136] w-full" />
         </div>
         <button
           onClick={(e) => {
