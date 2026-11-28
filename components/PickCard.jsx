@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import Link from 'next/link';
 import { useStore } from './StoreProvider';
 import { ProductMedia } from './ProductCard';
@@ -17,7 +18,7 @@ export default function PickCard({ product: p, selected, onToggle }) {
   const wearColor = TIER_COLOR[wearKey] || '#9ca3af';
   const lockText = p.availableAfter ? unlockLabel(p.availableAfter, lang) : null;
   const parts = String(p.name || '').split(' | ');
-  const weapon = parts.length > 1 ? parts[0] : weaponTypes.find((w) => w.slug === p.weaponType)?.[lang] || '';
+  const weapon = parts.length > 1 ? parts[0] : pick(weaponTypes.find((w) => w.slug === p.weaponType), lang);
   const skinName = parts.length > 1 ? parts.slice(1).join(' | ') : p.name;
   const count = Number.isFinite(p.count) && p.count > 0 ? p.count : null;
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useStore } from './StoreProvider';
@@ -77,7 +78,7 @@ export default function SkinCard({ product: p }) {
   const { t, lang, add, favorites, toggleFavorite } = useStore();
   const [added, setAdded] = useState(false);
 
-  const typeLabel = weaponTypes.find((w) => w.slug === p.weaponType)?.[lang];
+  const typeLabel = pick(weaponTypes.find((w) => w.slug === p.weaponType), lang);
   const rarity = rarityInfo(p);
   const rgb = rarityRgb(rarity.color);
   const fav = favorites.some((f) => f.id === p.id);

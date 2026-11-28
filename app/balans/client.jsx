@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '@/components/StoreProvider';
@@ -14,7 +15,7 @@ const QUICK = [200000, 500000, 1000000, 3000000];
 export default function BalansClient() {
   const router = useRouter();
   const { lang, balance, add } = useStore();
-  const L = TXT[lang] || TXT.uz;
+  const L = pick(TXT, lang);
 
   const [input, setInput] = useState('');
   const [budget, setBudget] = useState(500000);

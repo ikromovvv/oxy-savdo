@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useStore } from './StoreProvider';
@@ -23,7 +24,7 @@ export default function CatalogCard({ product: p }) {
   const wearKey = wearInfo(p.wear)?.key || null;
 
   const parts = String(p.name || '').split(' | ');
-  const weapon = parts.length > 1 ? parts[0] : weaponTypes.find((w) => w.slug === p.weaponType)?.[lang] || '';
+  const weapon = parts.length > 1 ? parts[0] : pick(weaponTypes.find((w) => w.slug === p.weaponType), lang);
   const skinName = parts.length > 1 ? parts.slice(1).join(' | ') : p.name;
   const count = Number.isFinite(p.count) && p.count > 0 ? p.count : null;
 

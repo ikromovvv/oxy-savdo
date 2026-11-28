@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -181,7 +182,7 @@ export default function ProductPage({ params }) {
     return <SteamLoginGate title={product.name} />;
   }
 
-  const typeLabel = weaponTypes.find((w) => w.slug === product.weaponType)?.[lang];
+  const typeLabel = pick(weaponTypes.find((w) => w.slug === product.weaponType), lang);
   const isSkin = product.category === 'skins';
   const isListing = Boolean(product.listingId);
   const lockText = product.availableAfter ? unlockLabel(product.availableAfter, lang) : null;
@@ -208,14 +209,14 @@ export default function ProductPage({ params }) {
           <Reveal stagger className="flex flex-col gap-5">
             {product.badge ? (
               <span className="w-fit rounded-full border border-line px-3 py-1 text-[10px] uppercase tracking-wider text-muted">
-                {product.badge[lang]}
+                {pick(product.badge, lang)}
               </span>
             ) : (
               <span className="hidden" />
             )}
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{product.name}</h1>
             <p className="text-muted">
-              {isSkin ? `${typeLabel || ''}${typeLabel && product.wear ? ' · ' : ''}${product.wear || ''}` : product.short?.[lang]}
+              {isSkin ? `${typeLabel || ''}${typeLabel && product.wear ? ' · ' : ''}${product.wear || ''}` : pick(product.short, lang)}
             </p>
 
             <div className="card p-5">
@@ -290,7 +291,7 @@ export default function ProductPage({ params }) {
                 ) : (
                   product.specs?.map((s) => (
                     <div key={s.v} className="flex justify-between py-2.5 text-sm">
-                      <dt className="text-muted">{s[lang]}</dt>
+                      <dt className="text-muted">{pick(s, lang)}</dt>
                       <dd>{s.v}</dd>
                     </div>
                   ))

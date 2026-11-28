@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from './StoreProvider';
+import { LANGS } from '@/lib/i18n';
 import { formatPrice } from '@/lib/products';
 import { site } from '@/lib/site';
 import OxyLogo from './OxyLogo';
@@ -222,7 +223,7 @@ function LangMenu({ lang, setLang }) {
     };
   }, [open]);
 
-  const langs = [['uz', "O'zbekcha"], ['ru', 'Русский']];
+  const langs = LANGS.map((l) => [l.code, l.name]);
   return (
     <div ref={ref} className="relative">
       <button
@@ -477,8 +478,8 @@ export default function Header() {
               )}
             </Link>
 
-            <div className="mt-3 flex gap-2 px-3">
-              {['uz', 'ru'].map((l) => (
+            <div className="mt-3 flex flex-wrap gap-2 px-3">
+              {LANGS.map((x) => x.code).map((l) => (
                 <button
                   key={l}
                   onClick={() => setLang(l)}

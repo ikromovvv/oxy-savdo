@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import { RotateCw, SlidersHorizontal, ChevronDown, SortLabel, X, Check } from './icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from './StoreProvider';
@@ -124,8 +125,18 @@ export default function BuyCatalogHome() {
 
   const tabs = weaponTypeLabels.filter((w) => availableWeaponTypes.includes(w.slug));
   const hasMore = items.length < total;
+  const L_EN = { filters: 'Filters', price: 'Price, UZS', wear: 'Wear', rarity: 'Skin colors', float: 'Float', more: 'More', sort: 'Sort', found: 'Found', popular: 'Popular', all: 'All', show: 'Show skins' };
+  const L_OTHER = {
+    en: L_EN,
+    es: { filters: 'Filtros', price: 'Precio, UZS', wear: 'Desgaste', rarity: 'Colores de skin', float: 'Float', more: 'Más', sort: 'Ordenar', found: 'Encontrados', popular: 'Populares', all: 'Todo', show: 'Mostrar skins' },
+    zh: { filters: '筛选', price: '价格（UZS）', wear: '磨损', rarity: '饰品颜色', float: '磨损值', more: '更多', sort: '排序', found: '找到', popular: '热门', all: '全部', show: '显示饰品' },
+    tr: { filters: 'Filtreler', price: 'Fiyat, UZS', wear: 'Aşınma', rarity: 'Skin renkleri', float: 'Float', more: 'Daha fazla', sort: 'Sırala', found: 'Bulundu', popular: 'Popüler', all: 'Tümü', show: 'Skinleri göster' },
+    kk: { filters: 'Сүзгілер', price: 'Баға, UZS', wear: 'Тозу', rarity: 'Скин түстері', float: 'Float', more: 'Тағы', sort: 'Сұрыптау', found: 'Табылды', popular: 'Танымал', all: 'Барлығы', show: 'Скиндерді көрсету' },
+  };
   const L =
-    lang === 'ru'
+    lang !== 'uz' && lang !== 'ru'
+      ? L_OTHER[lang] || L_EN
+      : lang === 'ru'
       ? { filters: 'Фильтры', price: 'Цена, сум', wear: 'Состояние (wear)', rarity: 'Цвета скинов', float: 'Float', more: 'Дополнительно', sort: 'Сортировка', found: 'Найдено', popular: 'Популярные', all: 'Все', show: 'Показать скины' }
       : { filters: 'Filtrlar', price: "Narx, so'm", wear: 'Holati (wear)', rarity: 'Skin ranglari', float: 'Float', more: "Qo'shimcha", sort: 'Saralash', found: 'Topildi', popular: 'Ommabop', all: 'Hammasi', show: "Skinlarni ko'rsatish" };
 
@@ -177,7 +188,7 @@ export default function BuyCatalogHome() {
     <section className="container-wide pb-8 pt-4">
       {/* kategoriyalar */}
       <div className="no-scrollbar -mx-5 flex gap-1.5 overflow-x-auto border-y border-line px-5 py-3 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:border-x-0 sm:px-0">
-        {[{ slug: 'all', label: L.all }, ...tabs.map((w) => ({ slug: w.slug, label: w[lang] || w.uz }))].map((c) => {
+        {[{ slug: 'all', label: L.all }, ...tabs.map((w) => ({ slug: w.slug, label: pick(w, lang) }))].map((c) => {
           const active = weaponType === c.slug;
           return (
             <button

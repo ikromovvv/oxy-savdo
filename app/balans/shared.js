@@ -71,6 +71,40 @@ export const TXT = {
   },
 };
 
+// Ingliz tili (es/zh/tr/kk uchun ham zaxira sifatida ishlatiladi)
+TXT.en = {
+  title: 'Pick skins by your balance',
+  sub: 'Enter your balance — we will show the best sets and the most popular skins that fit.',
+  budget: 'Balance, UZS',
+  mine: 'My balance',
+  sets: 'Ready-made sets',
+  popular: 'Most popular skins',
+  total: 'Total',
+  left: 'Left',
+  addAll: 'Add all to cart',
+  added: 'Added to cart',
+  items: 'skins',
+  loading: 'Picking…',
+  empty: 'No skins found for this balance. Try a larger amount.',
+  error: 'Could not load skins. Please try again later.',
+  back: 'Pick by balance',
+  budgetLabel: 'Balance',
+  otherSets: 'Other sets',
+  notFound: 'This set was not found right now — prices may have changed.',
+  names: {
+    duo: ['Two strong skins', 'Balance split into two'],
+    lead: ['Main + support', 'One strong weapon and a pair for it'],
+    kit: ['Weapon set', 'Rifle + sniper + pistol'],
+    premium: ['Premium', 'Knife or gloves + a weapon'],
+    trio: ['Three skins', 'Three evenly split skins'],
+    mix: ['Cheap and cheerful', '4–5 popular skins of different types'],
+    duo2: ['Two skins (variant)', 'Another popular pair'],
+    kit2: ['Weapon set (variant)', 'Another rifle + sniper + pistol'],
+    trio2: ['Three skins (variant)', 'Another popular trio'],
+    lead2: ['Main + support (variant)', 'Another strong pair'],
+  },
+};
+
 async function getJson(params) {
   const r = await fetch('/api/skins?' + new URLSearchParams(params).toString());
   if (!r.ok) throw new Error('http_' + r.status);

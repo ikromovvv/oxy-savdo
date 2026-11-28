@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { t as translate } from '@/lib/i18n';
+import { t as translate, isLang } from '@/lib/i18n';
 import { playSfx } from '@/lib/sfx';
 
 const StoreCtx = createContext(null);
@@ -22,7 +22,7 @@ export function StoreProvider({ children }) {
       const l = localStorage.getItem('oxy_lang');
       const c = localStorage.getItem('oxy_cart');
       const f = localStorage.getItem('oxy_favorites');
-      if (l) setLang(l);
+      if (l && isLang(l)) setLang(l);
       if (c) setItems(JSON.parse(c));
       if (f) {
         const parsed = JSON.parse(f);
@@ -67,6 +67,7 @@ export function StoreProvider({ children }) {
     if (!ready) return;
     try {
       localStorage.setItem('oxy_lang', lang);
+      document.documentElement.lang = lang;
       localStorage.setItem('oxy_cart', JSON.stringify(items));
       localStorage.setItem('oxy_favorites', JSON.stringify(favorites));
     } catch (e) {}

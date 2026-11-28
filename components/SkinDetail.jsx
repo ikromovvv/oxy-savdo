@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from './StoreProvider';
@@ -34,6 +35,22 @@ const DICT = {
     err: "Takliflar ro'yxatini yuklab bo'lmadi.", reset: 'Tozalash',
     also: 'Sizga yoqishi mumkin', description: 'Tavsif', whatToCheck: 'Sotib olishdan oldin tekshiring',
     favorite: 'Sevimli', noFloat: 'Float aniqlanmagan',
+  },
+  en: {
+    home: 'Home', skins: 'Skins', copy: 'Copy name', copied: 'Copied',
+    regular: 'Regular', stattrak: 'StatTrak™', souvenir: 'Souvenir',
+    float: 'Float', type: 'Type', rarity: 'Rarity', exterior: 'Wear', pattern: 'Pattern (seed)', stock: 'In stock',
+    inspect: 'Inspect in game', inspectNone: 'No inspect link', view3d: 'View in 3D', full3d: 'Full screen', exitFull3d: 'Exit full screen', close: 'Close', loading3d: 'Loading…',
+    inspectHint: 'CS2 will open and show the skin in game (Steam must be installed)',
+    stickers: 'Stickers', instant: 'Instant', slow: 'up to 12 hours', slowFull: 'Slow (up to 12 hours)',
+    addToCart: 'Add to cart', added: 'Added', buyNow: 'Buy now',
+    offers: 'offers', offersFrom: 'from', offer1: 'offer',
+    delivery: 'Delivery', all: 'All', fast: 'Instant',
+    from: 'from', to: 'to', floatFrom: 'Float from', floatTo: 'Float to', priceFrom: 'Price from', priceTo: 'Price to',
+    price: 'Price', actions: '', noOffers: 'No offers match this filter.', loading: 'Loading...',
+    err: 'Could not load the offers.', reset: 'Reset',
+    also: 'You may also like', description: 'Description', whatToCheck: 'Check before you buy',
+    favorite: 'Favorite', noFloat: 'Float not determined',
   },
   ru: {
     home: 'Главная', skins: 'Скины', copy: 'Копировать название', copied: 'Скопировано',
@@ -73,7 +90,7 @@ const fmtUsd = (n) => `$${Number(n).toLocaleString('en-US', { minimumFractionDig
 
 export default function SkinDetail({ product, related = [], variants = [], switching = false, onSelectVariant }) {
   const { lang, add, setCartOpen, favorites, toggleFavorite } = useStore();
-  const D = DICT[lang] || DICT.uz;
+  const D = pick(DICT, lang);
 
   // ---- nusxalar (LIS) ----
   const isListingPage = Boolean(product.listingId);
@@ -206,8 +223,14 @@ export default function SkinDetail({ product, related = [], variants = [], switc
   const countOffers = isListingPage ? 1 : lst.items.length || product.count || 0;
   const minP = cheapest?.price ?? product.price;
   const minUsd = cheapest?.priceUsd ?? product.priceUsd;
+  const descEn = [
+    `${product.fullName} — a ${rarity.label} skin for ${weapon}${typeLabel ? ` (${typeLabel})` : ''}.${wInfo ? ` Wear ${product.wear}: float ${range}.` : ''}${product.minFloat != null ? ` The skin's own float range: ${product.minFloat}–${product.maxFloat}.` : ''}`,
+    `OXY SAVDO currently has ${countOffers} offers, the cheapest is ${formatPrice(minP)}${minUsd ? ` (${fmtUsd(minUsd)})` : ''}.`,
+  ];
   const desc =
-    lang === 'ru'
+    lang !== 'uz' && lang !== 'ru'
+      ? descEn
+      : lang === 'ru'
       ? [
           `${product.fullName} — скин для ${weapon}${typeLabel ? ` (${typeLabel})` : ''}, редкость ${rarity.label}.${wInfo ? ` Состояние ${product.wear}: float ${range}.` : ''}${product.minFloat != null ? ` Float самого скина: ${product.minFloat}–${product.maxFloat}.` : ''}`,
           `Сейчас на OXY SAVDO ${countOffers} предложений, самое дешёвое — ${formatPrice(minP)}${minUsd ? ` (${fmtUsd(minUsd)})` : ''}.`,
@@ -216,8 +239,11 @@ export default function SkinDetail({ product, related = [], variants = [], switc
           `${product.fullName} — ${weapon} uchun ${rarity.label} rariteti skin${typeLabel ? ` (${typeLabel})` : ''}.${wInfo ? ` Holati ${product.wear}: float ${range}.` : ''}${product.minFloat != null ? ` Skinning o'z float diapazoni: ${product.minFloat}–${product.maxFloat}.` : ''}`,
           `Hozir OXY SAVDO'da ${countOffers} ta taklif bor, eng arzoni — ${formatPrice(minP)}${minUsd ? ` (${fmtUsd(minUsd)})` : ''}.`,
         ];
+  const checksEn = ['Float and pattern (seed) are unique to each copy', 'Stickers on the copy', 'The "Inspect in game" button opens the skin in CS2', 'A Steam Trade URL is required and Steam Guard must be enabled'];
   const checks =
-    lang === 'ru'
+    lang !== 'uz' && lang !== 'ru'
+      ? checksEn
+      : lang === 'ru'
       ? ['Float и паттерн (seed) — у каждого экземпляра свои', 'Стикеры на экземпляре', 'Кнопка «Осмотреть в игре» откроет скин в CS2', 'Нужна ссылка на обмен (Trade URL), Steam Guard включён']
       : ["Float va naqsh (seed) — har bir nusxada o'zi", 'Nusxadagi stikerlar', "\"O'yin ichida ko'rish\" tugmasi skinni CS2 ichida ochadi", "Steam Trade URL kerak, Steam Guard yoqilgan bo'lsin"];
 

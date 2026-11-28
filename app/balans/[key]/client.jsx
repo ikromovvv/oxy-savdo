@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -35,6 +36,24 @@ const T2 = {
     priceAsc: 'Narx: arzonidan',
     priceDesc: 'Narx: qimmatidan',
   },
+  en: {
+    selected: 'Selected skins',
+    sum: 'Total amount',
+    over: 'Over balance',
+    empty: 'Pick skins from the catalog on the left',
+    addCart: 'Add to cart',
+    buyNow: 'Buy now',
+    clear: 'Clear',
+    search: 'Search by skin name',
+    from: 'Price from',
+    to: 'Price to',
+    all: 'All',
+    more: 'Show more',
+    found: 'found',
+    popular: 'Popular',
+    priceAsc: 'Price: low to high',
+    priceDesc: 'Price: high to low',
+  },
   ru: {
     selected: 'Выбранные скины',
     sum: 'Общая сумма',
@@ -58,8 +77,8 @@ const T2 = {
 // To'plam tuzish sahifasi: chapda filtrli skinlar katalogi, o'ngda tanlangan skinlar (savatcha)
 export default function SetClient({ setKey }) {
   const { lang, add, items: cart, setCartOpen } = useStore();
-  const L = TXT[lang] || TXT.uz;
-  const S = T2[lang] || T2.uz;
+  const L = pick(TXT, lang);
+  const S = pick(T2, lang);
   const sp = useSearchParams();
   const raw = Number(sp.get('budget'));
   const budget = Number.isFinite(raw) && raw > 0 ? Math.round(raw) : 500000;
@@ -272,7 +291,7 @@ export default function SetClient({ setKey }) {
                 );
               })}
               <span className="mx-1 h-5 w-px bg-line" aria-hidden="true" />
-              {[{ slug: 'all', [lang]: S.all }, ...weaponTypes].map((w) => {
+              {[{ slug: 'all', uz: S.all, ru: S.all, en: S.all }, ...weaponTypes].map((w) => {
                 const active = weaponType === w.slug;
                 return (
                   <button
@@ -281,7 +300,7 @@ export default function SetClient({ setKey }) {
                     aria-pressed={active}
                     className={`rounded-lg border px-2.5 py-1 text-xs transition ${active ? 'border-white/40 bg-white/10 text-white' : 'border-line text-white/65 hover:border-white/30'}`}
                   >
-                    {w[lang] || w.uz}
+                    {pick(w, lang)}
                   </button>
                 );
               })}

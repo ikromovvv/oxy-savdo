@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useStore } from './StoreProvider';
@@ -11,11 +12,12 @@ import { ArrowRight } from './icons';
 const TXT = {
   uz: { title: 'Ommabop skinlar', all: 'Hammasi' },
   ru: { title: 'Популярные скины', all: 'Все' },
+  en: { title: 'Popular skins', all: 'All' },
 };
 
 export default function SkinStrip() {
   const { lang } = useStore();
-  const L = TXT[lang] || TXT.uz;
+  const L = pick(TXT, lang);
   const [items, setItems] = useState(null);
 
   useEffect(() => {

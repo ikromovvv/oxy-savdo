@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import Link from 'next/link';
 import { useStore } from '@/components/StoreProvider';
 import Reveal from '@/components/Reveal';
@@ -27,6 +28,17 @@ const content = {
       { href: '/qaytarish', title: 'Qaytarish shartlari', text: "Pulni qaytarish va mahsulotni almashtirish tartibi" },
       { href: '/oferta', title: 'Ommaviy oferta', text: "Buyurtma, to'lov, yetkazish va taraflar javobgarligi" },
       { href: '/maxfiylik', title: 'Maxfiylik siyosati', text: "Qanday ma'lumotlar yig'iladi va qanday himoyalanadi" },
+    ],
+  },
+  en: {
+    intro: 'If you have questions, message us on Telegram — we reply in about 10 minutes on average.',
+    faqTitle: 'Frequently asked questions',
+    faq: [],
+    docsTitle: 'Documents and terms',
+    docs: [
+      { href: '/qaytarish', title: 'Return policy', text: 'How refunds and product exchanges work' },
+      { href: '/oferta', title: 'Public offer', text: 'Orders, payment, delivery and the parties’ responsibility' },
+      { href: '/maxfiylik', title: 'Privacy policy', text: 'What data is collected and how it is protected' },
     ],
   },
   ru: {
@@ -81,7 +93,7 @@ function Faq({ items }) {
 
 export default function SupportPage() {
   const { t, lang } = useStore();
-  const c = content[lang] || content.uz;
+  const c = pick(content, lang);
 
   return (
     <section className="container-site max-w-3xl py-16">

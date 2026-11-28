@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import { notFound, redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ProductCard from '@/components/ProductCard';
@@ -48,7 +49,7 @@ export default function CatalogPage({ params }) {
     <section className="container-site py-14">
       <Reveal>
         <span className="label">OXY / {cat.slug}</span>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{cat[lang]}</h1>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{pick(cat, lang)}</h1>
       </Reveal>
 
       {loading ? (

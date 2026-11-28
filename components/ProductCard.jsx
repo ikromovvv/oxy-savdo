@@ -1,5 +1,6 @@
 'use client';
 
+import { pick } from '@/lib/i18n';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import gsap from 'gsap';
@@ -100,7 +101,7 @@ export default function ProductCard({ product }) {
       <Link href={`/mahsulot/${product.id}`} className="relative block">
         {product.badge && (
           <span className="absolute left-2 top-2 z-10 rounded-full border border-line bg-ink/80 px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted backdrop-blur">
-            {product.badge[lang]}
+            {pick(product.badge, lang)}
           </span>
         )}
         <ProductMedia product={product} innerRef={mediaRef} className="aspect-[4/3] rounded-xl" />
@@ -114,7 +115,7 @@ export default function ProductCard({ product }) {
           {product.name}
         </Link>
 
-        <p className="mt-2 line-clamp-2 text-sm text-muted">{product.short[lang]}</p>
+        <p className="mt-2 line-clamp-2 text-sm text-muted">{pick(product.short, lang)}</p>
 
         <div className="mt-4 flex items-center justify-between pt-2">
           <span className="text-sm font-semibold">{formatPrice(product.price)}</span>
