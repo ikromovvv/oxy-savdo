@@ -82,7 +82,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
 
       {/* tana */}
       <div className="flex flex-1 flex-col px-2.5 pb-3 pt-1.5 sm:px-3.5 sm:pb-3.5">
-        <Link href={`/telegram-skinlar/${String(p.id).split('/')[1]}`} className="line-clamp-1 text-[13px] font-semibold leading-tight hover:text-white/80 sm:text-[15px]">
+        <Link href={`/telegram-skinlar/${String(p.id).split('/')[1]}`} className="line-clamp-1 text-[13px] font-semibold leading-tight hover:text-white/80 sm:text-sm">
           {p.name}
         </Link>
 
@@ -105,7 +105,7 @@ export default function TgSkinCard({ item: p, onOpen }) {
         <div className="mt-auto pt-2">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <div className="whitespace-nowrap text-[15px] font-bold leading-tight sm:text-lg">
+              <div className="whitespace-nowrap text-[15px] font-bold leading-tight sm:text-base">
                 {p.priceUzs != null ? formatPrice(p.priceUzs) : sold ? '—' : t('tg_price_ask')}
               </div>
               {p.priceUsdShown != null && !sold && (
