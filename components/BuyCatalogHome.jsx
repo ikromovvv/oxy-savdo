@@ -102,7 +102,7 @@ export default function BuyCatalogHome() {
 
   function resetFilters() {
     setQuery('');
-    window.history.replaceState(null, '', '/skinlar');
+    window.history.replaceState(null, '', window.location.pathname);
     window.dispatchEvent(new CustomEvent('oxy:search', { detail: '' }));
     setWeaponType('all');
     setWear('all');

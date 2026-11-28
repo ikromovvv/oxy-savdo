@@ -100,7 +100,7 @@ function HeaderSearch({ placeholder, className = '', onDone }) {
   const [v, setV] = useState('');
   const timer = useRef(null);
   // shu sahifalarda yozganda ro'yxat o'sha zahoti filtrlanadi; qolgan sahifalarda Enter bosilsa katalogga o'tadi
-  const onCatalog = ['/skinlar', '/telegram-skinlar', '/sotish'].includes(pathname);
+  const onCatalog = ['/', '/skinlar', '/telegram-skinlar', '/sotish'].includes(pathname);
 
   useEffect(() => {
     setV(onCatalog ? new URLSearchParams(window.location.search).get('q') || '' : '');
@@ -255,7 +255,7 @@ export default function Header() {
     { href: '/yordam', label: t('nav_support') },
   ];
 
-  const isActive = (href) => (href === '/' ? pathname === '/' : pathname?.startsWith(href));
+  const isActive = (href) => (href === '/' || (href === '/skinlar' && pathname === '/') ? pathname === '/' : pathname?.startsWith(href));
   const loggedIn = !userLoading && user;
 
   return (
