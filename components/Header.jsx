@@ -298,6 +298,7 @@ export default function Header() {
   ];
   // yangi bo'lim qo'shilsa shu ro'yxatga qo'shiladi
   const moreLinks = [
+    { href: '/pul-ishlash', label: t('nav_earn') },
     { href: '/katalog/kovriklar', label: t('nav_pads') },
     { href: '/katalog/aksessuar', label: t('nav_acc') },
     { href: '/parvarish', label: t('nav_care') },
@@ -308,6 +309,7 @@ export default function Header() {
     { href: '/balans', label: t('nav_balance') },
     { href: '/telegram-skinlar', label: t('nav_tg') },
     { href: '/sotish', label: t('nav_sell') },
+    { href: '/pul-ishlash', label: t('nav_earn') },
     { href: '/katalog/kovriklar', label: t('nav_pads') },
     { href: '/katalog/aksessuar', label: t('nav_acc') },
     ...(user ? [{ href: '/buyurtmalarim', label: t('nav_orders') }] : []),
