@@ -12,6 +12,60 @@ import TopUpModal from './TopUpModal';
 import { ShoppingCart, Wallet, Plus, ChevronDown, SteamIcon, Search, Globe, Check, X } from './icons';
 
 
+// "Yana" ro'yxati: kam ishlatiladigan bo'limlar shu yerga tushadi (yangi bo'lim qo'shilsa, tepadagi menyu to'lib ketmaydi)
+function MoreMenu({ links, isActive, label }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const pathname = usePathname();
+
+  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e) => ref.current && !ref.current.contains(e.target) && setOpen(false);
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const anyActive = links.some((l) => isActive(l.href));
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className={`flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition ${
+          anyActive || open ? 'bg-white/[0.07] text-white' : 'text-white/65 hover:bg-white/5 hover:text-white'
+        }`}
+      >
+        {label}
+        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} strokeWidth={2} />
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute left-0 z-50 mt-2 w-52 overflow-hidden rounded-xl border border-line bg-ink/95 py-1 shadow-[0_16px_44px_rgba(0,0,0,0.6)] backdrop-blur-xl"
+        >
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              role="menuitem"
+              className={`block px-4 py-2.5 text-sm transition-colors hover:bg-white/5 hover:text-white ${isActive(l.href) ? 'text-white' : 'text-white/75'}`}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Foydalanuvchi menyusi (avatar + dropdown): buyurtmalar, saqlangan, balans, chiqish
 function ProfileMenu({ onTopUp }) {
   const { t, user, favoritesCount } = useStore();
@@ -240,7 +294,12 @@ export default function Header() {
     { href: '/balans', label: t('nav_balance') },
     { href: '/telegram-skinlar', label: t('nav_tg') },
     { href: '/sotish', label: t('nav_sell') },
+  ];
+  // yangi bo'lim qo'shilsa shu ro'yxatga qo'shiladi
+  const moreLinks = [
     { href: '/katalog/kovriklar', label: t('nav_pads') },
+    { href: '/katalog/aksessuar', label: t('nav_acc') },
+    { href: '/parvarish', label: t('nav_care') },
     { href: '/yordam', label: t('nav_support') },
   ];
   const drawerLinks = [
@@ -279,6 +338,7 @@ export default function Header() {
                   {l.label}
                 </Link>
               ))}
+              <MoreMenu links={moreLinks} isActive={isActive} label={t('nav_more')} />
             </nav>
           </div>
 
