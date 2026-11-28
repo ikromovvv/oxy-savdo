@@ -105,27 +105,27 @@ export default function Home() {
       {showHero && (
       <section ref={heroRef} className="grid-fade relative overflow-hidden border-b border-line">
         <div className="hero-glow" aria-hidden="true" />
-        <div className="container-site relative flex flex-col items-center justify-center py-8 text-center sm:min-h-[68vh] sm:py-20">
+        <div className="container-site relative flex flex-col items-center justify-center py-8 text-center sm:py-10">
           <span className="hero-kicker inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/[0.07] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
             {t('hero_kicker')}
           </span>
-          <h1 className="hero-title h-display mt-7 max-w-4xl !text-[2.25rem] sm:!text-6xl lg:!text-[5rem] lg:!leading-[1.05]">{t('hero_h1')}</h1>
-          <p className="hero-lead mt-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h1 className="hero-title h-display mt-5 max-w-4xl !text-[2.25rem] sm:!text-5xl lg:!text-[3.5rem] lg:!leading-[1.08]">{t('hero_h1')}</h1>
+          <p className="hero-lead mt-3 text-xl font-semibold tracking-tight sm:text-2xl">
             <AccentDots text={t('hero_title')} />
           </p>
-          <p className="hero-lead mt-5 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">{t('hero_text')}</p>
-          <div className="mt-9 flex flex-wrap justify-center gap-4">
+          <p className="hero-lead mt-3 max-w-2xl text-base leading-relaxed text-muted">{t('hero_text')}</p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Magnetic strength={0.4} scale={1.05}>
-              <Link href="/skinlar" className="hero-btn btn-primary !px-8 !py-4 !text-base shadow-[0_0_28px_rgba(255,255,255,0.22)]">
+              <Link href="/skinlar" className="hero-btn btn-primary shadow-[0_0_28px_rgba(255,255,255,0.22)]">
                 {t('hero_cta_skins')}
               </Link>
             </Magnetic>
             <Magnetic strength={0.4} scale={1.05}>
-              <Link href="/balans" className="hero-btn btn-ghost !px-8 !py-4 !text-base">{t('hero_cta_balance')}</Link>
+              <Link href="/balans" className="hero-btn btn-ghost">{t('hero_cta_balance')}</Link>
             </Magnetic>
           </div>
 
-          <ul className="hero-lead mt-8 hidden flex-wrap items-center justify-center gap-2.5 sm:flex">
+          <ul className="hero-lead mt-5 hidden flex-wrap items-center justify-center gap-2 sm:flex">
             {['hero_chip1', 'hero_chip2', 'hero_chip3', 'hero_chip4'].map((k) => (
               <li
                 key={k}
@@ -142,7 +142,7 @@ export default function Home() {
       )}
 
       {/* TELEGRAM KANALDAGI YANGI SKINLAR */}
-      <div className={`container-site ${showHero ? 'pt-8' : 'pt-8'}`}>
+      <div className={`container-site ${'pt-6'}`}>
         <SkinStrip />
       </div>
 
