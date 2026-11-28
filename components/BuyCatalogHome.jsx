@@ -280,7 +280,7 @@ export default function BuyCatalogHome() {
             <Select value={sort} onChange={setSort} options={sortOptions} />
           </div>
           {loading ? (
-            <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-4 min-[1600px]:grid-cols-5 min-[1900px]:grid-cols-6">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-3 min-[1700px]:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="card aspect-[3/4] animate-pulse bg-white/5" />
               ))}
@@ -296,7 +296,7 @@ export default function BuyCatalogHome() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-4 min-[1600px]:grid-cols-5 min-[1900px]:grid-cols-6">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-3 min-[1700px]:grid-cols-4">
                 {items.map((p) => (
                   <CatalogCard key={p.id} product={p} />
                 ))}
